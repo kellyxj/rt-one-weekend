@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include "vec4.h"
 
 int main() {
     int nx = 200;
