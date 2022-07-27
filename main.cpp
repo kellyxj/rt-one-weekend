@@ -18,5 +18,7 @@ int main() {
             output << ir << " " << ig << " " << ib << "\n";
         }
     }
+    vec4 test(1,2,3);
+    std::cout << test.length();
     output.close();
 }
