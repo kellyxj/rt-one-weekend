@@ -1,0 +1,1 @@
+//A scene consists of geometry objects, lights, and at least one camera

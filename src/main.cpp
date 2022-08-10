@@ -22,4 +22,7 @@ int main() {
         }
     }
     output.close();
+
+    Camera cam;
+    std::cout << cam.getEyeRay(512, 512).origin << cam.getEyeRay(512, 512).direction;
 }

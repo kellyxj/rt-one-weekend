@@ -2,7 +2,7 @@
 #include "vec4.h"
 
 vec4 vec4::normalize() {
-    return (*this) /= this->length();
+    return (*this) /= sqrt(this->length());
 }
 vec4 vec4::cross(vec4 &v) {
     return vec4(y*v.z - v.y*z, v.x*z - x*v.z, x*v.y - v.x*y, 0);
@@ -14,20 +14,20 @@ double vec4::length() {
     return this->dot(*this);
 }
 
-vec4 vec4::operator + (vec4 & v){
+vec4 vec4::operator + (const vec4 & v){
     return vec4(x+v.x, y+v.y, z+v.z, w+v.w);
 }
-vec4 & vec4::operator += (vec4 & v) {
+vec4 & vec4::operator += (const vec4 & v) {
     x += v.x;
     y += v.y;
     z += v.z;
     w += v.w;
     return (*this);
 }
-vec4 vec4::operator - (vec4 & v) {
+vec4 vec4::operator - (const vec4 & v) {
     return vec4(x-v.x, y-v.y, z-v.z, w-v.w);
 }
-vec4 & vec4::operator -= (vec4 & v) {
+vec4 & vec4::operator -= (const vec4 & v) {
     x -= v.x;
     y -= v.y;
     z -= v.z;

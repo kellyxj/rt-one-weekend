@@ -2,7 +2,7 @@
 #include "vec4.h"
 #include "ray.h"
 
-class camera {
+class Camera {
 public:
     vec4 eyePoint;
     vec4 aimPoint;
@@ -27,9 +27,9 @@ public:
     double pixelWidth;
     double pixelHeight;
 
-    camera() {
+    Camera() {
         eyePoint = vec4(-10, 0, 1, 1);
-        aimPoint = vec4(0, 0, 0, 1);
+        aimPoint = vec4(0, 0, 1, 1);
         up = vec4(0, 0, 1, 0);
 
         panAngle = 0;
@@ -45,33 +45,28 @@ public:
         height = 512;
         pixelWidth = (double)(right - left)/(double)(width);
         pixelHeight = (double)(top - bottom)/(double)(height);
+
+        setUVN();
     }
 
-    camera(vec4 eye, double pan, double tilt, int w, int h): eyePoint(eye), panAngle(pan), tiltAngle(tilt), width(w), height(h) {}
+    Camera(vec4 eye, double pan, double tilt, int w, int h, double near, double fovy, double aspect): eyePoint(eye), panAngle(pan), tiltAngle(tilt), width(w), height(h) {
+        setLookDirection(pan, tilt);
+        rayPerspective(fovy, aspect, near);
 
-    void setEyePosition(vec4 pos) {
-        eyePoint = pos;
+        pixelWidth = (double)(right - left)/(double)(width);
+        pixelHeight = (double)(top - bottom)/(double)(height);
     }
 
-    void setLookDirection(double pan, double tilt) {
-
-    }
+    void setEyePosition(vec4 pos);
+    void setLookDirection(double pan, double tilt);
 
     //define the absolute size of the image plane and its distance from the aperture
-    void rayFrustum(double _left, double _right, double _top, double _bottom, double _near) {
-        left = _left;
-        right = _right;
-        top = _top;
-        bottom = _bottom;
-        near = _near;
-    }
-
-    void rayPerspective(double fovy, double aspect, double near) {
-
-    }
+    void rayFrustum(double _left, double _right, double _top, double _bottom, double _near);
+    void rayPerspective(double fovy, double aspect, double near);
 
     //return the ray from the camera's aperture to (xPos, yPos) on the near/image plane
-    ray getEyeRay(double xPos, double yPos) {
+    //NB: in the image plane's coordinate system, each pixel is one unit wide by one unit tall
+    ray getEyeRay(double xPos, double yPos);
 
-    }
+    void setUVN();
 };

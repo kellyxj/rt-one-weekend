@@ -1,4 +1,7 @@
-#pragma once
+#ifndef __VECTOR_H__
+#define __VECTOR_H__
+
+#include <ostream>
 
 class vec4 {
 public:
@@ -12,12 +15,19 @@ public:
     double dot(vec4 &v);
     double length();
 
-    vec4 operator + (vec4 & v);
-    vec4 & operator += (vec4 & v);
-    vec4 operator - (vec4 & v);
-    vec4 & operator -= (vec4 & v);
+    vec4 operator + (const vec4 & v);
+    vec4 & operator += (const vec4 & v);
+    vec4 operator - (const vec4 & v);
+    vec4 & operator -= (const vec4 & v);
     vec4 operator * (double c);
     vec4 & operator *= (double c);
     vec4 operator / (double c);
     vec4 & operator /= (double c);
 };
+
+inline std::ostream& operator << (std::ostream &os, const vec4 &t) {
+    os << "(" << t.x << ", " << t.y << ", " << t.z << ", " << t.w << ")";
+    return os;
+}
+
+#endif
