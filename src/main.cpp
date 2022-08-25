@@ -15,6 +15,7 @@ int main() {
     int ny = 400;
     std::ofstream output("image.ppm");
     output << "P3\n" << nx << " " << ny << "\n255\n";
+
     for(int j = 0; j < ny; j++) {
         for(int i = 0; i < nx; i++) {
             color c(int(255*(i+j)/(nx+ny)), int(255*(i+j)/(nx+ny)), int(255*(i+j)/(nx+ny)));
@@ -24,5 +25,4 @@ int main() {
     output.close();
 
     Camera cam;
-    std::cout << cam.getEyeRay(512, 512).origin << cam.getEyeRay(512, 512).direction;
 }

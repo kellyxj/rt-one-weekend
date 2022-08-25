@@ -52,3 +52,5 @@ void Camera::setUVN() {
     uAxis = (up.cross(nAxis)).normalize();
     vAxis = nAxis.cross(uAxis);
 }
+
+//Camera::lookAt(vec4 aim)

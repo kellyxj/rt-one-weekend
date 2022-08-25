@@ -1,12 +1,12 @@
+#include ray.h
+#include hit.h
+
 class Material {
-    color Ka;
-    color Kd;
-    color Ks;
+    double Ka;
+    double Kd;
+    double Ks;
 
     //shininess
     double s;
-    //reflectance
-    double r;
-    //index of refraction
-    double n_r;
+    
 }
