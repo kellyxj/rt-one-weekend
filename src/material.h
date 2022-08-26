@@ -1,5 +1,5 @@
-#include ray.h
-#include hit.h
+#include "ray.h"
+#include "hit.h"
 
 class Material {
     double Ka;

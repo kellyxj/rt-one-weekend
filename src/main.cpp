@@ -7,6 +7,7 @@
 #include "color.h"
 #include "ray.h"
 #include "camera.h"
+#include "mat4.h"
 
 int main() {
     srand(time(NULL));
@@ -24,5 +25,8 @@ int main() {
     }
     output.close();
 
-    Camera cam;
+    mat4 m;
+    m.setIdentity();
+    m = m.scale(3);
+    std::cout << m.det();
 }
