@@ -1,6 +1,6 @@
 #include "camera.h"
 
-#define PI 3.141592653589793
+#include "defines.h"
 
 void Camera::setEyePosition(vec4 pos) {
     eyePoint = pos;

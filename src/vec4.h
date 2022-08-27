@@ -3,6 +3,8 @@
 
 #include <ostream>
 
+class mat4;
+
 class vec4 {
 public:
     double x, y, z, w;

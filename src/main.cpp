@@ -26,7 +26,7 @@ int main() {
     output.close();
 
     mat4 m;
-    m.setIdentity();
-    m = m.scale(3);
-    std::cout << m.det();
+    vec4 v(1,2,3,0), w(1,0,0,0);
+    m = m.rotate(135, w);
+    std::cout << m;
 }

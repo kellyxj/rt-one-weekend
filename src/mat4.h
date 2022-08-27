@@ -4,10 +4,12 @@
 #include <math.h>
 #include <ostream>
 #include "vec4.h"
-#define EPSILON 0.000000001
+#include "defines.h"
 
+//adapted from https://glmatrix.net/
 class mat4 {
 public:
+    //column major
     double entries [16];
     mat4() {
         setIdentity();
@@ -19,10 +21,11 @@ public:
     double det();
 
     //return this*b
-    mat4 multiply(const mat4 & b);
+    mat4 multiply(mat4 & b);
 
     mat4 translate(const vec4 & v);
     mat4 scale(double a);
+    //rotate about axis by angle (degrees). Positive means counterclockwise
     mat4 rotate(double angle, const vec4 & axis);
 
     double &operator[] (int index) {
@@ -38,13 +41,17 @@ public:
         entries[10] = 1;
         entries[15] = 1;
     }
+
+    //return this*v
+    vec4 transform(vec4 & v);
 };
 
 inline std::ostream& operator << (std::ostream &os, const mat4 &a) {
-    os << "[" << a.entries[0] << ", " << a.entries[1] << ", " << a.entries[2] << ", " << a.entries[3] << "\n";
-    os << a.entries[4] << ", " << a.entries[5] << ", " << a.entries[6] << ", " << a.entries[7] << "\n";
-    os << a.entries[8] << ", " << a.entries[9] << ", " << a.entries[10] << ", " << a.entries[11] << "\n";
-    os << a.entries[12] << ", " << a.entries[13] << ", " << a.entries[14] << ", " << a.entries[15] << "]";
+    //print in row major order
+    os << "[" << a.entries[0] << ", " << a.entries[4] << ", " << a.entries[8] << ", " << a.entries[12] << "\n";
+    os << a.entries[1] << ", " << a.entries[5] << ", " << a.entries[9] << ", " << a.entries[13] << "\n";
+    os << a.entries[2] << ", " << a.entries[6] << ", " << a.entries[10] << ", " << a.entries[14] << "\n";
+    os << a.entries[3] << ", " << a.entries[7] << ", " << a.entries[11] << ", " << a.entries[15] << "]";
     
     return os;
 }
