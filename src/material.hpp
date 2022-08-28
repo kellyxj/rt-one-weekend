@@ -1,5 +1,5 @@
-#include "ray.h"
-#include "hit.h"
+#include "ray.hpp"
+#include "hit.hpp"
 
 class Material {
     double Ka;
@@ -9,4 +9,4 @@ class Material {
     //shininess
     double s;
     
-}
+};

@@ -1,6 +1,6 @@
-#include "camera.h"
+#include "camera.hpp"
 
-#include "defines.h"
+#include "defines.hpp"
 
 void Camera::setEyePosition(vec4 pos) {
     eyePoint = pos;

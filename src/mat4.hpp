@@ -1,10 +1,10 @@
 #ifndef __MATRIX_H__
 #define __MATRIX_H__
 
-#include <math.h>
+#include <cmath>
 #include <ostream>
-#include "vec4.h"
-#include "defines.h"
+#include "vec4.hpp"
+#include "defines.hpp"
 
 //adapted from https://glmatrix.net/
 class mat4 {

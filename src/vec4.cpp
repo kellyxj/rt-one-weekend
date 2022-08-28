@@ -1,5 +1,5 @@
-#include <math.h>
-#include "vec4.h"
+#include <cmath>
+#include "vec4.hpp"
 
 vec4 vec4::normalize() {
     return (*this) /= sqrt(this->length());

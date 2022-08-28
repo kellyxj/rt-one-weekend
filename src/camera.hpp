@@ -1,6 +1,9 @@
-#include <math.h>
-#include "vec4.h"
-#include "ray.h"
+#ifndef __CAMERA_H__
+#define __CAMERA_H__
+
+#include <cmath>
+#include "vec4.hpp"
+#include "ray.hpp"
 
 class Camera {
 public:
@@ -70,3 +73,5 @@ public:
 
     void setUVN();
 };
+
+#endif

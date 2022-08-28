@@ -1,6 +1,6 @@
 #ifndef __RAY_H__
 #define __RAY_H__
-#include "vec4.h"
+#include "vec4.hpp"
 
 class ray {
 public:
