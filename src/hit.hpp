@@ -5,7 +5,7 @@
 
 class Hit {
 public:
-    double t;
+    double t = 1e12;
     vec4 pos;
     vec4 normal;
     //points to origin of incident ray
