@@ -6,6 +6,12 @@
 
 class RayTracer {
 public:
+    int maxDepth;
+    //number of samples per pixel
+    int sampleRate;
+
+    bool jitter = false;
+
     Image takePicture(Scene & scene, int camIndex);
     Hit traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth);
 };

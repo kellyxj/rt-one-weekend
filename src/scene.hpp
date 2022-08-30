@@ -9,7 +9,4 @@ public:
     std::vector<Geometry*> items;
     std::vector<Camera*> cameras;
 
-    int maxDepth;
-    int sampleRate;
-
 };

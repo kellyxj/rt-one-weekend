@@ -8,7 +8,7 @@ public:
     int height;
     std::vector<color> pixels;
 
-    //top left: (0,0). bottom right: (width-1, height-1)
+    //bottom left: (0,0). top right: (width-1, height-1)
     color getPixel(int x,int y);
     void setPixel(int x, int y, color c);
 

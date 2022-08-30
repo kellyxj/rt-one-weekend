@@ -23,8 +23,7 @@ int main() {
 
     Scene scene;
     Plane plane;
-    vec4 axis(1,0,0,0);
-    plane.rotate(30, axis);
+    vec4 axis(0,0,1,0);
     Plane* plane_pointer = &plane;
     scene.items.push_back(plane_pointer);
 
@@ -32,6 +31,7 @@ int main() {
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
+    rayTracer.sampleRate = 16;
 
     Image image;
     image = rayTracer.takePicture(scene, 0);

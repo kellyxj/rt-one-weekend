@@ -11,8 +11,11 @@ void Image::setPixel(int x, int y, color c) {
 }
 std::string Image::dump_ppm() {
     std::string output = "P3\n" + std::to_string(this->width) + " " + std::to_string(this->height) + "\n255\n";
-    for(color c : this->pixels) {
-        output += std::to_string((int)c.r) + " " + std::to_string((int)c.g) + " " + std::to_string((int)c.b) + "\n";
+    for(int j = this->height-1; j >= 0; j--) {
+        for(int i = 0; i < this->width; i++) {
+            color c = this->getPixel(i,j);
+            output += std::to_string((int)(255*c.r)) + " " + std::to_string((int)(255*c.g)) + " " + std::to_string((int)(255*c.b)) + "\n";
+        }
     }
     return output;
 }
