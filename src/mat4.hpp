@@ -24,7 +24,7 @@ public:
     mat4 multiply(mat4 & b);
 
     mat4 translate(const vec4 & v);
-    mat4 scale(double a);
+    mat4 scale(const vec4 & v);
     //rotate about axis by angle (degrees). Positive means counterclockwise
     mat4 rotate(double angle, const vec4 & axis);
 

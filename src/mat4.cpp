@@ -129,14 +129,28 @@ mat4 mat4::translate(const vec4 & v) {
 
     return a;
 }
-mat4 mat4::scale(double a) {
-    mat4 c = (*this);
+mat4 mat4::scale(const vec4 & v) {
+    double x = v.x, y = v.y, z = v.z;
 
-    for(int i = 0; i < 16; i++) {
-        c[i] *= a;
-    }
+    mat4 a = (*this);
 
-    return c;
+    a[0] = a[0] * x;
+    a[1] = a[1] * x;
+    a[2] = a[2] * x;
+    a[3] = a[3] * x;
+    a[4] = a[4] * y;
+    a[5] = a[5] * y;
+    a[6] = a[6] * y;
+    a[7] = a[7] * y;
+    a[8] = a[8] * z;
+    a[9] = a[9] * z;
+    a[10] = a[10] * z;
+    a[11] = a[11] * z;
+    a[12] = a[12];
+    a[13] = a[13];
+    a[14] = a[14];
+    a[15] = a[15];
+    return a;
 }
 mat4 mat4::rotate(double angle, const vec4 & axis) {
     mat4 a = (*this);

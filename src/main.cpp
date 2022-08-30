@@ -23,6 +23,8 @@ int main() {
 
     Scene scene;
     Plane plane;
+    vec4 axis(1,0,0,0);
+    plane.rotate(30, axis);
     Plane* plane_pointer = &plane;
     scene.items.push_back(plane_pointer);
 

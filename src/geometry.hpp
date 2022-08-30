@@ -14,7 +14,7 @@ public:
 
     Material m;
 
-    //void setMaterial(Material & m);
+    void setMaterial(Material & m);
     virtual vec4 getNormal(vec4 & pos) = 0;
 
     void setIdentity() {
@@ -23,9 +23,9 @@ public:
         normalToWorld.setIdentity();
     }
 
-    //void translate(vec4 & v);
-    //void rotate(double angle, vec4 & axis);
-    //void scale(vec4 & v);
+    void translate(vec4 & v);
+    void rotate(double angle, vec4 & axis);
+    void scale(vec4 & v);
 
     virtual Hit trace(ray & inRay) = 0;
     virtual ~Geometry() {}

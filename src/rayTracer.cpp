@@ -1,5 +1,4 @@
 #include "rayTracer.hpp"
-#include <iostream>
 
 Image RayTracer::takePicture(Scene & scene, int camIndex) {
     Image output;
@@ -13,15 +12,15 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
             Hit hit;
             hit = this->traceRay(scene, eyeRay, hit, 0);
             if(hit.t < 1e10) {
-                double xPos = hit.pos.x;
-                double yPos = hit.pos.y;
+                double xPos = hit.modelSpacePos.x;
+                double yPos = hit.modelSpacePos.y;
                 double intPart;
-                if(modf(xPos, &intPart) > .9 || modf(xPos, &intPart) < -.9 || modf(yPos, &intPart) > .9 || modf(yPos, &intPart) < -.9) {
+                if(modf(xPos, &intPart) > .95 || modf(xPos, &intPart) < -.95 || modf(yPos, &intPart) > .95 || modf(yPos, &intPart) < -.95) {
                     color c(0, 255, 0);
                     output.pixels.push_back(c);
                 }
-                else if((modf(xPos, &intPart) > 0 && modf(xPos, &intPart) < .1) || (modf(yPos, &intPart) > 0 && modf(yPos, &intPart) < .1) || 
-                        (modf(xPos, &intPart) < 0 && modf(xPos, &intPart) > -.1) || (modf(yPos, &intPart) < 0 && modf(yPos, &intPart) > -.1)) 
+                else if((modf(xPos, &intPart) > 0 && modf(xPos, &intPart) < .05) || (modf(yPos, &intPart) > 0 && modf(yPos, &intPart) < .05) || 
+                        (modf(xPos, &intPart) < 0 && modf(xPos, &intPart) > -.05) || (modf(yPos, &intPart) < 0 && modf(yPos, &intPart) > -.05)) 
                 {
                     color c(0, 255, 0);
                     output.pixels.push_back(c);
