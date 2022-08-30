@@ -1,10 +1,15 @@
 //A scene consists of geometry objects, lights, and at least one camera
 #include "geometry.hpp"
-#include "geometryIncludes.hpp"
+#include "plane.hpp"
 #include "camera.hpp"
+#include <vector>
 
-using namespace geometry;
 class Scene {
 public:
-    Geometry item;
+    std::vector<Geometry*> items;
+    std::vector<Camera*> cameras;
+
+    int maxDepth;
+    int sampleRate;
+
 };

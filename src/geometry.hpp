@@ -15,7 +15,7 @@ public:
     Material m;
 
     //void setMaterial(Material & m);
-    vec4 getNormal(vec4 & pos);
+    virtual vec4 getNormal(vec4 & pos) = 0;
 
     void setIdentity() {
         modelMatrix.setIdentity();
@@ -27,7 +27,8 @@ public:
     //void rotate(double angle, vec4 & axis);
     //void scale(vec4 & v);
 
-    Hit trace(ray & inRay);
+    virtual Hit trace(ray & inRay) = 0;
+    virtual ~Geometry() {}
 };
 
 #endif
