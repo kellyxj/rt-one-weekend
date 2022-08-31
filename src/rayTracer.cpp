@@ -28,35 +28,13 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
                 Hit hit;
                 hit = this->traceRay(scene, eyeRay, hit, 0);
                 if(hit.t < 1e10) {
-                    double xPos = hit.modelSpacePos.x;
-                    double yPos = hit.modelSpacePos.y;
-                    double intPart;
-                    if(modf(xPos, &intPart) > .95 || modf(xPos, &intPart) < -.95 || modf(yPos, &intPart) > .95 || modf(yPos, &intPart) < -.95) {
-                        color c = output.getPixel(i,j);
-                        color green(0,1,0);
-                        c.r += green.r/sampleRate;
-                        c.g += green.g/sampleRate;
-                        c.b += green.b/sampleRate;
-                        output.setPixel(i,j,c);
-                    }
-                    else if((modf(xPos, &intPart) > 0 && modf(xPos, &intPart) < .05) || (modf(yPos, &intPart) > 0 && modf(yPos, &intPart) < .05) || 
-                            (modf(xPos, &intPart) < 0 && modf(xPos, &intPart) > -.05) || (modf(yPos, &intPart) < 0 && modf(yPos, &intPart) > -.05)) 
-                    {
-                        color c = output.getPixel(i,j);
-                        color green(0,1,0);
-                        c.r += green.r/sampleRate;
-                        c.g += green.g/sampleRate;
-                        c.b += green.b/sampleRate;
-                        output.setPixel(i,j,c);
-                    }
-                    else {
-                        color c = output.getPixel(i,j);
-                        color white(1,1,1);
-                        c.r += white.r/sampleRate;
-                        c.g += white.g/sampleRate;
-                        c.b += white.b/sampleRate;
-                        output.setPixel(i,j,c);
-                    }  
+                    color c = output.getPixel(i,j);
+                    color hitColor = hit.material->getColor(hit.modelSpacePos);
+
+                    c.r += hitColor.r/sampleRate;
+                    c.g += hitColor.g/sampleRate;
+                    c.b += hitColor.b/sampleRate;
+                    output.setPixel(i,j,c);
                 }
                 else {
                     color c = output.getPixel(i,j);
@@ -76,10 +54,19 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
 Hit RayTracer::traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth) {
     Hit closest = hit;
     for(Geometry* item: scene.items) {
-        Hit current = dynamic_cast<Plane*>(item)->trace(eyeRay);
-        if(current.t < closest.t) {
-            closest = current;
+        if(item->getType() == 1) {
+            Hit current = dynamic_cast<Plane*>(item)->trace(eyeRay);
+            if(current.t < closest.t) {
+                closest = current;
+            }
         }
+        /*else if(item->getType() == 2) {
+            Hit current = dynamic_cast<Sphere*>(item)->trace(eyeRay);
+            if(current.t < closest.t) {
+                closest = current;
+            }
+        }*/
+        
     }
     return closest;
 }

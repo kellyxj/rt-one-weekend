@@ -1,12 +1,13 @@
-#include "ray.hpp"
-#include "hit.hpp"
+#ifndef __MATERIAL_H__
+#define __MATERIAL_H__
+
+#include "vec4.hpp"
+#include "color.hpp"
+#include <cmath>
 
 class Material {
-    double Ka;
-    double Kd;
-    double Ks;
-
-    //shininess
-    double s;
-    
+public:
+    virtual color getColor(vec4 & pos) = 0;
 };
+
+#endif

@@ -12,7 +12,7 @@ public:
     mat4 worldToModel;
     mat4 normalToWorld;
 
-    Material m;
+    Material* material;
 
     void setMaterial(Material & m);
     virtual vec4 getNormal(vec4 & pos) = 0;
@@ -29,6 +29,7 @@ public:
 
     virtual Hit trace(ray & inRay) = 0;
     virtual ~Geometry() {}
+    virtual int getType() = 0;
 };
 
 #endif

@@ -14,10 +14,14 @@ Hit Plane::trace(ray & inRay) {
         hit.pos = inRay.origin + (inRay.direction.normalize() * t0);
         hit.modelSpacePos = ray.origin + (ray.direction * t0);
         hit.normal = this->getNormal(hit.pos);
+        hit.material = this->material;
     }
     return hit;
 }
 vec4 Plane::getNormal(vec4 & pos) {
     vec4 v(0,0,1,0);
     return (this->normalToWorld).transform(v);
+}
+int Plane::getType() {
+    return 1;
 }

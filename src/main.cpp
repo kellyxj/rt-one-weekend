@@ -23,11 +23,20 @@ int main() {
 
     Scene scene;
     Plane plane;
+    groundGrid planeMat;
+    plane.setMaterial(planeMat);
+
     vec4 axis(0,0,1,0);
+    //plane.rotate(30, axis);
     Plane* plane_pointer = &plane;
     scene.items.push_back(plane_pointer);
 
-    Camera cam(vec4(-2,0,1,1), 0, 0, nx, ny, .01, 45, 1);
+    Sphere sphere;
+    sphere.translate(axis);
+    Sphere* sphere_pointer = &sphere;
+    //scene.items.push_back(sphere_pointer);
+
+    Camera cam(vec4(-2,0,1,1), 0, 0, nx, ny, .01, 90, 1);
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;

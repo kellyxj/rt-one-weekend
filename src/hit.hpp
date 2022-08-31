@@ -1,7 +1,8 @@
 #ifndef __HIT_H__
 #define __HIT_H__
 
-#include "vec4.hpp"
+#include "ray.hpp"
+#include "material.hpp"
 
 class Hit {
 public:
@@ -11,6 +12,8 @@ public:
     vec4 normal;
     //points to origin of incident ray
     vec4 v;
+
+    Material* material;
 };
 
 #endif

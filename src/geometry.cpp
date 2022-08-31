@@ -1,6 +1,10 @@
 #include "geometry.hpp"
 #include <iostream>
 
+void Geometry::setMaterial(Material & m) {
+    this->material = &m;
+}
+
 void Geometry::translate(vec4 & v) {
     setIdentity();
     modelMatrix = modelMatrix.translate(v);
