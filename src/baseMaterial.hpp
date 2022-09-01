@@ -1,6 +1,7 @@
 #include "material.hpp"
 
-class groundGrid: public Material {
+class base: public Material {
 public:
+    Color c;
     Color getColor(vec4 & pos);
 };

@@ -193,11 +193,12 @@ mat4 mat4::rotate(double angle, const vec4 & axis) {
 
 vec4 mat4::transform(vec4 & v) {
     double x = v.x, y = v.y, z = v.z, w = v.w;
+    vec4 output;
     mat4 m = (*this);
 
-    v.x = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
-    v.y = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
-    v.z = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
-    v.w = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
-    return v;
+    output.x = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
+    output.y = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
+    output.z = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
+    output.w = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
+    return output;
 }

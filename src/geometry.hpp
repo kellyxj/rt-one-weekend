@@ -3,6 +3,7 @@
 
 #include "mat4.hpp"
 #include "material.hpp"
+#include "baseMaterial.hpp"
 #include "hit.hpp"
 #include "vec4.hpp"
 
@@ -13,6 +14,8 @@ public:
     mat4 normalToWorld;
 
     Material* material;
+
+    bool isLight = false;
 
     void setMaterial(Material & m);
     virtual vec4 getNormal(vec4 & pos) = 0;

@@ -8,7 +8,7 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
     output.height = cam.height;
     for(int i = 0; i < output.width; i++) {
         for(int j = 0; j < output.height; j++) {
-            color c;
+            Color c;
             output.pixels.push_back(c);
         }
     }
@@ -18,8 +18,8 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
     for(int j = (cam.height-1); j >= 0; j--) {
         for(int i = 0; i < (cam.width); i++) {
             for(int k = 0; k < sampleRate; k++) {
-                double randX = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-                double randY = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+                double randX = static_cast <double> (rand()) / static_cast <double> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
+                double randY = static_cast <double> (rand()) / static_cast <double> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
 
                 randX -= .5;
                 randY -= .5;
@@ -27,27 +27,28 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
                 ray eyeRay = cam.getEyeRay(i+.5+randX, j+.5+randY);
                 Hit hit;
                 hit = this->traceRay(scene, eyeRay, hit, 0);
-                if(hit.t < 1e10) {
-                    color c = output.getPixel(i,j);
-                    color hitColor = hit.material->getColor(hit.modelSpacePos);
 
-                    c.r += hitColor.r/sampleRate;
-                    c.g += hitColor.g/sampleRate;
-                    c.b += hitColor.b/sampleRate;
-                    output.setPixel(i,j,c);
-                }
-                else {
-                    color c = output.getPixel(i,j);
-                    color blue(0,0,1);
-                    c.r += blue.r/sampleRate;
-                    c.g += blue.g/sampleRate;
-                    c.b += blue.b/sampleRate;
-                    output.setPixel(i,j,c);
-                }
+                Color c = output.getPixel(i,j);
+                c.r += hit.color.r/sampleRate;
+                c.g += hit.color.g/sampleRate;
+                c.b += hit.color.b/sampleRate;
+
+                //normal map
+                //c.r += (hit.normal.x + 1)/(2*sampleRate);
+                //c.g += (hit.normal.y + 1)/(2*sampleRate);
+                //c.b += (hit.normal.z + 1)/(2*sampleRate);
+
+                //unnormalized depth map
+                //c.r += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
+                //c.g += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
+                //c.b += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
+
+                output.setPixel(i,j,c);
             }
             
         }
     }
+        
     return output;
 }
 
@@ -58,15 +59,84 @@ Hit RayTracer::traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth) {
             Hit current = dynamic_cast<Plane*>(item)->trace(eyeRay);
             if(current.t < closest.t) {
                 closest = current;
+                closest.isLight = false;
             }
         }
-        /*else if(item->getType() == 2) {
+        else if(item->getType() == 2) {
             Hit current = dynamic_cast<Sphere*>(item)->trace(eyeRay);
             if(current.t < closest.t) {
                 closest = current;
+                closest.isLight = false;
             }
-        }*/
-        
+        }
+    }
+    for(Geometry* light: scene.lights) {
+        if(light->getType() == 2) {
+            Hit current = light->trace(eyeRay);
+            if(current.t < closest.t) {
+                closest = current;
+                closest.isLight = true;
+            }
+        }
+    }
+    if(!closest.isLight) {
+        this->findShade(scene, closest, depth);
+    }
+    else {
+        closest.color = white;
+    }
+    return closest;
+}
+
+void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
+    //missed
+    if(hit.t > 1e10) {
+        hit.color = blue;
+    }
+    //hit
+    else {
+        for(Geometry* light: scene.lights) {
+            vec4 lightCenter(0,0,0,1);
+            lightCenter = light->modelMatrix.transform(lightCenter);
+
+            ray shadowRay(hit.pos+lightCenter*EPSILON, lightCenter-vec4(0,0,0,lightCenter.w), 0);
+            Hit shadowHit;
+            shadowHit = this->traceShadowRay(scene, shadowRay, shadowHit);
+
+            if(shadowHit.isLight) {
+                hit.color = hit.material->getColor(hit.modelSpacePos);
+            }
+        }
+    }
+}
+
+Hit RayTracer::traceShadowRay(Scene & scene, ray & shadowRay, Hit & hit) {
+    Hit closest = hit;
+
+    for(Geometry* item: scene.items) {
+        if(item->getType() == 1) {
+            Hit current = dynamic_cast<Plane*>(item)->trace(shadowRay);
+            if(current.t < closest.t) {
+                closest = current;
+                closest.isLight = false;
+            }
+        }
+        else if(item->getType() == 2) {
+            Hit current = dynamic_cast<Sphere*>(item)->trace(shadowRay);
+            if(current.t < closest.t) {
+                closest = current;
+                closest.isLight = false;
+            }
+        }
+    }
+    for(Geometry* light: scene.lights) {
+        if(light->getType() == 2) {
+            Hit current = light->trace(shadowRay);
+            if(current.t < closest.t) {
+                closest = current;
+                closest.isLight = true;
+            }
+        }
     }
     return closest;
 }

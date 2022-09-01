@@ -26,21 +26,39 @@ int main() {
     groundGrid planeMat;
     plane.setMaterial(planeMat);
 
-    vec4 axis(0,0,1,0);
+    vec4 axis(0,0,2,0);
     //plane.rotate(30, axis);
     Plane* plane_pointer = &plane;
     scene.items.push_back(plane_pointer);
 
     Sphere sphere;
     sphere.translate(axis);
-    Sphere* sphere_pointer = &sphere;
-    //scene.items.push_back(sphere_pointer);
+    base sphereMat;
+    sphereMat.c = grey;
+    sphere.setMaterial(sphereMat);
 
-    Camera cam(vec4(-2,0,1,1), 0, 0, nx, ny, .01, 90, 1);
+    Sphere* sphere_pointer = &sphere;
+    scene.items.push_back(sphere_pointer);
+
+    base lightMat;
+    lightMat.c = white;
+    SphereLight light;
+    light.setMaterial(lightMat);
+    
+    axis.z = 1000;
+    light.translate(axis);
+
+    vec4 scaleVec(200,200,200);
+    light.scale(scaleVec);
+    
+    Geometry* light_pointer = &light;
+    scene.lights.push_back(light_pointer);
+
+    Camera cam(vec4(-3,0,1,1), 0, 0, nx, ny, .01, 90, 1);
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.sampleRate = 16;
+    rayTracer.sampleRate = 4;
 
     Image image;
     image = rayTracer.takePicture(scene, 0);

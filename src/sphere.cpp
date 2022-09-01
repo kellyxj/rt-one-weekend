@@ -3,7 +3,6 @@
 Hit Sphere::trace(ray & inRay) {
     vec4 origin = (this->worldToModel).transform(inRay.origin);
     vec4 dir = (this->worldToModel).transform(inRay.direction);
-    dir = dir.normalize();
 
     vec4 center(0,0,0,1);
     vec4 r2s = center-origin;
@@ -14,23 +13,39 @@ Hit Sphere::trace(ray & inRay) {
     Hit hit;
     //rays originating inside sphere
     if(L2 <= 1) {
-        double tca2 = tcaS * tcaS;
+        double DL2 = dir.length();
+
+        double tca2 = tcaS * tcaS/DL2;
         double LM2 = L2 - tca2;
+
+        double L2hc = 1-LM2;
+        double t0 = tcaS/DL2 + sqrt(L2hc/DL2);
+
+        hit.t = t0;
+        hit.pos = inRay.origin + (inRay.direction * t0);
+        hit.modelSpacePos = origin + (dir * t0);
+        hit.normal = this->getNormal(hit.modelSpacePos);
+        hit.material = this->material;
+        hit.v = (hit.pos-inRay.origin).normalize();
     }
     //if tcaS < 0, sphere is behind the camera
     else if(tcaS >= 0) {
-        double tca2 = tcaS * tcaS;
+        double DL2 = dir.length();
+
+        double tca2 = tcaS * tcaS/DL2;
         double LM2 = L2 - tca2;
 
         if(LM2 <= 1) {
             double L2hc = 1-LM2;
-            double t0 = tcaS - sqrt(L2hc);
-            double t1 = tcaS + sqrt(L2hc);
+            double t0 = tcaS/DL2 - sqrt(L2hc/DL2);
+            double t1 = tcaS/DL2 + sqrt(L2hc/DL2);
 
             hit.t = t0;
-            hit.pos = inRay.origin + (inRay.direction.normalize() * t0);
+            hit.pos = inRay.origin + (inRay.direction * t0);
             hit.modelSpacePos = origin + (dir * t0);
             hit.normal = this->getNormal(hit.modelSpacePos);
+            hit.material = this->material;
+            hit.v = (hit.pos-inRay.origin).normalize();
         }
     }
     return hit;

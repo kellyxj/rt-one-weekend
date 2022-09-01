@@ -7,7 +7,7 @@
 
 class Material {
 public:
-    virtual color getColor(vec4 & pos) = 0;
+    virtual Color getColor(vec4 & pos) = 0;
 };
 
 #endif
