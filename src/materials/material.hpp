@@ -1,8 +1,8 @@
 #ifndef __MATERIAL_H__
 #define __MATERIAL_H__
 
-#include "vec4.hpp"
-#include "color.hpp"
+#include "../vec4.hpp"
+#include "../color.hpp"
 #include <cmath>
 
 class Material {

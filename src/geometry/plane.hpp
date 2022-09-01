@@ -1,5 +1,5 @@
 #include "geometry.hpp"
-#include "groundGrid.hpp"
+#include "../materials/groundGrid.hpp"
 
 class Plane : public Geometry {
 public:

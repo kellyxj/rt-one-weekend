@@ -1,9 +1,9 @@
 //A scene consists of geometry objects, lights, and at least one camera
-#include "geometry.hpp"
-#include "plane.hpp"
+#include "geometry/geometry.hpp"
+#include "geometry/plane.hpp"
 #include "camera.hpp"
-#include "sphere.hpp"
-#include "sphereLight.hpp"
+#include "geometry/sphere.hpp"
+#include "geometry/sphereLight.hpp"
 #include <vector>
 
 class Scene {

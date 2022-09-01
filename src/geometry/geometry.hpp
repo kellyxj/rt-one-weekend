@@ -1,11 +1,11 @@
 #ifndef __GEOMETRY_H__
 #define __GEOMETRY_H__
 
-#include "mat4.hpp"
-#include "material.hpp"
-#include "baseMaterial.hpp"
-#include "hit.hpp"
-#include "vec4.hpp"
+#include "../mat4.hpp"
+#include "../materials/material.hpp"
+#include "../materials/baseMaterial.hpp"
+#include "../hit.hpp"
+#include "../vec4.hpp"
 
 class Geometry {
 public:

@@ -2,7 +2,7 @@
 #define __HIT_H__
 
 #include "ray.hpp"
-#include "material.hpp"
+#include "materials/material.hpp"
 
 class Hit {
 public:
