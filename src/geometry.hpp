@@ -16,6 +16,7 @@ public:
     Material* material;
 
     bool isLight = false;
+    double brightness;
 
     void setMaterial(Material & m);
     virtual vec4 getNormal(vec4 & pos) = 0;

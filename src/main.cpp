@@ -34,7 +34,7 @@ int main() {
     Sphere sphere;
     sphere.translate(axis);
     base sphereMat;
-    sphereMat.c = grey;
+    sphereMat.c = red;
     sphere.setMaterial(sphereMat);
 
     Sphere* sphere_pointer = &sphere;
@@ -43,6 +43,7 @@ int main() {
     base lightMat;
     lightMat.c = white;
     SphereLight light;
+    light.brightness = .85;
     light.setMaterial(lightMat);
     
     axis.z = 1000;
@@ -50,9 +51,18 @@ int main() {
 
     vec4 scaleVec(200,200,200);
     light.scale(scaleVec);
-    
-    Geometry* light_pointer = &light;
-    scene.lights.push_back(light_pointer);
+    scene.lights.push_back(&light);
+
+    SphereLight light2;
+    light2.setMaterial(lightMat);
+    light2.brightness = .4;
+    axis.z = 3;
+    axis.y = 3;
+    axis.x = 0;
+    scaleVec = vec4(.4,.4,.4);
+    light2.translate(axis);
+    light2.scale(scaleVec);
+    //scene.lights.push_back(&light2);
 
     Camera cam(vec4(-3,0,1,1), 0, 0, nx, ny, .01, 90, 1);
     Camera* cam_pointer = &cam;

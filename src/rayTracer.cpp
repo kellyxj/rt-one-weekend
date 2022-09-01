@@ -99,13 +99,24 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
             vec4 lightCenter(0,0,0,1);
             lightCenter = light->modelMatrix.transform(lightCenter);
 
-            ray shadowRay(hit.pos+lightCenter*EPSILON, lightCenter-vec4(0,0,0,lightCenter.w), 0);
+            ray shadowRay(hit.pos+lightCenter*EPSILON, lightCenter-hit.pos, 0);
             Hit shadowHit;
             shadowHit = this->traceShadowRay(scene, shadowRay, shadowHit);
 
             if(shadowHit.isLight) {
-                hit.color = hit.material->getColor(hit.modelSpacePos);
+                Color hitColor = hit.material->getColor(hit.modelSpacePos);
+                vec4 N = (hit.normal).normalize();
+                vec4 L = (lightCenter - hit.pos).normalize();
+                double lambertian = N.dot(L);
+                lambertian = lambertian < 0 ? 0 : lambertian;
+
+                hit.color.r += hitColor.r * lambertian * light->brightness;
+                hit.color.g += hitColor.g * lambertian * light->brightness;
+                hit.color.b += hitColor.b * lambertian * light->brightness;
             }
+            hit.color.r += .15;
+            hit.color.b += .15;
+            hit.color.g += .15;
         }
     }
 }
