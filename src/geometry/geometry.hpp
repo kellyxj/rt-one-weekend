@@ -19,7 +19,7 @@ public:
     double brightness;
 
     void setMaterial(Material & m);
-    virtual vec4 getNormal(vec4 & pos) = 0;
+    virtual vec4 getNormal(vec4 & pos, ray & inRay) = 0;
 
     void setIdentity() {
         modelMatrix.setIdentity();

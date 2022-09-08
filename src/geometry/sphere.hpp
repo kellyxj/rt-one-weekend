@@ -6,7 +6,7 @@
 class Sphere: public Geometry {
 public:
     Hit trace(ray & inRay);
-    vec4 getNormal(vec4 & pos);
+    vec4 getNormal(vec4 & pos, ray & inRay);
     int getType();
 };
 

@@ -4,6 +4,8 @@ Hit Sphere::trace(ray & inRay) {
     vec4 origin = (this->worldToModel).transform(inRay.origin);
     vec4 dir = (this->worldToModel).transform(inRay.direction);
 
+    ray ray(origin, dir, inRay.bouncesLeft);
+
     vec4 center(0,0,0,1);
     vec4 r2s = center-origin;
 
@@ -24,7 +26,7 @@ Hit Sphere::trace(ray & inRay) {
         hit.t = t0;
         hit.pos = inRay.origin + (inRay.direction * t0);
         hit.modelSpacePos = origin + (dir * t0);
-        hit.normal = this->getNormal(hit.modelSpacePos);
+        hit.normal = this->getNormal(hit.modelSpacePos, ray);
         hit.material = this->material;
         hit.v = (hit.pos-inRay.origin).normalize();
     }
@@ -43,7 +45,7 @@ Hit Sphere::trace(ray & inRay) {
             hit.t = t0;
             hit.pos = inRay.origin + (inRay.direction * t0);
             hit.modelSpacePos = origin + (dir * t0);
-            hit.normal = this->getNormal(hit.modelSpacePos);
+            hit.normal = this->getNormal(hit.modelSpacePos, ray);
             hit.material = this->material;
             hit.v = (hit.pos-inRay.origin).normalize();
         }
@@ -51,9 +53,12 @@ Hit Sphere::trace(ray & inRay) {
     return hit;
 }
 
-vec4 Sphere::getNormal(vec4 & pos) {
+vec4 Sphere::getNormal(vec4 & pos, ray & inRay) {
     vec4 normVec(pos.x, pos.y, pos.z, 0);
     normVec = (this->worldToModel).transform(normVec);
+    if(normVec.dot(inRay.direction) > 0) {
+        normVec = normVec * -1;
+    }
     return normVec;
 }
 

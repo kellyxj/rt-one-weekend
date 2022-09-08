@@ -79,21 +79,19 @@ Hit RayTracer::traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth) {
             }
         }
     }
-    if(!closest.isLight) {
-        this->findShade(scene, closest, depth);
-    }
-    else {
-        closest.color = white;
-    }
+    this->findShade(scene, closest, depth);
     return closest;
 }
 
 void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
     //missed
     if(hit.t > 1e10) {
-        hit.color = blue;
+        hit.color = sky;
     }
     //hit
+    else if(hit.isLight) {
+        hit.color = white;
+    }
     else {
         for(Geometry* light: scene.lights) {
             vec4 lightCenter(0,0,0,1);
