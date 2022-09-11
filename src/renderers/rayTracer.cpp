@@ -69,6 +69,13 @@ Hit RayTracer::traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth) {
                 closest.isLight = false;
             }
         }
+        else if(item->getType() == 3) {
+            Hit current = dynamic_cast<Square*>(item)->trace(eyeRay);
+            if(current.t < closest.t) {
+                closest = current;
+                closest.isLight = false;
+            }
+         }
     }
     for(Geometry* light: scene.lights) {
         if(light->getType() == 2) {

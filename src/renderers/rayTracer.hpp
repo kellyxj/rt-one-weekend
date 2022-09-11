@@ -1,9 +1,9 @@
 //abstract class for generating an image from a camera
 //TODO: implement direct illumination (Whitted) model, path tracer, volume raycaster, and bidirectional path tracer classes
-#include "scene.hpp"
-#include "image.hpp"
-#include "materials/material.hpp"
-#include "hit.hpp"
+#include "../scene.hpp"
+#include "../image.hpp"
+#include "../materials/material.hpp"
+#include "../hit.hpp"
 
 class RayTracer {
 public:

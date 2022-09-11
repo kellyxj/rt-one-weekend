@@ -9,7 +9,7 @@
 #include "ray.hpp"
 #include "camera.hpp"
 #include "mat4.hpp"
-#include "rayTracer.hpp"
+#include "renderers/rayTracer.hpp"
 
 int main() {
     srand(time(NULL));
@@ -30,6 +30,11 @@ int main() {
     //plane.rotate(30, axis);
     Plane* plane_pointer = &plane;
     scene.items.push_back(plane_pointer);
+
+    Square square;
+    square.setMaterial(planeMat);
+    Square* square_pointer = &square;
+    //scene.items.push_back(square_pointer);
 
     Sphere sphere;
     sphere.translate(axis);

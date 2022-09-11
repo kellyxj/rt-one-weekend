@@ -4,4 +4,5 @@ class base: public Material {
 public:
     Color c;
     Color getColor(vec4 & pos);
+    //ray refract()
 };

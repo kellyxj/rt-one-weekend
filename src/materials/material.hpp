@@ -3,11 +3,13 @@
 
 #include "../vec4.hpp"
 #include "../color.hpp"
+#include "../ray.hpp"
 #include <cmath>
 
 class Material {
 public:
     virtual Color getColor(vec4 & pos) = 0;
+    //virtual ray refract()
 };
 
 #endif
