@@ -12,8 +12,7 @@ public:
     vec4 pos;
     vec4 modelSpacePos;
     vec4 normal;
-    //points to origin of incident ray
-    vec4 v;
+    ray inRay;
 
     Material* material;
     Color color;
@@ -25,7 +24,7 @@ inline std::ostream& operator << (std::ostream &os, const Hit &h) {
     os << "world space position " << h.pos << "\n";
     os << "model space position " << h.modelSpacePos << "\n";
     os << "normal vector " << h.normal << "\n";
-    os << "direction to origin point: " << h.v << "\n";
+    os << "incident ray " << h.inRay << "\n";
     os << "color: " << h.color << "\n";
 
     return os;

@@ -38,7 +38,7 @@ int main() {
     groundGrid planeMat;
     plane.setMaterial(planeMat);
 
-    vec4 axis(0,0,2,0);
+    vec4 axis(0,0,1,0);
     //plane.rotate(30, axis);
     Plane* plane_pointer = &plane;
     scene.items.push_back(plane_pointer);
@@ -50,6 +50,10 @@ int main() {
 
     Sphere sphere;
     sphere.translate(axis);
+
+    //vec4 scale(2,2,2);
+    //sphere.scale(scale);
+
     base sphereMat;
     sphereMat.c = red;
     sphere.setMaterial(sphereMat);
@@ -81,7 +85,7 @@ int main() {
     light2.scale(scaleVec);
     //scene.lights.push_back(&light2);
 
-    Camera cam(vec4(-3,0,1,1), 0, 0, nx, ny, .01, 90, 1);
+    Camera cam(vec4(-3,0,.5,1), 0, 0, nx, ny, .01, 90, 1);
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
@@ -98,8 +102,8 @@ int main() {
     ray inRay(origin, direction);
     vec4 pos(0,1,0,1);
     vec4 normal(0,0,1,0);
-    testScatter(inRay, pos, normal, &planeMat);
-    testHit(inRay, &plane);
+    //testScatter(inRay, pos, normal, &planeMat);
+    //testHit(inRay, &plane);
     
     end = std::chrono::system_clock::now();
   

@@ -28,7 +28,7 @@ Hit Sphere::trace(ray & inRay) {
         hit.modelSpacePos = origin + (dir * t0);
         hit.normal = this->getNormal(hit.modelSpacePos, ray);
         hit.material = this->material;
-        hit.v = (hit.pos-inRay.origin).normalize();
+        hit.inRay = inRay;
     }
     //if tcaS < 0, sphere is behind the camera
     else if(tcaS >= 0) {
@@ -47,7 +47,7 @@ Hit Sphere::trace(ray & inRay) {
             hit.modelSpacePos = origin + (dir * t0);
             hit.normal = this->getNormal(hit.modelSpacePos, ray);
             hit.material = this->material;
-            hit.v = (hit.pos-inRay.origin).normalize();
+            hit.inRay = inRay;
         }
     }
     return hit;

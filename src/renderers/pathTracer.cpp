@@ -88,29 +88,24 @@ void PathTracer::findShade(Scene & scene, Hit & hit, int depth) {
     }
     else {
         ray reflectedRay;
-        vec4 origin = hit.pos - hit.v;
-        vec4 in = hit.v * -1;
-        ray inRay;
-        inRay.origin = origin;
-        inRay.direction = in;
 
-        vec4 translatedHitPos = hit.pos+hit.normal*EPSILON;
+        //vec4 translatedHitPos = hit.pos+hit.normal*EPSILON;
 
-        reflectedRay = hit.material->scatter(inRay, translatedHitPos, hit.normal);
+        std::cout << hit.material;
+        reflectedRay = hit.material->scatter(hit.inRay, hit.pos, hit.normal);
+
         Hit reflectedHit;
         if(depth < this->maxDepth) {
             this->traceRay(scene, reflectedRay, reflectedHit, depth+1);
         }
         if(reflectedHit.isLight) {
-            hit.color.r += .85;
-            hit.color.g += .85;
-            hit.color.b += .85;
+            hit.color.r += .85 * hit.material->getColor(hit.modelSpacePos).r;
+            hit.color.g += .85 * hit.material->getColor(hit.modelSpacePos).g;
+            hit.color.b += .85 * hit.material->getColor(hit.modelSpacePos).b;
         }
-        if(reflectedHit.t > 1e10) {
-            hit.color.r += .15 * hit.material->getColor(hit.modelSpacePos).r;
-            hit.color.g += .15 * hit.material->getColor(hit.modelSpacePos).g;
-            hit.color.b += .15 * hit.material->getColor(hit.modelSpacePos).b;
-        }
+        hit.color.r += .15 * hit.material->getColor(hit.modelSpacePos).r;
+        hit.color.g += .15 * hit.material->getColor(hit.modelSpacePos).g;
+        hit.color.b += .15 * hit.material->getColor(hit.modelSpacePos).b;
     }
     
 }

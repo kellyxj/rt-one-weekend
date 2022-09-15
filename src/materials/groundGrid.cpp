@@ -20,7 +20,7 @@ Color groundGrid::getColor(vec4 & pos) {
 ray groundGrid::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     double theta = 2*PI*static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
     double phi = 2*PI*static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-    vec4 randomDirection = pos;
+    vec4 randomDirection;
     randomDirection.x += cos(phi) * sin(theta);
     randomDirection.y += sin(phi) * sin(theta);
     randomDirection.z += cos(theta);

@@ -16,6 +16,7 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
     int sampleRate = this->sampleRate;
 
     for(int j = (cam.height-1); j >= 0; j--) {
+        //std::cout << j << "\n";
         for(int i = 0; i < (cam.width); i++) {
             for(int k = 0; k < sampleRate; k++) {
                 double randX = static_cast <double> (rand()) / static_cast <double> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
@@ -100,6 +101,8 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
         hit.color = white;
     }
     else {
+        //Phong shading
+        /*
         for(Geometry* light: scene.lights) {
             vec4 lightCenter(0,0,0,1);
             lightCenter = light->modelMatrix.transform(lightCenter);
@@ -119,13 +122,37 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
                 hit.color.g += hitColor.g * lambertian * light->brightness;
                 hit.color.b += hitColor.b * lambertian * light->brightness;
             }
-            hit.color.r += .15;
-            hit.color.b += .15;
-            hit.color.g += .15;
-
+            
+        }
+        
+        hit.color.r += .15;
+        hit.color.b += .15;
+        hit.color.g += .15;
+        */
+        
+        //ambient occlusion
+        
+        int reflectedRayCount = 100;
+        for(int i = 0; i < reflectedRayCount; i++) {
             Hit bounceHit;
             ray reflectedRay;
+            vec4 translatedHitPos = hit.pos + hit.normal * EPSILON;
+            reflectedRay = hit.material->scatter(hit.inRay, translatedHitPos, hit.normal);
+            if(depth < this->maxDepth) {
+                bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth+1);
+            }
+            if(bounceHit.isLight || bounceHit.t > 1e10) {
+                double lambertian = reflectedRay.direction.dot(hit.normal);
+                lambertian = lambertian < 0 ? -1 * lambertian : lambertian;
+
+                Color hitColor = hit.material->getColor(hit.modelSpacePos);
+
+                hit.color.r += hitColor.r * lambertian * 1/reflectedRayCount;
+                hit.color.g += hitColor.g * lambertian *1/reflectedRayCount;
+                hit.color.b += hitColor.b * lambertian *1/reflectedRayCount;
+            }
         }
+        
     }
 }
 
