@@ -4,7 +4,7 @@ Hit Square::trace(ray & inRay) {
     vec4 origin = (this->worldToModel).transform(inRay.origin);
     vec4 dir = (this->worldToModel).transform(inRay.direction);
 
-    ray ray(origin, dir, inRay.bouncesLeft);
+    ray ray(origin, dir);
 
     double t0 = -origin.z/dir.z;
     vec4 modelSpacePos = origin + (dir * t0);

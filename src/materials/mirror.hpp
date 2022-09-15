@@ -1,6 +1,6 @@
 #include "material.hpp"
 
-class base: public Material {
+class Mirror: public Material {
 public:
     Color c;
     Color getColor(vec4 & pos);

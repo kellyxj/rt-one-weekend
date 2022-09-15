@@ -10,6 +10,18 @@
 #include "camera.hpp"
 #include "mat4.hpp"
 #include "renderers/rayTracer.hpp"
+#include "renderers/pathTracer.hpp"
+
+void testScatter(ray & inRay, vec4 & pos, vec4 & normal, Material* material) {
+    ray outRay = material->scatter(inRay, pos, normal);
+    std::cout << "Incident ray " << inRay;
+    std::cout << "Outgoing ray " << outRay;
+}
+
+void testHit(ray & inRay, Geometry* hittable) {
+    Hit hit = hittable->trace(inRay);
+    std::cout << hit;
+}
 
 int main() {
     srand(time(NULL));
@@ -73,11 +85,21 @@ int main() {
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
+    rayTracer.maxDepth = 1;
     rayTracer.sampleRate = 4;
 
     Image image;
-    image = rayTracer.takePicture(scene, 0);
+    //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
+    image = rayTracer.takePicture(scene,0);
     output << image.dump_ppm();
+
+    vec4 origin(1,1,1,1);
+    vec4 direction(-1,0,-1,0);
+    ray inRay(origin, direction);
+    vec4 pos(0,1,0,1);
+    vec4 normal(0,0,1,0);
+    testScatter(inRay, pos, normal, &planeMat);
+    testHit(inRay, &plane);
     
     end = std::chrono::system_clock::now();
   

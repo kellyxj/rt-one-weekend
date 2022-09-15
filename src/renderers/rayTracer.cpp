@@ -104,7 +104,7 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
             vec4 lightCenter(0,0,0,1);
             lightCenter = light->modelMatrix.transform(lightCenter);
 
-            ray shadowRay(hit.pos+lightCenter*EPSILON, lightCenter-hit.pos, 0);
+            ray shadowRay(hit.pos+lightCenter*EPSILON, lightCenter-hit.pos);
             Hit shadowHit;
             shadowHit = this->traceShadowRay(scene, shadowRay, shadowHit);
 
@@ -122,6 +122,9 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
             hit.color.r += .15;
             hit.color.b += .15;
             hit.color.g += .15;
+
+            Hit bounceHit;
+            ray reflectedRay;
         }
     }
 }

@@ -4,7 +4,7 @@ Hit Sphere::trace(ray & inRay) {
     vec4 origin = (this->worldToModel).transform(inRay.origin);
     vec4 dir = (this->worldToModel).transform(inRay.direction);
 
-    ray ray(origin, dir, inRay.bouncesLeft);
+    ray ray(origin, dir);
 
     vec4 center(0,0,0,1);
     vec4 r2s = center-origin;
