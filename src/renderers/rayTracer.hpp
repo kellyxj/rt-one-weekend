@@ -5,7 +5,7 @@
 //TODO: implement direct illumination (Whitted) model, path tracer, volume raycaster, and bidirectional path tracer classes
 #include "../scene.hpp"
 #include "../image.hpp"
-#include "../materials/material.hpp"
+#include "../materials/mirror.hpp"
 #include "../hit.hpp"
 
 class RayTracer {

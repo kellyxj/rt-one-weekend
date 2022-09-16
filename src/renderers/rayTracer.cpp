@@ -16,7 +16,7 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
     int sampleRate = this->sampleRate;
 
     for(int j = (cam.height-1); j >= 0; j--) {
-        //std::cout << j << "\n";
+        std::cout << j << "\n";
         for(int i = 0; i < (cam.width); i++) {
             for(int k = 0; k < sampleRate; k++) {
                 double randX = static_cast <double> (rand()) / static_cast <double> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
@@ -132,24 +132,27 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
         
         //ambient occlusion
         
-        int reflectedRayCount = 100;
+        int reflectedRayCount = 10;
         for(int i = 0; i < reflectedRayCount; i++) {
             Hit bounceHit;
             ray reflectedRay;
             vec4 translatedHitPos = hit.pos + hit.normal * EPSILON;
             reflectedRay = hit.material->scatter(hit.inRay, translatedHitPos, hit.normal);
+
+            Color hitColor = hit.material->getColor(hit.modelSpacePos);
+
             if(depth < this->maxDepth) {
                 bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth+1);
             }
             if(bounceHit.isLight || bounceHit.t > 1e10) {
-                double lambertian = reflectedRay.direction.dot(hit.normal);
-                lambertian = lambertian < 0 ? -1 * lambertian : lambertian;
-
-                Color hitColor = hit.material->getColor(hit.modelSpacePos);
-
-                hit.color.r += hitColor.r * lambertian * 1/reflectedRayCount;
-                hit.color.g += hitColor.g * lambertian *1/reflectedRayCount;
-                hit.color.b += hitColor.b * lambertian *1/reflectedRayCount;
+                hit.color.r += hitColor.r * 1/reflectedRayCount;
+                hit.color.g += hitColor.g * 1/reflectedRayCount;
+                hit.color.b += hitColor.b * 1/reflectedRayCount;
+            }
+            else {
+                hit.color.r += .8 * hitColor.r * bounceHit.color.r * 1/reflectedRayCount;
+                hit.color.g += .8 * hitColor.g * bounceHit.color.g * 1/reflectedRayCount;
+                hit.color.b += .8 * hitColor.b * bounceHit.color.b * 1/reflectedRayCount;
             }
         }
         
