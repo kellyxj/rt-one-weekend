@@ -9,6 +9,7 @@
 
 class Material {
 public:
+    double brightness;
     virtual Color getColor(vec4 & pos) = 0;
     virtual ray scatter(ray & inRay, vec4 & pos, vec4 & normal) = 0;
 };

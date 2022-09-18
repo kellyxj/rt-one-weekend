@@ -6,6 +6,7 @@
 #include "../scene.hpp"
 #include "../image.hpp"
 #include "../materials/mirror.hpp"
+#include "../materials/glass.hpp"
 #include "../hit.hpp"
 
 class RayTracer {

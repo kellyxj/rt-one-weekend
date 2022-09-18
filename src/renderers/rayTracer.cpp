@@ -30,9 +30,9 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
                 hit = this->traceRay(scene, eyeRay, hit, 0);
 
                 Color c = output.getPixel(i,j);
-                c.r += hit.color.r/sampleRate;
-                c.g += hit.color.g/sampleRate;
-                c.b += hit.color.b/sampleRate;
+                c.r += hit.color.r/sampleRate * cam.exposure;
+                c.g += hit.color.g/sampleRate * cam.exposure;
+                c.b += hit.color.b/sampleRate * cam.exposure;
 
                 //normal map
                 //c.r += (hit.normal.x + 1)/(2*sampleRate);
@@ -94,7 +94,7 @@ Hit RayTracer::traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth) {
 void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
     //missed
     if(hit.t > 1e10) {
-        hit.color = sky;
+        hit.color = white;
     }
     //hit
     else if(hit.isLight) {
@@ -132,7 +132,7 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
         
         //ambient occlusion
         
-        int reflectedRayCount = 10;
+        int reflectedRayCount = 20;
         for(int i = 0; i < reflectedRayCount; i++) {
             Hit bounceHit;
             ray reflectedRay;
@@ -144,15 +144,15 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
             if(depth < this->maxDepth) {
                 bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth+1);
             }
-            if(bounceHit.isLight || bounceHit.t > 1e10) {
-                hit.color.r += hitColor.r * 1/reflectedRayCount;
-                hit.color.g += hitColor.g * 1/reflectedRayCount;
-                hit.color.b += hitColor.b * 1/reflectedRayCount;
+            if(bounceHit.isLight) {
+                hit.color.r += bounceHit.material->brightness * hitColor.r * 1/reflectedRayCount;
+                hit.color.g += bounceHit.material->brightness * hitColor.g * 1/reflectedRayCount;
+                hit.color.b += bounceHit.material->brightness * hitColor.b * 1/reflectedRayCount;
             }
             else {
-                hit.color.r += .8 * hitColor.r * bounceHit.color.r * 1/reflectedRayCount;
-                hit.color.g += .8 * hitColor.g * bounceHit.color.g * 1/reflectedRayCount;
-                hit.color.b += .8 * hitColor.b * bounceHit.color.b * 1/reflectedRayCount;
+                hit.color.r += hitColor.r * bounceHit.color.r * 1/reflectedRayCount;
+                hit.color.g += hitColor.g * bounceHit.color.g * 1/reflectedRayCount;
+                hit.color.b += hitColor.b * bounceHit.color.b * 1/reflectedRayCount;
             }
         }
         

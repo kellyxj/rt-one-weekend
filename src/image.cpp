@@ -14,7 +14,15 @@ std::string Image::dump_ppm() {
     for(int j = this->height-1; j >= 0; j--) {
         for(int i = 0; i < this->width; i++) {
             Color c = this->getPixel(i,j);
-            output += std::to_string((int)(255*c.r)) + " " + std::to_string((int)(255*c.g)) + " " + std::to_string((int)(255*c.b)) + "\n";
+            c.r = 255*c.r;
+            c.g = 255*c.g;
+            c.b = 255*c.b;
+
+            c.r = c.r > 255 ? 255 : c.r;
+            c.g = c.g > 255 ? 255 : c.g;
+            c.b = c.b > 255 ? 255 : c.b;
+
+            output += std::to_string(int(c.r)) + " " + std::to_string(int(c.g)) + " " + std::to_string(int(c.b)) + "\n";
         }
     }
     return output;

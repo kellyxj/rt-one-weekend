@@ -30,6 +30,8 @@ public:
     double pixelWidth;
     double pixelHeight;
 
+    double exposure = 1;
+
     Camera() {
         eyePoint = vec4(-10, 0, 1, 1);
         aimPoint = vec4(0, 0, 1, 1);

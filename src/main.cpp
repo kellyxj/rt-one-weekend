@@ -54,8 +54,8 @@ int main() {
     //vec4 scale(2,2,2);
     //sphere.scale(scale);
 
-    Mirror sphereMat;
-    sphereMat.c = white;
+    base sphereMat;
+    sphereMat.c = red;
     sphere.setMaterial(sphereMat);
 
     Sphere* sphere_pointer = &sphere;
@@ -64,7 +64,7 @@ int main() {
     base lightMat;
     lightMat.c = white;
     SphereLight light;
-    light.brightness = .85;
+    lightMat.brightness = 1000;
     light.setMaterial(lightMat);
     
     axis.z = 1000;
@@ -72,17 +72,17 @@ int main() {
 
     vec4 scaleVec(200,200,200);
     light.scale(scaleVec);
-    scene.lights.push_back(&light);
+    //scene.lights.push_back(&light);
 
     SphereLight light2;
+    lightMat.brightness = 45;
     light2.setMaterial(lightMat);
-    light2.brightness = .4;
     axis.z = 3;
     axis.y = 3;
     axis.x = 0;
     scaleVec = vec4(.4,.4,.4);
     light2.translate(axis);
-    //light2.scale(scaleVec);
+    light2.scale(scaleVec);
     //scene.lights.push_back(&light2);
 
     Camera cam(vec4(-3,0,.5,1), 0, 0, nx, ny, .01, 90, 1);
