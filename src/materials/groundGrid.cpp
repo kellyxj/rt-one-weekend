@@ -27,6 +27,6 @@ ray groundGrid::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     randomDirection.z += cos(theta);
     randomDirection.w = 0;
     
-    ray outRay(pos, randomDirection);
+    ray outRay(pos+normal*EPSILON, randomDirection);
     return outRay;
 }

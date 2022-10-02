@@ -132,19 +132,23 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
         
         //ambient occlusion
         
-        int reflectedRayCount = 20;
+        int reflectedRayCount = 5;
         for(int i = 0; i < reflectedRayCount; i++) {
             Hit bounceHit;
             ray reflectedRay;
-            vec4 translatedHitPos = hit.pos + hit.normal * EPSILON;
-            reflectedRay = hit.material->scatter(hit.inRay, translatedHitPos, hit.normal);
+            reflectedRay = hit.material->scatter(hit.inRay, hit.pos, hit.normal);
 
             Color hitColor = hit.material->getColor(hit.modelSpacePos);
 
             if(depth < this->maxDepth) {
                 bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth+1);
             }
-            if(bounceHit.isLight) {
+            if(bounceHit.t > 1e10) {
+                hit.color.r += .85 * hitColor.r * 1/reflectedRayCount;
+                hit.color.g += .85 * hitColor.g * 1/reflectedRayCount;
+                hit.color.b += .85 * hitColor.b * 1/reflectedRayCount;
+            }
+            else if(bounceHit.isLight) {
                 hit.color.r += bounceHit.material->brightness * hitColor.r * 1/reflectedRayCount;
                 hit.color.g += bounceHit.material->brightness * hitColor.g * 1/reflectedRayCount;
                 hit.color.b += bounceHit.material->brightness * hitColor.b * 1/reflectedRayCount;

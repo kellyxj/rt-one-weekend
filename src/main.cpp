@@ -39,12 +39,25 @@ int main() {
     plane.setMaterial(planeMat);
 
     vec4 axis(0,0,1,0);
+    vec4 translate(0,0,1,0);
     //plane.rotate(30, axis);
     Plane* plane_pointer = &plane;
     scene.items.push_back(plane_pointer);
 
+    base sphereMat;
+    Glass glass;
+    Mirror mirror;
+
+    mirror.c = white;
+    glass.c = white;
+    glass.n_i = 2;
+    sphereMat.c = red;
+
     Square square;
-    square.setMaterial(planeMat);
+    square.setMaterial(glass);
+    square.rotate(90, axis);
+    square.rotate(45, translate);
+    square.translate(translate);
     Square* square_pointer = &square;
     //scene.items.push_back(square_pointer);
 
@@ -53,10 +66,7 @@ int main() {
 
     //vec4 scale(2,2,2);
     //sphere.scale(scale);
-
-    base sphereMat;
-    sphereMat.c = red;
-    sphere.setMaterial(sphereMat);
+    sphere.setMaterial(glass);
 
     Sphere* sphere_pointer = &sphere;
     scene.items.push_back(sphere_pointer);
@@ -89,7 +99,7 @@ int main() {
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.maxDepth = 1;
+    rayTracer.maxDepth = 2;
     rayTracer.sampleRate = 4;
 
     Image image;
@@ -102,7 +112,7 @@ int main() {
     ray inRay(origin, direction);
     vec4 pos(0,1,0,1);
     vec4 normal(0,0,1,0);
-    //testScatter(inRay, pos, normal, &planeMat);
+    //testScatter(inRay, pos, normal, &glass);
     //testHit(inRay, &plane);
     
     end = std::chrono::system_clock::now();
