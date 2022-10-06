@@ -100,7 +100,7 @@ int main() {
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
     rayTracer.maxDepth = 2;
-    rayTracer.sampleRate = 4;
+    rayTracer.sampleRate = 16;
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);

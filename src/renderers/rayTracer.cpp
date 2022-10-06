@@ -132,7 +132,7 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
         
         //ambient occlusion
         
-        int reflectedRayCount = 5;
+        int reflectedRayCount = 1;
         for(int i = 0; i < reflectedRayCount; i++) {
             Hit bounceHit;
             ray reflectedRay;
