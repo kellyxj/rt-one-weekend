@@ -36,13 +36,6 @@ int main() {
     Scene scene;
     Plane plane;
     groundGrid planeMat;
-    plane.setMaterial(planeMat);
-
-    vec4 axis(0,0,1,0);
-    vec4 translate(0,0,1,0);
-    //plane.rotate(30, axis);
-    Plane* plane_pointer = &plane;
-    scene.items.push_back(plane_pointer);
 
     base sphereMat;
     Glass glass;
@@ -52,6 +45,14 @@ int main() {
     glass.c = white;
     glass.n_i = 2;
     sphereMat.c = red;
+
+    plane.setMaterial(planeMat);
+
+    vec4 axis(0,0,1,0);
+    vec4 translate(0,0,1,0);
+    //plane.rotate(30, axis);
+    Plane* plane_pointer = &plane;
+    scene.items.push_back(plane_pointer);
 
     Square square;
     square.setMaterial(glass);

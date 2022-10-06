@@ -129,35 +129,29 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
         hit.color.b += .15;
         hit.color.g += .15;
         */
-        
-        //ambient occlusion
-        
-        int reflectedRayCount = 1;
-        for(int i = 0; i < reflectedRayCount; i++) {
-            Hit bounceHit;
-            ray reflectedRay;
-            reflectedRay = hit.material->scatter(hit.inRay, hit.pos, hit.normal);
+        Hit bounceHit;
+        ray reflectedRay;
+        reflectedRay = hit.material->scatter(hit.inRay, hit.pos, hit.normal);
 
-            Color hitColor = hit.material->getColor(hit.modelSpacePos);
+        Color hitColor = hit.material->getColor(hit.modelSpacePos);
 
-            if(depth < this->maxDepth) {
-                bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth+1);
-            }
-            if(bounceHit.t > 1e10) {
-                hit.color.r += .85 * hitColor.r * 1/reflectedRayCount;
-                hit.color.g += .85 * hitColor.g * 1/reflectedRayCount;
-                hit.color.b += .85 * hitColor.b * 1/reflectedRayCount;
-            }
-            else if(bounceHit.isLight) {
-                hit.color.r += bounceHit.material->brightness * hitColor.r * 1/reflectedRayCount;
-                hit.color.g += bounceHit.material->brightness * hitColor.g * 1/reflectedRayCount;
-                hit.color.b += bounceHit.material->brightness * hitColor.b * 1/reflectedRayCount;
-            }
-            else {
-                hit.color.r += hitColor.r * bounceHit.color.r * 1/reflectedRayCount;
-                hit.color.g += hitColor.g * bounceHit.color.g * 1/reflectedRayCount;
-                hit.color.b += hitColor.b * bounceHit.color.b * 1/reflectedRayCount;
-            }
+        if(depth < this->maxDepth) {
+            bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth+1);
+        }
+        if(bounceHit.t > 1e10) {
+            hit.color.r += .85 * hitColor.r;
+            hit.color.g += .85 * hitColor.g;
+            hit.color.b += .85 * hitColor.b;
+        }
+        else if(bounceHit.isLight) {
+            hit.color.r += bounceHit.material->brightness * hitColor.r;
+            hit.color.g += bounceHit.material->brightness * hitColor.g;
+            hit.color.b += bounceHit.material->brightness * hitColor.b;
+        }
+        else {
+            hit.color.r += hitColor.r * bounceHit.color.r;
+            hit.color.g += hitColor.g * bounceHit.color.g;
+            hit.color.b += hitColor.b * bounceHit.color.b;
         }
         
     }
