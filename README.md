@@ -12,3 +12,7 @@ for more complex scenes to be rendered.
 4. Simplistic geometry. This project will include a parser for .obj files.
 5. Simplistic materials. This project will implement distribution ray tracing for more realistic reflections/transparency
 6. General code reorganization
+
+To use this project, clone the repository. Navigate to the src directory and run make. Then run ./main
+The renderer's output can be viewed by opening image.ppm
+Past results can be viewed in the screenshots directory
