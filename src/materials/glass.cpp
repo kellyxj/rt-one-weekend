@@ -5,7 +5,7 @@ Color Glass::getColor(vec4 & pos) {
 }
 
 ray Glass::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
-    double dot = inRay.direction.dot(normal);
+    float dot = inRay.direction.dot(normal);
     vec4 parallel = normal * dot;
     vec4 orthog = inRay.direction - parallel;
 
@@ -18,8 +18,8 @@ ray Glass::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     else {
         outRay.n_i = 1;
     }
-    double sin_theta2_squared = inRay.n_i * inRay.n_i/(outRay.n_i * outRay.n_i) * (1 - (dot) * (dot));
-    double cos_theta2_squared = 1 - sin_theta2_squared;
+    float sin_theta2_squared = inRay.n_i * inRay.n_i/(outRay.n_i * outRay.n_i) * (1 - (dot) * (dot));
+    float cos_theta2_squared = 1 - sin_theta2_squared;
 
     //total internal reflection case
     if(sin_theta2_squared > 1) {

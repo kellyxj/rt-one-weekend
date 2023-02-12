@@ -1,9 +1,10 @@
 #include "groundGrid.hpp"
 
 Color groundGrid::getColor(vec4 & pos) {
-    double xPos = pos.x;
-    double yPos = pos.y;
+    float xPos = pos.x;
+    float yPos = pos.y;
     double intPart;
+
     if(modf(xPos, &intPart) > .95 || modf(xPos, &intPart) < -.95 || modf(yPos, &intPart) > .95 || modf(yPos, &intPart) < -.95) {
         return green;
     }
@@ -18,8 +19,8 @@ Color groundGrid::getColor(vec4 & pos) {
 }
 
 ray groundGrid::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
-    double theta = 2*PI*static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-    double phi = 2*PI*static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+    float theta = 2*PI*static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    float phi = 2*PI*static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     vec4 randomDirection;
     randomDirection += normal.normalize();
     randomDirection.x += cos(phi) * sin(theta);

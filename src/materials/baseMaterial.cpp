@@ -5,8 +5,8 @@ Color base::getColor(vec4 & pos) {
 }
 
 ray base::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
-    double theta = 2*PI*static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-    double phi = 2*PI*static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+    float theta = 2*PI*static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    float phi = 2*PI*static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     vec4 randomDirection;
     randomDirection += normal.normalize();
     randomDirection.x += cos(phi) * sin(theta);

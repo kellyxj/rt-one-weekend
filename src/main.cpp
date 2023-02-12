@@ -29,8 +29,8 @@ int main() {
   
     start = std::chrono::system_clock::now();
 
-    int nx = 400;
-    int ny = 400;
+    int nx = 1600;
+    int ny = 1600;
     std::ofstream output("image.ppm");
 
     Scene scene;
@@ -67,7 +67,7 @@ int main() {
 
     //vec4 scale(2,2,2);
     //sphere.scale(scale);
-    sphere.setMaterial(glass);
+    sphere.setMaterial(mirror);
 
     Sphere* sphere_pointer = &sphere;
     scene.items.push_back(sphere_pointer);
@@ -101,7 +101,7 @@ int main() {
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
     rayTracer.maxDepth = 2;
-    rayTracer.sampleRate = 16;
+    rayTracer.sampleRate = 64;
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
