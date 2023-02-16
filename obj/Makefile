@@ -2,10 +2,10 @@ CXXFLAGS=-Wall
 CXX=g++
 
 objects = main.o vec4.o color.o ray.o camera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o
-VPATH = geometry:materials:renderers
+VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin
 
 edit: $(objects)
-	$(CXX) -o main $(objects)
+	$(CXX) -o ../bin/main $(objects)
 
 main.o: main.cpp vec4.hpp color.hpp ray.hpp camera.hpp mat4.hpp rayTracer.hpp
 ray.o: ray.cpp vec4.hpp
@@ -22,4 +22,5 @@ glass.o: glass.cpp material.hpp
 .PHONY: clean
 clean: 
 	rm -rf *.o
-	rm -rf *.ppm
+	rm -rf ../data/*.ppm
+	rm ../bin/main

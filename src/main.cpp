@@ -30,7 +30,7 @@ int main() {
 
     int nx = 400;
     int ny = 400;
-    std::ofstream output("image3.ppm");
+    std::ofstream output("../data/image.ppm");
 
     Scene scene;
     scene.ambientLight = .25;
@@ -87,7 +87,6 @@ int main() {
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
     image = rayTracer.takePicture(scene,0);
-    std::string output_filepath = "image.ppm";
     output << image.dump_ppm();
 
     vec4 origin(1,1,1,1);
