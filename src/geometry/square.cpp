@@ -6,7 +6,7 @@ Hit Square::trace(ray & inRay) {
 
     ray ray(origin, dir);
 
-    double t0 = -origin.z/dir.z;
+    float t0 = -origin.z/dir.z;
     vec4 modelSpacePos = origin + (dir * t0);
 
     Hit hit;

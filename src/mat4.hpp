@@ -10,7 +10,7 @@
 class mat4 {
 public:
     //column major
-    double entries [16];
+    float entries [16];
     mat4() {
         setIdentity();
     }
@@ -18,7 +18,7 @@ public:
     mat4 transpose();
     mat4 invert();
 
-    double det();
+    float det();
 
     //return this*b
     mat4 multiply(mat4 & b);
@@ -26,9 +26,9 @@ public:
     mat4 translate(const vec4 & v);
     mat4 scale(const vec4 & v);
     //rotate about axis by angle (degrees). Positive means counterclockwise
-    mat4 rotate(double angle, const vec4 & axis);
+    mat4 rotate(float angle, const vec4 & axis);
 
-    double &operator[] (int index) {
+    float &operator[] (int index) {
         return entries[index];
     }
 

@@ -17,8 +17,8 @@ Image PathTracer::takePicture(Scene & scene, int camIndex) {
     for(int j = (cam.height-1); j >= 0; j--) {
         for(int i = 0; i < (cam.width); i++) {
             for(int k = 0; k < sampleRate; k++) {
-                double randX = static_cast <double> (rand()) / static_cast <double> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
-                double randY = static_cast <double> (rand()) / static_cast <double> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
+                float randX = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
+                float randY = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
 
                 randX -= .5;
                 randY -= .5;

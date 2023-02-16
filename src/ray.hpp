@@ -6,7 +6,7 @@ class ray {
 public:
     vec4 origin;
     vec4 direction;
-    double n_i = 1.0;
+    float n_i = 1.0;
 
     ray(): origin(vec4()), direction(vec4()) {
 

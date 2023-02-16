@@ -6,7 +6,7 @@ void Camera::setEyePosition(vec4 pos) {
     eyePoint = pos;
 }
 
-void Camera::setLookDirection(double pan, double tilt) {
+void Camera::setLookDirection(float pan, float tilt) {
     tiltAngle = tilt;
     panAngle = pan;
     aimPoint = vec4(eyePoint.x+cos(PI*panAngle/180)*cos(PI*tiltAngle/180),
@@ -22,7 +22,7 @@ void Camera::setLookDirection(double pan, double tilt) {
 }
 
 //define the absolute size of the image plane and its distance from the aperture
-void Camera::rayFrustum(double _left, double _right, double _top, double _bottom, double _near) {
+void Camera::rayFrustum(float _left, float _right, float _top, float _bottom, float _near) {
     left = _left;
     right = _right;
     top = _top;
@@ -30,16 +30,16 @@ void Camera::rayFrustum(double _left, double _right, double _top, double _bottom
     near = _near;
 }
 
-void Camera::rayPerspective(double fovy, double aspect, double _near) {
-    double _top = _near * tan(.5 * fovy * PI/180);
+void Camera::rayPerspective(float fovy, float aspect, float _near) {
+    float _top = _near * tan(.5 * fovy * PI/180);
     rayFrustum(-_top * aspect, _top * aspect, _top, -_top, _near);
 }
 
 //return the ray from the camera's aperture to (xPos, yPos) on the image/near plane
 //NB: in the image plane's coordinate system, each pixel is one unit wide by one unit tall
-ray Camera::getEyeRay(double xPos, double yPos) {
-    double posU = left + xPos * pixelWidth;
-    double posV = bottom + yPos * pixelHeight;
+ray Camera::getEyeRay(float xPos, float yPos) {
+    float posU = left + xPos * pixelWidth;
+    float posV = bottom + yPos * pixelHeight;
 
     ray eyeRay;
     eyeRay.origin = eyePoint;

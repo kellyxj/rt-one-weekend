@@ -1,3 +1,5 @@
+#ifndef __SCENE_H__
+
 //A scene consists of geometry objects, lights, and at least one camera
 #include "geometry/geometry.hpp"
 #include "geometry/plane.hpp"
@@ -13,3 +15,4 @@ public:
     std::vector<Camera*> cameras;
     std::vector<Geometry*> lights;
 };
+#endif

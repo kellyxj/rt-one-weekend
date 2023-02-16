@@ -13,7 +13,7 @@ void Geometry::translate(vec4 & v) {
     normalToWorld = worldToModel.transpose();
 }
 
-void Geometry::rotate(double angle, vec4 & axis){
+void Geometry::rotate(float angle, vec4 & axis){
     modelMatrix = modelMatrix.rotate(angle, axis);
     worldToModel = worldToModel.rotate(-angle, axis);
     normalToWorld = worldToModel.transpose();

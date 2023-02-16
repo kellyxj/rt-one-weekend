@@ -19,8 +19,8 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
         std::cout << j << "\n";
         for(int i = 0; i < (cam.width); i++) {
             for(int k = 0; k < sampleRate; k++) {
-                double randX = static_cast <double> (rand()) / static_cast <double> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
-                double randY = static_cast <double> (rand()) / static_cast <double> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
+                float randX = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
+                float randY = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
 
                 randX -= .5;
                 randY -= .5;
@@ -115,7 +115,7 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
                 Color hitColor = hit.material->getColor(hit.modelSpacePos);
                 vec4 N = (hit.normal).normalize();
                 vec4 L = (lightCenter - hit.pos).normalize();
-                double lambertian = N.dot(L);
+                float lambertian = N.dot(L);
                 lambertian = lambertian < 0 ? 0 : lambertian;
 
                 hit.color.r += hitColor.r * lambertian * light->brightness;

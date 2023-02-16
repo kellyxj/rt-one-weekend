@@ -6,7 +6,6 @@
 #include "../materials/baseMaterial.hpp"
 #include "../hit.hpp"
 #include "../vec4.hpp"
-
 class Geometry {
 public:
     mat4 modelMatrix;
@@ -14,9 +13,6 @@ public:
     mat4 normalToWorld;
 
     Material* material;
-
-    bool isLight = false;
-    double brightness;
 
     void setMaterial(Material & m);
     virtual vec4 getNormal(vec4 & pos, ray & inRay) = 0;
@@ -28,7 +24,7 @@ public:
     }
 
     void translate(vec4 & v);
-    void rotate(double angle, vec4 & axis);
+    void rotate(float angle, vec4 & axis);
     void scale(vec4 & v);
 
     virtual Hit trace(ray & inRay) = 0;

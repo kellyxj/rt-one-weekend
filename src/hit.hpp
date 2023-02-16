@@ -6,7 +6,7 @@
 
 class Hit {
 public:
-    double t = 1e12;
+    float t = 1e12;
     bool isLight = false;
 
     vec4 pos;

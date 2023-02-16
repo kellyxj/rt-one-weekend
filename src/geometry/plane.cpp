@@ -7,7 +7,7 @@ Hit Plane::trace(ray & inRay) {
 
     ray ray(origin, dir);
 
-    double t0 = -origin.z/dir.z;
+    float t0 = -origin.z/dir.z;
     Hit hit;
     if(t0 >= 0) {
         hit.t = t0;

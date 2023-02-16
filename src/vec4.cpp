@@ -7,10 +7,10 @@ vec4 vec4::normalize() {
 vec4 vec4::cross(vec4 &v) {
     return vec4(y*v.z - v.y*z, v.x*z - x*v.z, x*v.y - v.x*y, 0);
 }
-double vec4::dot(vec4 &v){
+float vec4::dot(vec4 &v){
     return x*v.x + y*v.y + z*v.z + w*v.w;
 }
-double vec4::length() {
+float vec4::length() {
     return this->dot(*this);
 }
 
@@ -34,20 +34,20 @@ vec4 & vec4::operator -= (const vec4 & v) {
     w -= v.w;
     return (*this);
 }
-vec4 vec4::operator * (double c){
+vec4 vec4::operator * (float c){
     return vec4(c*x, c*y, c*z, c*w);
 }
-vec4 & vec4::operator *= (double c){
+vec4 & vec4::operator *= (float c){
     x *= c;
     y *= c;
     z *= c;
     w *= c;
     return (*this);
 }
-vec4 vec4::operator / (double c) {
+vec4 vec4::operator / (float c) {
     return vec4(x/c, y/c, z/c, w/c);
 }
-vec4 & vec4::operator /= (double c){
+vec4 & vec4::operator /= (float c){
     x /= c;
     y /= c;
     z /= c;

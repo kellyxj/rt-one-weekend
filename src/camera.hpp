@@ -11,26 +11,26 @@ public:
     vec4 aimPoint;
     vec4 up;
 
-    double panAngle;
-    double tiltAngle;
+    float panAngle;
+    float tiltAngle;
 
     vec4 uAxis;
     vec4 vAxis;
     vec4 nAxis;
     
-    double left;
-    double right;
-    double top;
-    double bottom;
-    double near;
+    float left;
+    float right;
+    float top;
+    float bottom;
+    float near;
 
     int width;
     int height;
 
-    double pixelWidth;
-    double pixelHeight;
+    float pixelWidth;
+    float pixelHeight;
 
-    double exposure = 1;
+    float exposure = 1;
 
     Camera() {
         eyePoint = vec4(-10, 0, 1, 1);
@@ -48,30 +48,30 @@ public:
 
         width = 512;
         height = 512;
-        pixelWidth = (double)(right - left)/(double)(width);
-        pixelHeight = (double)(top - bottom)/(double)(height);
+        pixelWidth = (float)(right - left)/(float)(width);
+        pixelHeight = (float)(top - bottom)/(float)(height);
 
         setUVN();
     }
 
-    Camera(vec4 eye, double pan, double tilt, int w, int h, double near, double fovy, double aspect): eyePoint(eye), panAngle(pan), tiltAngle(tilt), width(w), height(h) {
+    Camera(vec4 eye, float pan, float tilt, int w, int h, float near, float fovy, float aspect): eyePoint(eye), panAngle(pan), tiltAngle(tilt), width(w), height(h) {
         setLookDirection(pan, tilt);
         rayPerspective(fovy, aspect, near);
 
-        pixelWidth = (double)(right - left)/(double)(width);
-        pixelHeight = (double)(top - bottom)/(double)(height);
+        pixelWidth = (float)(right - left)/(float)(width);
+        pixelHeight = (float)(top - bottom)/(float)(height);
     }
 
     void setEyePosition(vec4 pos);
-    void setLookDirection(double pan, double tilt);
+    void setLookDirection(float pan, float tilt);
 
     //define the absolute size of the image plane and its distance from the aperture
-    void rayFrustum(double _left, double _right, double _top, double _bottom, double _near);
-    void rayPerspective(double fovy, double aspect, double near);
+    void rayFrustum(float _left, float _right, float _top, float _bottom, float _near);
+    void rayPerspective(float fovy, float aspect, float near);
 
     //return the ray from the camera's aperture to (xPos, yPos) on the near/image plane
     //NB: in the image plane's coordinate system, each pixel is one unit wide by one unit tall
-    ray getEyeRay(double xPos, double yPos);
+    ray getEyeRay(float xPos, float yPos);
 
     void setUVN();
 };

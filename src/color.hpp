@@ -5,10 +5,10 @@
 
 class Color {
 public:
-    double r, g, b, a;
+    float r, g, b, a;
     Color(): r(0), g(0), b(0), a(1) {}
-    Color(double red, double green, double blue): r(red), g(green), b(blue), a(1) {}
-    Color(double red, double green, double blue, double alpha): r(red), g(green), b(blue), a(alpha) {}
+    Color(float red, float green, float blue): r(red), g(green), b(blue), a(1) {}
+    Color(float red, float green, float blue, float alpha): r(red), g(green), b(blue), a(alpha) {}
 };
 
 inline std::ostream& operator << (std::ostream &os, const Color &c) {

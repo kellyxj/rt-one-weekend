@@ -3,7 +3,7 @@
 
 mat4 mat4::transpose() {
     mat4 a = (*this);
-    double a01 = a[1], a02 = a[2], a03=a[3], a12=a[6], a13 = a[7], a23 = a[11];
+    float a01 = a[1], a02 = a[2], a03=a[3], a12=a[6], a13 = a[7], a23 = a[11];
     a[1] = a[4];
     a[2] = a[8];
     a[3] = a[12];
@@ -22,12 +22,12 @@ mat4 mat4::transpose() {
 mat4 mat4::invert() {
     mat4 a = (*this);
 
-    double a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+    float a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
         a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
         a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
         a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
 
-    double b00 = a00 * a11 - a01 * a10,
+    float b00 = a00 * a11 - a01 * a10,
         b01 = a00 * a12 - a02 * a10,
         b02 = a00 * a13 - a03 * a10,
         b03 = a01 * a12 - a02 * a11,
@@ -40,7 +40,7 @@ mat4 mat4::invert() {
         b10 = a21 * a33 - a23 * a31,
         b11 = a22 * a33 - a23 * a32;
 
-    double det = 1/std::max(EPSILON, this->det());
+    float det = 1/std::max(EPSILON, this->det());
 
     a[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
     a[1] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
@@ -62,14 +62,14 @@ mat4 mat4::invert() {
     return a;
 }
 
-double mat4::det() {
+float mat4::det() {
     mat4 a = (*this);
-    double a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+    float a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
             a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
             a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
             a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
     
-    double b00 = a00 * a11 - a01 * a10,
+    float b00 = a00 * a11 - a01 * a10,
             b01 = a00 * a12 - a02 * a10,
             b02 = a00 * a13 - a03 * a10,
             b03 = a01 * a12 - a02 * a11,
@@ -86,12 +86,12 @@ double mat4::det() {
 }
 mat4 mat4::multiply(mat4 & b) {
     mat4 a = (*this);
-    double a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+    float a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
             a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
             a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
             a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
 
-    double b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];  
+    float b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];  
     a[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     a[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
     a[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
@@ -121,7 +121,7 @@ mat4 mat4::multiply(mat4 & b) {
 mat4 mat4::translate(const vec4 & v) {
     mat4 a = (*this);
 
-    double x = v.x, y = v.y, z = v.z;
+    float x = v.x, y = v.y, z = v.z;
     a[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
     a[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
     a[14] = a[2] * x + a[6] * y + a[10] * z + a[14];
@@ -130,7 +130,7 @@ mat4 mat4::translate(const vec4 & v) {
     return a;
 }
 mat4 mat4::scale(const vec4 & v) {
-    double x = v.x, y = v.y, z = v.z;
+    float x = v.x, y = v.y, z = v.z;
 
     mat4 a = (*this);
 
@@ -152,26 +152,26 @@ mat4 mat4::scale(const vec4 & v) {
     a[15] = a[15];
     return a;
 }
-mat4 mat4::rotate(double angle, const vec4 & axis) {
+mat4 mat4::rotate(float angle, const vec4 & axis) {
     mat4 a = (*this);
 
-    double x = axis.x, y = axis.y, z = axis.z;
-    double len = sqrt(x * x + y * y + z * z);
+    float x = axis.x, y = axis.y, z = axis.z;
+    float len = sqrt(x * x + y * y + z * z);
 
     len = 1 / std::max(len, EPSILON);
     x *= len;
     y *= len;
     z *= len;
 
-    double s = sin(angle * PI/180);
-    double c = cos(angle * PI/180);
-    double t = 1 - c;
+    float s = sin(angle * PI/180);
+    float c = cos(angle * PI/180);
+    float t = 1 - c;
 
-    double a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+    float a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
         a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
         a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
 
-    double b00 = x * x * t + c, b01 = y * x * t + z * s, b02 = z * x * t - y * s,
+    float b00 = x * x * t + c, b01 = y * x * t + z * s, b02 = z * x * t - y * s,
         b10 = x * y * t - z * s, b11 = y * y * t + c, b12 = z * y * t + x * s,
         b20 = x * z * t + y * s, b21 = y * z * t - x * s, b22 = z * z * t + c;
 
@@ -192,7 +192,7 @@ mat4 mat4::rotate(double angle, const vec4 & axis) {
 }
 
 vec4 mat4::transform(vec4 & v) {
-    double x = v.x, y = v.y, z = v.z, w = v.w;
+    float x = v.x, y = v.y, z = v.z, w = v.w;
     vec4 output;
     mat4 m = (*this);
 
