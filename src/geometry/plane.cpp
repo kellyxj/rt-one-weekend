@@ -15,6 +15,7 @@ Hit Plane::trace(ray & inRay) {
         hit.modelSpacePos = origin + (dir * t0);
         hit.normal = this->getNormal(hit.pos, ray);
         hit.material = this->material;
+        hit.brightness = hit.material->brightness;
         hit.inRay = inRay;
     }
     return hit;

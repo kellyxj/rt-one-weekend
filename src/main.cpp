@@ -10,7 +10,6 @@
 #include "camera.hpp"
 #include "mat4.hpp"
 #include "renderers/rayTracer.hpp"
-#include "renderers/pathTracer.hpp"
 
 void testScatter(ray & inRay, vec4 & pos, vec4 & normal, Material* material) {
     ray outRay = material->scatter(inRay, pos, normal);
@@ -29,8 +28,8 @@ int main() {
   
     start = std::chrono::system_clock::now();
 
-    int nx = 1600;
-    int ny = 1600;
+    int nx = 400;
+    int ny = 400;
     std::ofstream output("image.ppm");
 
     Scene scene;
@@ -41,66 +40,46 @@ int main() {
     Glass glass;
     Mirror mirror;
 
-    mirror.c = white;
-    glass.c = white;
+    mirror.c = Color(.8 + .2 * (rand() % 1), .8 + .2 * (rand() % 1), .8 + .2 * (rand() % 1));
+    glass.c = Color(.8 + .2 * (rand() % 1), .8 + .2 * (rand() % 1), .8 + .2 * (rand() % 1));
     glass.n_i = 2;
     sphereMat.c = red;
 
     plane.setMaterial(planeMat);
 
     vec4 axis(0,0,1,0);
-    vec4 translate(0,0,1,0);
+    vec4 translate(0,0,3,0);
     //plane.rotate(30, axis);
     Plane* plane_pointer = &plane;
     scene.items.push_back(plane_pointer);
 
     Square square;
-    square.setMaterial(glass);
+    base squareMat;
+    squareMat.c = white;
+    squareMat.brightness = 2;
+    square.setMaterial(squareMat);
+
     square.rotate(90, axis);
-    square.rotate(45, translate);
     square.translate(translate);
     Square* square_pointer = &square;
-    //scene.items.push_back(square_pointer);
+    scene.items.push_back(square_pointer);
 
     Sphere sphere;
     sphere.translate(axis);
 
     //vec4 scale(2,2,2);
     //sphere.scale(scale);
-    sphere.setMaterial(mirror);
+    sphere.setMaterial(glass);
 
     Sphere* sphere_pointer = &sphere;
     scene.items.push_back(sphere_pointer);
 
-    base lightMat;
-    lightMat.c = white;
-    SphereLight light;
-    lightMat.brightness = 1000;
-    light.setMaterial(lightMat);
-    
-    axis.z = 1000;
-    light.translate(axis);
-
-    vec4 scaleVec(200,200,200);
-    light.scale(scaleVec);
-    //scene.lights.push_back(&light);
-
-    SphereLight light2;
-    lightMat.brightness = 45;
-    light2.setMaterial(lightMat);
-    axis.z = 3;
-    axis.y = 3;
-    axis.x = 0;
-    scaleVec = vec4(.4,.4,.4);
-    light2.translate(axis);
-    light2.scale(scaleVec);
-    //scene.lights.push_back(&light2);
-
     Camera cam(vec4(-3,0,.5,1), 0, 0, nx, ny, .01, 90, 1);
+    cam.gamma = 2;
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.maxDepth = 2;
+    rayTracer.maxDepth = 3;
     rayTracer.sampleRate = 64;
 
     Image image;

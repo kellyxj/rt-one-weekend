@@ -17,6 +17,8 @@ public:
     vec4 uAxis;
     vec4 vAxis;
     vec4 nAxis;
+
+    float gamma;
     
     float left;
     float right;

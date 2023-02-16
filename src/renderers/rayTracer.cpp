@@ -46,7 +46,11 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
 
                 output.setPixel(i,j,c);
             }
-            
+            Color c = output.getPixel(i,j);
+            c.r = (float)pow((double)c.r, 1/cam.gamma);
+            c.g = (float)pow((double)c.g, 1/cam.gamma);
+            c.b = (float)pow((double)c.b, 1/cam.gamma);
+            output.setPixel(i,j,c);
         }
     }
         
@@ -56,35 +60,9 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
 Hit RayTracer::traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth) {
     Hit closest = hit;
     for(Geometry* item: scene.items) {
-        if(item->getType() == 1) {
-            Hit current = dynamic_cast<Plane*>(item)->trace(eyeRay);
-            if(current.t < closest.t) {
-                closest = current;
-                closest.isLight = false;
-            }
-        }
-        else if(item->getType() == 2) {
-            Hit current = dynamic_cast<Sphere*>(item)->trace(eyeRay);
-            if(current.t < closest.t) {
-                closest = current;
-                closest.isLight = false;
-            }
-        }
-        else if(item->getType() == 3) {
-            Hit current = dynamic_cast<Square*>(item)->trace(eyeRay);
-            if(current.t < closest.t) {
-                closest = current;
-                closest.isLight = false;
-            }
-         }
-    }
-    for(Geometry* light: scene.lights) {
-        if(light->getType() == 2) {
-            Hit current = light->trace(eyeRay);
-            if(current.t < closest.t) {
-                closest = current;
-                closest.isLight = true;
-            }
+        Hit current = item->trace(eyeRay);
+        if(current.t < closest.t) {
+            closest=current;
         }
     }
     this->findShade(scene, closest, depth);
@@ -94,12 +72,9 @@ Hit RayTracer::traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth) {
 void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
     //missed
     if(hit.t > 1e10) {
-        hit.color = white;
+        hit.color = grey;
     }
     //hit
-    else if(hit.isLight) {
-        hit.color = white;
-    }
     else {
         //Phong shading
         /*
@@ -138,22 +113,21 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
         if(depth < this->maxDepth) {
             bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth+1);
         }
-        if(bounceHit.t > 1e10) {
-            hit.color.r += .85 * hitColor.r;
-            hit.color.g += .85 * hitColor.g;
-            hit.color.b += .85 * hitColor.b;
-        }
-        else if(bounceHit.isLight) {
-            hit.color.r += bounceHit.material->brightness * hitColor.r;
-            hit.color.g += bounceHit.material->brightness * hitColor.g;
-            hit.color.b += bounceHit.material->brightness * hitColor.b;
+        if(bounceHit.brightness > 0) {
+            hit.color.r += bounceHit.brightness * bounceHit.color.r * hitColor.r;
+            hit.color.g += bounceHit.brightness * bounceHit.color.g * hitColor.g;
+            hit.color.b += bounceHit.brightness * bounceHit.color.b * hitColor.b;
         }
         else {
             hit.color.r += hitColor.r * bounceHit.color.r;
             hit.color.g += hitColor.g * bounceHit.color.g;
             hit.color.b += hitColor.b * bounceHit.color.b;
         }
-        
+
+        //light sources don't scatter
+        if(hit.brightness > 0) {
+            hit.color = hitColor;
+        }
     }
 }
 
@@ -161,28 +135,9 @@ Hit RayTracer::traceShadowRay(Scene & scene, ray & shadowRay, Hit & hit) {
     Hit closest = hit;
 
     for(Geometry* item: scene.items) {
-        if(item->getType() == 1) {
-            Hit current = dynamic_cast<Plane*>(item)->trace(shadowRay);
-            if(current.t < closest.t) {
+        Hit current = item->trace(shadowRay);
+        if(current.t < closest.t) {
                 closest = current;
-                closest.isLight = false;
-            }
-        }
-        else if(item->getType() == 2) {
-            Hit current = dynamic_cast<Sphere*>(item)->trace(shadowRay);
-            if(current.t < closest.t) {
-                closest = current;
-                closest.isLight = false;
-            }
-        }
-    }
-    for(Geometry* light: scene.lights) {
-        if(light->getType() == 2) {
-            Hit current = light->trace(shadowRay);
-            if(current.t < closest.t) {
-                closest = current;
-                closest.isLight = true;
-            }
         }
     }
     return closest;

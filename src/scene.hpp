@@ -5,7 +5,6 @@
 #include "geometry/plane.hpp"
 #include "camera.hpp"
 #include "geometry/sphere.hpp"
-#include "geometry/sphereLight.hpp"
 #include "geometry/square.hpp"
 #include <vector>
 

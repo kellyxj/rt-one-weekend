@@ -16,6 +16,7 @@ Hit Square::trace(ray & inRay) {
         hit.modelSpacePos = modelSpacePos;
         hit.normal = this->getNormal(hit.pos, ray);
         hit.material = this->material;
+        hit.brightness = hit.material->brightness;
         hit.inRay = inRay;
     }
     return hit;

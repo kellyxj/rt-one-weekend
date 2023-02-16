@@ -7,7 +7,8 @@
 class Hit {
 public:
     float t = 1e12;
-    bool isLight = false;
+    //default hit brightness controls amount of ambient occlusion
+    float brightness = 2;
 
     vec4 pos;
     vec4 modelSpacePos;
@@ -20,7 +21,6 @@ public:
 
 inline std::ostream& operator << (std::ostream &os, const Hit &h) {
     os << "time: " << h.t << "\n";
-    os << "hit light? " << h.isLight << "\n";
     os << "world space position " << h.pos << "\n";
     os << "model space position " << h.modelSpacePos << "\n";
     os << "normal vector " << h.normal << "\n";
