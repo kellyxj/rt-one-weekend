@@ -22,4 +22,4 @@ glass.o: glass.cpp material.hpp
 .PHONY: clean
 clean: 
 	rm -rf *.o
-	rm -rf image.ppm
+	rm -rf *.ppm

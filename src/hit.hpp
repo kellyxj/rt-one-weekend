@@ -7,8 +7,7 @@
 class Hit {
 public:
     float t = 1e12;
-    //default hit brightness controls amount of ambient occlusion
-    float brightness = 2;
+    float brightness = 0;
 
     vec4 pos;
     vec4 modelSpacePos;

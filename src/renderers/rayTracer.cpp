@@ -72,7 +72,8 @@ Hit RayTracer::traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth) {
 void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
     //missed
     if(hit.t > 1e10) {
-        hit.color = grey;
+        hit.color = scene.backgroundColor;
+        hit.brightness = scene.ambientLight;
     }
     //hit
     else {

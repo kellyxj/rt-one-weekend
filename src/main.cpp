@@ -30,9 +30,11 @@ int main() {
 
     int nx = 400;
     int ny = 400;
-    std::ofstream output("image.ppm");
+    std::ofstream output("image3.ppm");
 
     Scene scene;
+    scene.ambientLight = .25;
+
     Plane plane;
     groundGrid planeMat;
 
@@ -40,8 +42,8 @@ int main() {
     Glass glass;
     Mirror mirror;
 
-    mirror.c = Color(.8 + .2 * (rand() % 1), .8 + .2 * (rand() % 1), .8 + .2 * (rand() % 1));
-    glass.c = Color(.8 + .2 * (rand() % 1), .8 + .2 * (rand() % 1), .8 + .2 * (rand() % 1));
+    mirror.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
+    glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
     glass.n_i = 2;
     sphereMat.c = red;
 
@@ -56,7 +58,7 @@ int main() {
     Square square;
     base squareMat;
     squareMat.c = white;
-    squareMat.brightness = 2;
+    squareMat.brightness = 1;
     square.setMaterial(squareMat);
 
     square.rotate(90, axis);
@@ -85,6 +87,7 @@ int main() {
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
     image = rayTracer.takePicture(scene,0);
+    std::string output_filepath = "image.ppm";
     output << image.dump_ppm();
 
     vec4 origin(1,1,1,1);

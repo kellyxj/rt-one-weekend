@@ -10,8 +10,9 @@
 
 class Scene {
 public:
+    Color backgroundColor = sky;
+    float ambientLight = .25;
     std::vector<Geometry*> items;
     std::vector<Camera*> cameras;
-    std::vector<Geometry*> lights;
 };
 #endif

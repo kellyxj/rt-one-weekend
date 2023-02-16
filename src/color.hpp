@@ -24,6 +24,6 @@ const Color green(0,1,0);
 const Color blue(0,0,1);
 
 const Color grey(.4, .4, .4);
-const Color sky(.5, .8, .9);
+const Color sky(.85, .85, .85);
 
 #endif
