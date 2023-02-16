@@ -1,1 +1,0 @@
-#include "sphereLight.hpp"
