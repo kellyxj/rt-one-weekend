@@ -27,6 +27,3 @@ vec4 Plane::getNormal(vec4 & pos, ray & inRay) {
     }
     return (this->normalToWorld).transform(v);
 }
-int Plane::getType() {
-    return 1;
-}

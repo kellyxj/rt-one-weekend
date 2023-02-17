@@ -28,6 +28,3 @@ vec4 Square::getNormal(vec4 & pos, ray & inRay) {
     }
     return (this->normalToWorld).transform(v);
 }
-int Square::getType() {
-    return 3;
-}

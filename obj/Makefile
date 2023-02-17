@@ -1,7 +1,8 @@
 CXXFLAGS=-Wall
 CXX=g++
 
-objects = main.o vec4.o color.o ray.o camera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o
+objects = main.o vec4.o color.o ray.o camera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o \
+triangle.o mesh.o
 VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin
 
 edit: $(objects)
@@ -18,6 +19,7 @@ rayTracer.o: rayTracer.cpp scene.hpp image.hpp hit.hpp material.hpp sphere.hpp p
 square.o: square.cpp geometry.hpp
 mirror.o: mirror.cpp material.hpp
 glass.o: glass.cpp material.hpp
+triangle.o: triangle.cpp geometry.hpp
 
 .PHONY: clean
 clean: 

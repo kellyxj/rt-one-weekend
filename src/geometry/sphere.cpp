@@ -63,7 +63,3 @@ vec4 Sphere::getNormal(vec4 & pos, ray & inRay) {
     }
     return normVec;
 }
-
-int Sphere::getType() {
-    return 2;
-}

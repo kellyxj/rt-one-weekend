@@ -86,14 +86,21 @@ int main() {
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
-    image = rayTracer.takePicture(scene,0);
+    //image = rayTracer.takePicture(scene,0);
     output << image.dump_ppm();
 
-    vec4 origin(1,1,1,1);
-    vec4 direction(-1,0,-1,0);
+    vec4 origin(0,0,1,1);
+    vec4 direction(0,1,-1,0);
     ray inRay(origin, direction);
-    vec4 pos(0,1,0,1);
-    vec4 normal(0,0,1,0);
+    
+    vec4 a(-1,-1,0,1);
+    vec4 b(1,-1,0,1);
+    vec4 c(0,1,0,1);
+
+    Triangle triangle(a,b,c);
+    triangle.setMaterial(sphereMat);
+    Hit hit = triangle.trace(inRay);
+    std::cout << hit;
     //testScatter(inRay, pos, normal, &glass);
     //testHit(inRay, &plane);
     

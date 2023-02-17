@@ -6,6 +6,7 @@
 #include "camera.hpp"
 #include "geometry/sphere.hpp"
 #include "geometry/square.hpp"
+#include "geometry/triangle.hpp"
 #include <vector>
 
 class Scene {

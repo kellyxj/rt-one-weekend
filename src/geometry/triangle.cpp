@@ -1,0 +1,65 @@
+#include "triangle.hpp"
+Triangle::Triangle() {
+    v0 = vec4();
+    v1 = vec4();
+    v2 = vec4();
+}
+
+Triangle::Triangle(vec4 & a, vec4 & b, vec4 & c) {
+    v0 = a;
+    v1 = b;
+    v2 = c;
+}
+
+vec4 Triangle::getNormal(vec4 & pos, ray & inRay) {
+    vec4 edge1 = v1-v0;
+    vec4 edge2 = v2-v0;
+    vec4 normal = edge1.cross(edge2);
+    normal.normalize();
+    return normal;
+}
+
+//Möller–Trumbore intersection algorithm (https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm)
+Hit Triangle::trace(ray & inRay) {
+    vec4 edge1 = v1-v0;
+    vec4 edge2 = v2-v0;
+
+    //project to plane
+    vec4 h = inRay.direction.cross(edge2);
+    float a = edge1.dot(h);
+    Hit hit;
+
+    //parallel component to plane is 0
+    if(abs(a) < EPSILON) {
+        return hit;
+    }
+    float f= 1.0/a;
+    vec4 s = inRay.origin - v0;
+    //convert to barycentric
+    float u = f * s.dot(h);
+    if (u < 0.0 || u > 1.0)
+    {
+        return hit;
+    }
+
+    vec4 q = s.cross(edge1);
+    float v = f * inRay.direction.dot(q);
+    if (v < 0.0 || u+v > 1.0)
+    {
+        return hit;
+    }
+
+    float t = f * edge2.dot(q);
+
+    //t < 0 means triangle behind origin
+    if(t > 0) {
+        hit.t = t;
+        hit.pos = inRay.origin + (inRay.direction * t);
+        hit.modelSpacePos = hit.pos;
+        hit.normal = this->getNormal(hit.modelSpacePos, inRay);
+        hit.material = this->material;
+        hit.brightness = hit.material->brightness;
+        hit.inRay = inRay;
+    }
+    return hit;
+}
