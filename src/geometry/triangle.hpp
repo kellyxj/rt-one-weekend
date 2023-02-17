@@ -1,3 +1,4 @@
+#ifndef __TRIANGLE_H__
 #include "geometry.hpp"
 
 //N.B.: modelMatrix of individual triangles is assumed to be identity. Use transforms on containing meshes instead
@@ -11,3 +12,4 @@ public:
     vec4 getNormal(vec4 & pos, ray & inRay);
     Hit trace(ray & inRay);
 };
+#endif

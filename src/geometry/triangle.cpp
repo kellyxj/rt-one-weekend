@@ -15,6 +15,9 @@ vec4 Triangle::getNormal(vec4 & pos, ray & inRay) {
     vec4 edge1 = v1-v0;
     vec4 edge2 = v2-v0;
     vec4 normal = edge1.cross(edge2);
+    if(normal.dot(inRay.direction) > 0) {
+        normal = normal * -1;
+    }
     normal.normalize();
     return normal;
 }
@@ -28,9 +31,8 @@ Hit Triangle::trace(ray & inRay) {
     vec4 h = inRay.direction.cross(edge2);
     float a = edge1.dot(h);
     Hit hit;
-
     //parallel component to plane is 0
-    if(abs(a) < EPSILON) {
+    if(a < EPSILON && a > -EPSILON) {
         return hit;
     }
     float f= 1.0/a;
@@ -53,10 +55,11 @@ Hit Triangle::trace(ray & inRay) {
 
     //t < 0 means triangle behind origin
     if(t > 0) {
+        
         hit.t = t;
         hit.pos = inRay.origin + (inRay.direction * t);
         hit.modelSpacePos = hit.pos;
-        hit.normal = this->getNormal(hit.modelSpacePos, inRay);
+        hit.normal = getNormal(hit.modelSpacePos, inRay);
         hit.material = this->material;
         hit.brightness = hit.material->brightness;
         hit.inRay = inRay;

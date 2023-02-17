@@ -3,7 +3,7 @@ CXX=g++
 
 objects = main.o vec4.o color.o ray.o camera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o \
 triangle.o mesh.o
-VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin
+VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/util
 
 edit: $(objects)
 	$(CXX) -o ../bin/main $(objects)
@@ -20,6 +20,7 @@ square.o: square.cpp geometry.hpp
 mirror.o: mirror.cpp material.hpp
 glass.o: glass.cpp material.hpp
 triangle.o: triangle.cpp geometry.hpp
+mesh.o: mesh.cpp triangle.hpp
 
 .PHONY: clean
 clean: 

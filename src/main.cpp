@@ -74,9 +74,20 @@ int main() {
     sphere.setMaterial(glass);
 
     Sphere* sphere_pointer = &sphere;
-    scene.items.push_back(sphere_pointer);
+    //scene.items.push_back(sphere_pointer);
 
-    Camera cam(vec4(-3,0,.5,1), 0, 0, nx, ny, .01, 90, 1);
+    axis = vec4(1,0,0,0);
+    Mesh mesh;
+    mesh.loadFromObj("../data/cornell_box.obj");
+    mesh.setMaterial(sphereMat);
+    Mesh* mesh_pointer = &mesh;
+    mesh.rotate(-90, axis);
+
+    vec4 translateVec(-1,0,0,0);
+    mesh.translate(translateVec);
+    scene.items.push_back(mesh_pointer);
+
+    Camera cam(vec4(0,-3,.5,1), -90, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
@@ -86,23 +97,14 @@ int main() {
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
-    //image = rayTracer.takePicture(scene,0);
+    image = rayTracer.takePicture(scene,0);
     output << image.dump_ppm();
 
-    vec4 origin(0,0,1,1);
-    vec4 direction(0,1,-1,0);
+    vec4 origin(-3,0,.5,1);
+    vec4 direction(1,.01,0,0);
     ray inRay(origin, direction);
-    
-    vec4 a(-1,-1,0,1);
-    vec4 b(1,-1,0,1);
-    vec4 c(0,1,0,1);
-
-    Triangle triangle(a,b,c);
-    triangle.setMaterial(sphereMat);
-    Hit hit = triangle.trace(inRay);
-    std::cout << hit;
     //testScatter(inRay, pos, normal, &glass);
-    //testHit(inRay, &plane);
+    //testHit(inRay, &triangle);
     
     end = std::chrono::system_clock::now();
   
