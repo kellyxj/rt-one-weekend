@@ -33,7 +33,7 @@ int main() {
     std::ofstream output("../data/image.ppm");
 
     Scene scene;
-    scene.ambientLight = .25;
+    scene.ambientLight = .75;
 
     Plane plane;
     groundGrid planeMat;
@@ -71,21 +71,10 @@ int main() {
 
     //vec4 scale(2,2,2);
     //sphere.scale(scale);
-    sphere.setMaterial(glass);
+    sphere.setMaterial(mirror);
 
     Sphere* sphere_pointer = &sphere;
-    //scene.items.push_back(sphere_pointer);
-
-    axis = vec4(1,0,0,0);
-    Mesh mesh;
-    mesh.loadFromObj("../data/cornell_box.obj");
-    mesh.setMaterial(sphereMat);
-    Mesh* mesh_pointer = &mesh;
-    mesh.rotate(-90, axis);
-
-    vec4 translateVec(-1,0,0,0);
-    mesh.translate(translateVec);
-    scene.items.push_back(mesh_pointer);
+    scene.items.push_back(sphere_pointer);
 
     Camera cam(vec4(0,-3,.5,1), -90, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
