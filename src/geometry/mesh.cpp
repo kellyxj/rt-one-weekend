@@ -55,6 +55,15 @@ void Mesh::loadFromObj(std::string filepath) {
     auto& shapes = reader.GetShapes();
     auto& materials = reader.GetMaterials();
 
+    //get bounding box
+    float min_x = 1/EPSILON;
+    float min_y = 1/EPSILON;
+    float min_z = 1/EPSILON;
+
+    float max_x = -min_x;
+    float max_y = -min_y;
+    float max_z = -min_z;
+
     // Loop over shapes
     for (size_t s = 0; s < shapes.size(); s++) {
         // Loop over faces(polygon)
@@ -71,6 +80,14 @@ void Mesh::loadFromObj(std::string filepath) {
                 vertices[v].y = attrib.vertices[3*size_t(idx.vertex_index)+1];
                 vertices[v].z = attrib.vertices[3*size_t(idx.vertex_index)+2];
                 vertices[v].w = 1;
+                
+                min_x = vertices[v].x < min_x ? vertices[v].x : min_x;
+                min_y = vertices[v].y < min_y ? vertices[v].y : min_y;
+                min_z = vertices[v].z < min_z ? vertices[v].z : min_z;
+
+                max_x = vertices[v].x > max_x ? vertices[v].x : max_x;
+                max_y = vertices[v].y > max_y ? vertices[v].y : max_y;
+                max_z = vertices[v].z > max_z ? vertices[v].z : max_z;
 
                 // Check if `normal_index` is zero or positive. negative = no normal data
                 if (idx.normal_index >= 0) {
