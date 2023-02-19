@@ -5,8 +5,8 @@ BVH::BVH() {
 }
 
 BVH::BVH(vec4 & min_, vec4 & max_) {
-    min = min;
-    max = max;
+    min = vec4(min_.x, min_.y, min_.z, min_.w);
+    max = vec4(max_.x, max_.y, max_.z, max_.w);
 }
 
 void BVH::setMaterial(Material & m) {
@@ -39,12 +39,12 @@ Hit BVH::trace(ray & inRay) {
     float ty_exit = std::max(ty_min, ty_max);
 
     float tz_enter = std::min(tz_min ,tz_max);
-    float tz_exit = std::min(tz_min ,tz_max);
+    float tz_exit = std::max(tz_min ,tz_max);
 
     float t_enter = std::max(std::max(tx_enter, ty_enter), tz_enter);
     float t_exit = std::min(std::min(tx_exit, ty_exit), tz_exit);
 
-    if(t_enter < t_exit) {
+    if(t_enter < t_exit && t_exit > 0) {
         for(Geometry* child : children) {
             Hit hit = child->trace(inRay);
             if(hit.t < closest.t) {

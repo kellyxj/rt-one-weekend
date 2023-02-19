@@ -28,8 +28,8 @@ int main() {
   
     start = std::chrono::system_clock::now();
 
-    int nx = 400;
-    int ny = 400;
+    int nx = 1600;
+    int ny = 1600;
     std::ofstream output("../data/image.ppm");
 
     Scene scene;
@@ -42,7 +42,7 @@ int main() {
     Glass glass;
     Mirror mirror;
 
-    mirror.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
+    mirror.c = white;
     glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
     glass.n_i = 2;
 
@@ -55,12 +55,15 @@ int main() {
     Plane* plane_pointer = &plane;
     scene.items.push_back(plane_pointer);
 
-    translate = vec4(0,0,3,0);
+    translate = vec4(0,0,5,0);
     Square square;
     square.translate(translate);
+    vec4 scaleAmount = vec4(2,2,2);
+    square.scale(scaleAmount);
+
     base squareMat;
     squareMat.c = white;
-    squareMat.brightness = 1;
+    squareMat.brightness = 2;
     square.setMaterial(squareMat);
 
     Square* square_pointer = &square;
@@ -70,12 +73,12 @@ int main() {
     sphere.translate(axis);
 
     base sphereMat;
-    sphereMat.c = white;
-    sphereMat.brightness = 1;
+    sphereMat.c = red;
+    //sphereMat.brightness = 10;
     sphere.setMaterial(mirror);
 
     Sphere* sphere_pointer = &sphere;
-    //scene.items.push_back(sphere_pointer);
+    scene.items.push_back(sphere_pointer);
 
     
     Mesh mesh;
@@ -87,28 +90,32 @@ int main() {
     axis = vec4(0,0,1);
     mesh.rotate(90, axis);
 
+    translate = vec4(1.5,0,0);
+    mesh.translate(translate);
+
     base meshMaterial;
     meshMaterial.c = grey;
-    mesh.setMaterial(meshMaterial);
+    mesh.setMaterial(mirror);
+    mesh.constructBVH();
 
     Mesh * mesh_pointer = &mesh;
-    scene.items.push_back(mesh_pointer);
+    //scene.items.push_back(mesh_pointer);
     
 
-    Camera cam(vec4(-4,0,1,1), 0, 0, nx, ny, .01, 90, 1);
+    Camera cam(vec4(-6,0,.5,1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.maxDepth = 1;
-    rayTracer.sampleRate = 4;
+    rayTracer.maxDepth = 4;
+    rayTracer.sampleRate = 256;
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
     image = rayTracer.takePicture(scene,0);
     output << image.dump_ppm();
 
-    vec4 origin(-3,0,.5,1);
+    vec4 origin(0,0,.5,1);
     vec4 direction(1,.01,0,0);
     ray inRay(origin, direction);
     //testScatter(inRay, pos, normal, &glass);

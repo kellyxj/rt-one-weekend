@@ -20,19 +20,7 @@ Hit Mesh::trace(ray & inRay) {
     vec4 origin;
     vec4 dir;
 
-    origin = this->worldToModel.transform(inRay.origin);
-    dir = this->worldToModel.transform(inRay.direction);
-
-    ray ray(origin, dir);
-
-    //closest = bvh.trace(inRay);
-    for(Geometry* triangle : triangleList) {
-        Hit hit;
-        hit = triangle->trace(ray);
-        if(hit.t < closest.t) {
-            closest = hit;
-        }
-    }
+    closest = bvh.trace(inRay);
 
     return closest;
 }
@@ -157,7 +145,6 @@ void Mesh::constructBVH() {
         max.y = v2_world.y > max.y ? v2_world.y : max.y;
         max.z = v2_world.z > max.z ? v2_world.z : max.z;
     }
-
     bvh = BVH(min, max);
     bvh.children = triangleList;
 }

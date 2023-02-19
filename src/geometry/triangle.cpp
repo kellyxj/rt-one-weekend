@@ -28,8 +28,14 @@ Hit Triangle::trace(ray & inRay) {
     vec4 origin;
     vec4 dir;
 
-    origin = inRay.origin;
-    dir = inRay.direction;
+    if(parent != NULL) {
+        origin = parent->worldToModel.transform(inRay.origin);
+        dir = parent->worldToModel.transform(inRay.direction);
+    }
+    else {
+        origin = this->worldToModel.transform(inRay.origin);
+        dir = this->worldToModel.transform(inRay.direction);
+    }
 
     ray ray(origin, dir);
 
@@ -54,7 +60,7 @@ Hit Triangle::trace(ray & inRay) {
     }
 
     vec4 q = s.cross(edge1);
-    float v = f * inRay.direction.dot(q);
+    float v = f * ray.direction.dot(q);
     if (v < 0.0 || u+v > 1.0)
     {
         return hit;

@@ -44,6 +44,7 @@ ray Camera::getEyeRay(float xPos, float yPos) {
     ray eyeRay;
     eyeRay.origin = eyePoint;
     eyeRay.direction = (uAxis * posU) + (vAxis * posV) - (nAxis * near);
+    eyeRay.direction.normalize();
     return eyeRay;
 }
 

@@ -8,7 +8,7 @@
 class Mesh : public Geometry {
 public:
     std::vector<Geometry*> triangleList;
-    BVH bvh;
+    BVH bvh = BVH();
     
     void setMaterial(Material & m);
     vec4 getNormal(vec4 & pos, ray & inRay);
