@@ -5,9 +5,10 @@ Color Glass::getColor(vec4 & pos) {
 }
 
 ray Glass::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
-    float dot = inRay.direction.dot(normal);
+    vec4 dir = inRay.direction.normalize();
+    float dot = dir.dot(normal);
     vec4 parallel = normal * dot;
-    vec4 orthog = inRay.direction - parallel;
+    vec4 orthog = dir - parallel;
 
     ray outRay(pos, parallel+orthog);
 

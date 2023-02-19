@@ -61,6 +61,6 @@ vec4 Sphere::getNormal(vec4 & pos, ray & inRay) {
     if(normVec.dot(inRay.direction) > 0) {
         normVec = normVec * -1;
     }
-    normVec = (this->worldToModel).transform(normVec);
+    normVec = (this->normalToWorld).transform(normVec);
     return normVec.normalize();
 }

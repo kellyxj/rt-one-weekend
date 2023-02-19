@@ -1,4 +1,4 @@
-CXXFLAGS=-Wall
+CXXFLAGS=-Wall -O2
 CXX=g++
 
 objects = main.o vec4.o color.o ray.o camera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o \

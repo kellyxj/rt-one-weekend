@@ -24,13 +24,15 @@ vec4 BVH::getNormal(vec4 & pos, ray & inRay) {
 //perform desired transformations on a mesh object, then call mesh.constructBVH
 Hit BVH::trace(ray & inRay) {
     Hit closest;
-    float tx_min = (min.x - inRay.origin.x)/inRay.direction.x;
-    float ty_min = (min.y - inRay.origin.y)/inRay.direction.y;
-    float tz_min = (min.z - inRay.origin.z)/inRay.direction.z;
+    vec4 inv_dir(1.0/inRay.direction.x, 1.0/inRay.direction.y, 1.0/inRay.direction.z);
 
-    float tx_max = (max.x - inRay.origin.x)/inRay.direction.x;
-    float ty_max = (max.y - inRay.origin.y)/inRay.direction.y;
-    float tz_max = (max.z - inRay.origin.z)/inRay.direction.z;
+    float tx_min = (min.x - inRay.origin.x)*inv_dir.x;
+    float ty_min = (min.y - inRay.origin.y)*inv_dir.y;
+    float tz_min = (min.z - inRay.origin.z)*inv_dir.z;
+
+    float tx_max = (max.x - inRay.origin.x)*inv_dir.x;
+    float ty_max = (max.y - inRay.origin.y)*inv_dir.y;
+    float tz_max = (max.z - inRay.origin.z)*inv_dir.z;
 
     float tx_enter = std::min(tx_min, tx_max);
     float tx_exit = std::max(tx_min, tx_max);

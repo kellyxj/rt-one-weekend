@@ -28,12 +28,12 @@ int main() {
   
     start = std::chrono::system_clock::now();
 
-    int nx = 1600;
-    int ny = 1600;
+    int nx = 400;
+    int ny = 400;
     std::ofstream output("../data/image.ppm");
 
     Scene scene;
-    scene.ambientLight = .5;
+    scene.ambientLight = .8;
 
     Plane plane;
     groundGrid planeMat;
@@ -44,7 +44,7 @@ int main() {
 
     mirror.c = white;
     glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
-    glass.n_i = 2;
+    glass.n_i = 1.3;
 
     plane.setMaterial(planeMat);
 
@@ -63,7 +63,7 @@ int main() {
 
     base squareMat;
     squareMat.c = white;
-    squareMat.brightness = 2;
+    squareMat.brightness = 1;
     square.setMaterial(squareMat);
 
     Square* square_pointer = &square;
@@ -75,40 +75,40 @@ int main() {
     base sphereMat;
     sphereMat.c = red;
     //sphereMat.brightness = 10;
-    sphere.setMaterial(mirror);
+    sphere.setMaterial(glass);
 
     Sphere* sphere_pointer = &sphere;
-    scene.items.push_back(sphere_pointer);
+    //scene.items.push_back(sphere_pointer);
 
     
     Mesh mesh;
     mesh.loadFromObj("../data/teapot.obj");
 
     axis = vec4(1,0,0);
-    mesh.rotate(90, axis);
+    //mesh.rotate(90, axis);
 
     axis = vec4(0,0,1);
-    mesh.rotate(90, axis);
+    //mesh.rotate(90, axis);
 
     translate = vec4(1.5,0,0);
     mesh.translate(translate);
 
     base meshMaterial;
     meshMaterial.c = grey;
-    mesh.setMaterial(mirror);
+    mesh.setMaterial(meshMaterial);
     mesh.constructBVH();
 
     Mesh * mesh_pointer = &mesh;
-    //scene.items.push_back(mesh_pointer);
+    scene.items.push_back(mesh_pointer);
     
 
-    Camera cam(vec4(-6,0,.5,1), 0, 0, nx, ny, .01, 90, 1);
+    Camera cam(vec4(-5,0,.5,1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
     rayTracer.maxDepth = 4;
-    rayTracer.sampleRate = 256;
+    rayTracer.sampleRate = 16;
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
