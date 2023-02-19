@@ -33,56 +33,75 @@ int main() {
     std::ofstream output("../data/image.ppm");
 
     Scene scene;
-    scene.ambientLight = .75;
+    scene.ambientLight = .5;
 
     Plane plane;
     groundGrid planeMat;
 
-    base sphereMat;
+    //base sphereMat;
     Glass glass;
     Mirror mirror;
 
     mirror.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
     glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
     glass.n_i = 2;
-    sphereMat.c = red;
 
     plane.setMaterial(planeMat);
 
     vec4 axis(0,0,1,0);
-    vec4 translate(0,0,3,0);
+    vec4 translate(0,0,-2,0);
     //plane.rotate(30, axis);
+    //plane.translate(translate);
     Plane* plane_pointer = &plane;
     scene.items.push_back(plane_pointer);
 
+    translate = vec4(0,0,3,0);
     Square square;
+    square.translate(translate);
     base squareMat;
     squareMat.c = white;
     squareMat.brightness = 1;
     square.setMaterial(squareMat);
 
-    square.rotate(90, axis);
-    square.translate(translate);
     Square* square_pointer = &square;
     scene.items.push_back(square_pointer);
 
     Sphere sphere;
     sphere.translate(axis);
 
-    //vec4 scale(2,2,2);
-    //sphere.scale(scale);
+    base sphereMat;
+    sphereMat.c = white;
+    sphereMat.brightness = 1;
     sphere.setMaterial(mirror);
 
     Sphere* sphere_pointer = &sphere;
-    scene.items.push_back(sphere_pointer);
+    //scene.items.push_back(sphere_pointer);
 
-    Camera cam(vec4(0,-3,.5,1), -90, 0, nx, ny, .01, 90, 1);
+    
+    Mesh mesh;
+    mesh.loadFromObj("../data/teapot.obj");
+
+    axis = vec4(1,0,0);
+    mesh.rotate(90, axis);
+
+    axis = vec4(0,0,1);
+    mesh.rotate(90, axis);
+
+    base meshMaterial;
+    meshMaterial.c = grey;
+    mesh.setMaterial(meshMaterial);
+
+    Mesh * mesh_pointer = &mesh;
+    scene.items.push_back(mesh_pointer);
+    
+
+    Camera cam(vec4(-4,0,1,1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.maxDepth = 3;
-    rayTracer.sampleRate = 64;
+    rayTracer.maxDepth = 1;
+    rayTracer.sampleRate = 4;
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);

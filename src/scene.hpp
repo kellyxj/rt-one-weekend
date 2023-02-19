@@ -1,4 +1,5 @@
 #ifndef __SCENE_H__
+#define __SCENE_H__
 
 //A scene consists of geometry objects, lights, and at least one camera
 #include "geometry/geometry.hpp"

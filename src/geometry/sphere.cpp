@@ -57,9 +57,10 @@ Hit Sphere::trace(ray & inRay) {
 
 vec4 Sphere::getNormal(vec4 & pos, ray & inRay) {
     vec4 normVec(pos.x, pos.y, pos.z, 0);
-    normVec = (this->worldToModel).transform(normVec);
+    
     if(normVec.dot(inRay.direction) > 0) {
         normVec = normVec * -1;
     }
-    return normVec;
+    normVec = (this->worldToModel).transform(normVec);
+    return normVec.normalize();
 }

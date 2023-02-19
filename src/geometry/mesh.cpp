@@ -15,15 +15,20 @@ vec4 Mesh::getNormal(vec4 & pos, ray & inRay) {
 }
 
 Hit Mesh::trace(ray & inRay) {
-    vec4 origin = (this->worldToModel).transform(inRay.origin);
-    vec4 dir = (this->worldToModel).transform(inRay.direction);
+    Hit closest;
+
+    vec4 origin;
+    vec4 dir;
+
+    origin = this->worldToModel.transform(inRay.origin);
+    dir = this->worldToModel.transform(inRay.direction);
 
     ray ray(origin, dir);
 
-    Hit closest;
-
+    //closest = bvh.trace(inRay);
     for(Geometry* triangle : triangleList) {
-        Hit hit = triangle->trace(ray);
+        Hit hit;
+        hit = triangle->trace(ray);
         if(hit.t < closest.t) {
             closest = hit;
         }
@@ -55,15 +60,6 @@ void Mesh::loadFromObj(std::string filepath) {
     auto& shapes = reader.GetShapes();
     auto& materials = reader.GetMaterials();
 
-    //get bounding box
-    float min_x = 1/EPSILON;
-    float min_y = 1/EPSILON;
-    float min_z = 1/EPSILON;
-
-    float max_x = -min_x;
-    float max_y = -min_y;
-    float max_z = -min_z;
-
     // Loop over shapes
     for (size_t s = 0; s < shapes.size(); s++) {
         // Loop over faces(polygon)
@@ -80,14 +76,6 @@ void Mesh::loadFromObj(std::string filepath) {
                 vertices[v].y = attrib.vertices[3*size_t(idx.vertex_index)+1];
                 vertices[v].z = attrib.vertices[3*size_t(idx.vertex_index)+2];
                 vertices[v].w = 1;
-                
-                min_x = vertices[v].x < min_x ? vertices[v].x : min_x;
-                min_y = vertices[v].y < min_y ? vertices[v].y : min_y;
-                min_z = vertices[v].z < min_z ? vertices[v].z : min_z;
-
-                max_x = vertices[v].x > max_x ? vertices[v].x : max_x;
-                max_y = vertices[v].y > max_y ? vertices[v].y : max_y;
-                max_z = vertices[v].z > max_z ? vertices[v].z : max_z;
 
                 // Check if `normal_index` is zero or positive. negative = no normal data
                 if (idx.normal_index >= 0) {
@@ -111,15 +99,65 @@ void Mesh::loadFromObj(std::string filepath) {
             Triangle* triangle = new Triangle(vertices[0], vertices[1], vertices[2]);
 
             // per-face material
-            tinyobj::material_t mat = materials[shapes[s].mesh.material_ids[f]];  
-            base* triangleMat = new base();
-            //diffuse only for now
-            triangleMat->c.r = mat.diffuse[0];
-            triangleMat->c.g = mat.diffuse[1];
-            triangleMat->c.b = mat.diffuse[2];
-            triangle->setMaterial(*triangleMat);
+            if(materials.size() > 0) {
+                tinyobj::material_t mat = materials[shapes[s].mesh.material_ids[f]];  
+                base* triangleMat = new base();
+                //diffuse only for now
+                triangleMat->c.r = mat.diffuse[0];
+                triangleMat->c.g = mat.diffuse[1];
+                triangleMat->c.b = mat.diffuse[2];
+                triangle->setMaterial(*triangleMat);
+            }
+            
+            triangle->parent = this;
 
             triangleList.push_back(triangle);
         }
     }
+}
+
+void Mesh::constructBVH() {
+    float min_x = 1/EPSILON;
+    float min_y = 1/EPSILON;
+    float min_z = 1/EPSILON;
+    vec4 min(min_x, min_y, min_z, 1);
+
+    float max_x = -min_x;
+    float max_y = -min_y;
+    float max_z = -min_z;
+    vec4 max(max_x, max_y, max_z, 1);
+
+    for(Geometry* triangle : triangleList) {
+        Triangle* triangle_ = dynamic_cast<Triangle*>(triangle);
+        vec4 v0_world = modelMatrix.transform(triangle_->v0);
+        vec4 v1_world = modelMatrix.transform(triangle_->v1);
+        vec4 v2_world = modelMatrix.transform(triangle_->v2);
+
+        min.x = v0_world.x < min.x ? v0_world.x : min.x;
+        min.y = v0_world.y < min.y ? v0_world.y : min.y;
+        min.z = v0_world.z < min.z ? v0_world.z : min.z;
+
+        max.x = v0_world.x > max.x ? v0_world.x : max.x;
+        max.y = v0_world.y > max.y ? v0_world.y : max.y;
+        max.z = v0_world.z > max.z ? v0_world.z : max.z;
+
+        min.x = v1_world.x < min.x ? v1_world.x : min.x;
+        min.y = v1_world.y < min.y ? v1_world.y : min.y;
+        min.z = v1_world.z < min.z ? v1_world.z : min.z;
+
+        max.x = v1_world.x > max.x ? v1_world.x : max.x;
+        max.y = v1_world.y > max.y ? v1_world.y : max.y;
+        max.z = v1_world.z > max.z ? v1_world.z : max.z;
+
+        min.x = v2_world.x < min.x ? v2_world.x : min.x;
+        min.y = v2_world.y < min.y ? v2_world.y : min.y;
+        min.z = v2_world.z < min.z ? v2_world.z : min.z;
+
+        max.x = v2_world.x > max.x ? v2_world.x : max.x;
+        max.y = v2_world.y > max.y ? v2_world.y : max.y;
+        max.z = v2_world.z > max.z ? v2_world.z : max.z;
+    }
+
+    bvh = BVH(min, max);
+    bvh.children = triangleList;
 }
