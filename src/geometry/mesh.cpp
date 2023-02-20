@@ -17,10 +17,14 @@ vec4 Mesh::getNormal(vec4 & pos, ray & inRay) {
 Hit Mesh::trace(ray & inRay) {
     Hit closest;
 
-    vec4 origin;
-    vec4 dir;
-
-    closest = bvh.trace(inRay);
+    //closest = bvh.trace(inRay);
+    for(Geometry * triangle : bvh.children) {
+        Hit hit;
+        hit = triangle->trace(inRay);
+        if(hit.t < closest.t) {
+            closest = hit;
+        }
+    }
 
     return closest;
 }
@@ -118,6 +122,7 @@ void Mesh::constructBVH() {
     for(Geometry* triangle : triangleList) {
         Triangle* triangle_ = dynamic_cast<Triangle*>(triangle);
         vec4 v0_world = modelMatrix.transform(triangle_->v0);
+        std::cout << triangle_->v0;
         vec4 v1_world = modelMatrix.transform(triangle_->v1);
         vec4 v2_world = modelMatrix.transform(triangle_->v2);
 

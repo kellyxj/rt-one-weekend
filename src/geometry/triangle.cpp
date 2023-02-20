@@ -12,11 +12,9 @@ Triangle::Triangle(vec4 & a, vec4 & b, vec4 & c) {
 }
 
 vec4 Triangle::getNormal(vec4 & pos, ray & inRay) {
-    mat4 worldTransform = (parent != NULL ? parent->worldToModel : worldToModel);
+    mat4 worldTransform = parent->worldToModel;
     vec4 edge1 = v1-v0;
-    edge1 = worldTransform.transform(edge1);
     vec4 edge2 = v2-v0;
-    edge2 = worldTransform.transform(edge2);
     vec4 normal = edge1.cross(edge2);
     if(normal.dot(inRay.direction) > 0) {
         normal = normal * -1;
@@ -31,16 +29,14 @@ Hit Triangle::trace(ray & inRay) {
     vec4 origin;
     vec4 dir;
 
-    mat4 worldTransform = (parent != NULL ? parent->worldToModel : worldToModel);
+    mat4 worldTransform = parent->worldToModel;
     origin = worldTransform.transform(inRay.origin);
     dir = worldTransform.transform(inRay.direction);
 
     ray ray(origin, dir);
 
     vec4 edge1 = v1-v0;
-    edge1 = worldTransform.transform(edge1);
     vec4 edge2 = v2-v0;
-    edge2 = worldTransform.transform(edge2);
 
     //project to plane
     vec4 h = ray.direction.cross(edge2);
@@ -51,7 +47,7 @@ Hit Triangle::trace(ray & inRay) {
         return hit;
     }
     float f= 1.0/a;
-    vec4 s = ray.origin - worldTransform.transform(v0);
+    vec4 s = ray.origin - v0;
     //convert to barycentric
     float u = f * s.dot(h);
     if (u < 0.0 || u > 1.0)

@@ -33,7 +33,7 @@ int main() {
     std::ofstream output("../data/image.ppm");
 
     Scene scene;
-    scene.ambientLight = .8;
+    scene.ambientLight = .25;
 
     Plane plane;
     groundGrid planeMat;
@@ -75,22 +75,22 @@ int main() {
     base sphereMat;
     sphereMat.c = red;
     //sphereMat.brightness = 10;
-    sphere.setMaterial(glass);
+    sphere.setMaterial(mirror);
 
     Sphere* sphere_pointer = &sphere;
     //scene.items.push_back(sphere_pointer);
 
     
     Mesh mesh;
-    mesh.loadFromObj("../data/teapot.obj");
+    mesh.loadFromObj("../data/cornell_box.obj");
 
     axis = vec4(1,0,0);
-    //mesh.rotate(90, axis);
+    mesh.rotate(-90, axis);
 
     axis = vec4(0,0,1);
-    //mesh.rotate(90, axis);
+    mesh.rotate(90, axis);
 
-    translate = vec4(1.5,0,0);
+    translate = vec4(1,-.5,3);
     mesh.translate(translate);
 
     base meshMaterial;
@@ -100,7 +100,6 @@ int main() {
 
     Mesh * mesh_pointer = &mesh;
     scene.items.push_back(mesh_pointer);
-    
 
     Camera cam(vec4(-5,0,.5,1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
