@@ -12,7 +12,6 @@ Triangle::Triangle(vec4 & a, vec4 & b, vec4 & c) {
 }
 
 vec4 Triangle::getNormal(vec4 & pos, ray & inRay) {
-    mat4 worldTransform = parent->worldToModel;
     vec4 edge1 = v1-v0;
     vec4 edge2 = v2-v0;
     vec4 normal = edge1.cross(edge2);

@@ -33,7 +33,7 @@ int main() {
     std::ofstream output("../data/image.ppm");
 
     Scene scene;
-    scene.ambientLight = .25;
+    scene.ambientLight = .5;
 
     Plane plane;
     groundGrid planeMat;
@@ -44,22 +44,22 @@ int main() {
 
     mirror.c = white;
     glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
-    glass.n_i = 1.3;
+    glass.n_i = 2.1;
 
     plane.setMaterial(planeMat);
 
-    vec4 axis(0,0,1,0);
+    vec4 axis(0,0,1.5,0);
     vec4 translate(0,0,-2,0);
     //plane.rotate(30, axis);
     //plane.translate(translate);
     Plane* plane_pointer = &plane;
-    scene.items.push_back(plane_pointer);
+    //scene.items.push_back(plane_pointer);
 
-    translate = vec4(0,0,5,0);
+    translate = vec4(0,0,2.99,0);
     Square square;
-    square.translate(translate);
-    vec4 scaleAmount = vec4(2,2,2);
+    vec4 scaleAmount = vec4(.5,.5,.5);
     square.scale(scaleAmount);
+    square.translate(translate);
 
     base squareMat;
     squareMat.c = white;
@@ -70,44 +70,47 @@ int main() {
     scene.items.push_back(square_pointer);
 
     Sphere sphere;
+    sphere.scale(scaleAmount);
     sphere.translate(axis);
 
     base sphereMat;
     sphereMat.c = red;
     //sphereMat.brightness = 10;
-    sphere.setMaterial(mirror);
+    sphere.setMaterial(glass);
 
     Sphere* sphere_pointer = &sphere;
     //scene.items.push_back(sphere_pointer);
-
     
     Mesh mesh;
-    mesh.loadFromObj("../data/cornell_box.obj");
+    mesh.loadFromObj("../data/cornell_box_cube.obj");
 
     axis = vec4(1,0,0);
-    mesh.rotate(-90, axis);
-
-    axis = vec4(0,0,1);
     mesh.rotate(90, axis);
 
-    translate = vec4(1,-.5,3);
+    axis = vec4(0,0,1);
+    mesh.rotate(-90, axis);
+
+    vec4 scaleVec(2,2,2);
+    //mesh.scale(scaleVec);
+
+    translate = vec4(0,0,1);
     mesh.translate(translate);
 
     base meshMaterial;
     meshMaterial.c = grey;
-    mesh.setMaterial(meshMaterial);
+    //mesh.setMaterial(meshMaterial);
     mesh.constructBVH();
 
     Mesh * mesh_pointer = &mesh;
     scene.items.push_back(mesh_pointer);
 
-    Camera cam(vec4(-5,0,.5,1), 0, 0, nx, ny, .01, 90, 1);
+    Camera cam(vec4(-2,0,2,1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
     rayTracer.maxDepth = 4;
-    rayTracer.sampleRate = 16;
+    rayTracer.sampleRate = 64;
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);

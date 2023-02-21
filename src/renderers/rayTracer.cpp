@@ -114,11 +114,13 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
         if(depth < this->maxDepth) {
             bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth+1);
         }
+        //direct light contribution
         if(bounceHit.brightness > 0) {
             hit.color.r += (bounceHit.brightness) * bounceHit.color.r * hitColor.r;
             hit.color.g += (bounceHit.brightness)  * bounceHit.color.g * hitColor.g;
             hit.color.b += (bounceHit.brightness)  * bounceHit.color.b * hitColor.b;
         }
+        //BRDF contribution
         else {
             hit.color.r += hitColor.r * bounceHit.color.r;
             hit.color.g += hitColor.g * bounceHit.color.g;
