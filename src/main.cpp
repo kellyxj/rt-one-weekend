@@ -44,18 +44,18 @@ int main() {
 
     mirror.c = white;
     glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
-    glass.n_i = 2.1;
+    glass.n_i = 1.3;
 
     plane.setMaterial(planeMat);
 
-    vec4 axis(0,0,1.5,0);
+    vec4 axis(0,0,1,0);
     vec4 translate(0,0,-2,0);
     //plane.rotate(30, axis);
     //plane.translate(translate);
     Plane* plane_pointer = &plane;
     //scene.items.push_back(plane_pointer);
 
-    translate = vec4(0,0,2.99,0);
+    translate = vec4(0,0,1.99,0);
     Square square;
     vec4 scaleAmount = vec4(.5,.5,.5);
     square.scale(scaleAmount);
@@ -70,7 +70,7 @@ int main() {
     scene.items.push_back(square_pointer);
 
     Sphere sphere;
-    sphere.scale(scaleAmount);
+    //sphere.scale(scaleAmount);
     sphere.translate(axis);
 
     base sphereMat;
@@ -92,9 +92,8 @@ int main() {
 
     vec4 scaleVec(2,2,2);
     //mesh.scale(scaleVec);
-
     translate = vec4(0,0,1);
-    mesh.translate(translate);
+    //mesh.translate(translate);
 
     base meshMaterial;
     meshMaterial.c = grey;
@@ -104,13 +103,13 @@ int main() {
     Mesh * mesh_pointer = &mesh;
     scene.items.push_back(mesh_pointer);
 
-    Camera cam(vec4(-2,0,2,1), 0, 0, nx, ny, .01, 90, 1);
+    Camera cam(vec4(-2,0,1,1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
     rayTracer.maxDepth = 4;
-    rayTracer.sampleRate = 64;
+    rayTracer.sampleRate = 16;
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);

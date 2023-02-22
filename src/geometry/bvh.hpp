@@ -17,6 +17,14 @@ public:
     void setMaterial(Material & m);
     vec4 getNormal(vec4 & pos, ray & inRay);
     Hit trace(ray & inRay);
+
+    //expand the bounding box to include point
+    BVH include(vec4 & point);
+
+    //combine this bounding box with a different one
+    BVH coalesce(BVH & other);
+
+    BVH transform(mat4 & m);
 };
 
 #endif

@@ -1,12 +1,14 @@
 #include "bvh.hpp"
 BVH::BVH() {
-    min = vec4();
-    max = vec4();
+    min = vec4(1.0/EPSILON, 1.0/EPSILON, 1.0/EPSILON);
+    min.w = 1;
+    max = min * -1;
+    max.w = 1;
 }
 
 BVH::BVH(vec4 & min_, vec4 & max_) {
-    min = vec4(min_.x, min_.y, min_.z, min_.w);
-    max = vec4(max_.x, max_.y, max_.z, max_.w);
+    min = vec4(min_.x, min_.y, min_.z, 1);
+    max = vec4(max_.x, max_.y, max_.z, 1);
 }
 
 void BVH::setMaterial(Material & m) {
@@ -55,4 +57,52 @@ Hit BVH::trace(ray & inRay) {
         }
     }
     return closest;
+}
+
+BVH BVH::include(vec4 & point) {
+    min.x = point.x < min.x ? point.x : min.x;
+    min.y = point.y < min.y ? point.y : min.y;
+    min.z = point.z < min.z ? point.z : min.z;
+
+    max.x = point.x > max.x ? point.x : max.x;
+    max.y = point.y > max.y ? point.y : max.y;
+    max.z = point.z > max.z ? point.z : max.z;
+
+    return *this;
+}
+
+BVH BVH::coalesce(BVH & other) {
+    return *this;
+}
+
+BVH BVH::transform(mat4 & m) {
+    BVH output = BVH();
+    vec4 corner_0 = vec4(min.x, min.y, min.z, 1);
+    vec4 corner_1 = vec4(max.x, min.y, min.z, 1);
+    vec4 corner_2 = vec4(min.x, max.y, min.z, 1);
+    vec4 corner_3 = vec4(min.x, min.y, max.z, 1);
+    vec4 corner_4 = vec4(max.x, max.y, min.z, 1);
+    vec4 corner_5 = vec4(max.x, min.y, max.z, 1);
+    vec4 corner_6 = vec4(min.x, max.y, max.z, 1);
+    vec4 corner_7 = vec4(max.x, max.y, max.z, 1);
+
+    corner_0 = m.transform(corner_0);
+    corner_1 = m.transform(corner_1);
+    corner_2 = m.transform(corner_2);
+    corner_3 = m.transform(corner_3);
+    corner_4 = m.transform(corner_4);
+    corner_5 = m.transform(corner_5);
+    corner_6 = m.transform(corner_6);
+    corner_7 = m.transform(corner_7);
+
+    output.include(corner_0);
+    output.include(corner_1);
+    output.include(corner_2);
+    output.include(corner_3);
+    output.include(corner_4);
+    output.include(corner_5);
+    output.include(corner_6);
+    output.include(corner_7);
+
+    return output;
 }
