@@ -28,8 +28,8 @@ int main() {
   
     start = std::chrono::system_clock::now();
 
-    int nx = 400;
-    int ny = 400;
+    int nx = 1600;
+    int ny = 1600;
     std::ofstream output("../data/image.ppm");
 
     Scene scene;
@@ -70,7 +70,7 @@ int main() {
     scene.items.push_back(square_pointer);
 
     Sphere sphere;
-    //sphere.scale(scaleAmount);
+    sphere.scale(scaleAmount);
     sphere.translate(axis);
 
     base sphereMat;
@@ -79,10 +79,10 @@ int main() {
     sphere.setMaterial(glass);
 
     Sphere* sphere_pointer = &sphere;
-    //scene.items.push_back(sphere_pointer);
+    scene.items.push_back(sphere_pointer);
     
     Mesh mesh;
-    mesh.loadFromObj("../data/cornell_box_cube.obj");
+    mesh.loadFromObj("../data/cornell_box.obj");
 
     axis = vec4(1,0,0);
     mesh.rotate(90, axis);
@@ -108,8 +108,8 @@ int main() {
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.maxDepth = 4;
-    rayTracer.sampleRate = 16;
+    rayTracer.maxDepth = 10;
+    rayTracer.sampleRate = 256;
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);

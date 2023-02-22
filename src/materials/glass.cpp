@@ -28,9 +28,21 @@ ray Glass::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
         outRay.direction = inRay.direction - normal * 2 * inRay.direction.dot(normal);
     }
     else {
-        outRay.origin -= normal * EPSILON;
-        outRay.direction = normal * -1 * sqrt(cos_theta2_squared);
-        outRay.direction += orthog.normalize() * sqrt(sin_theta2_squared);
+        //Schlick approximation https://en.wikipedia.org/wiki/Schlick%27s_approximation
+        float cos_theta = sqrt(cos_theta2_squared);
+        float r0 = (inRay.n_i-outRay.n_i)*(inRay.n_i-outRay.n_i)/((inRay.n_i+outRay.n_i)*(inRay.n_i+outRay.n_i));
+        float reflectedPercent = r0+(1-r0)*(1-cos_theta);
+
+        float randomVariable = rand()%1;
+        if(randomVariable > reflectedPercent) {
+            outRay.origin -= normal * EPSILON;
+            outRay.direction = normal * -1 * cos_theta;
+            outRay.direction += orthog.normalize() * sqrt(sin_theta2_squared);
+        }
+        else {
+            outRay.origin += normal * EPSILON;
+            outRay.direction = inRay.direction - normal * 2 * inRay.direction.dot(normal);
+        }
     }
     
     return outRay;
