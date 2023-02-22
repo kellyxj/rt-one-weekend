@@ -44,11 +44,11 @@ int main() {
 
     mirror.c = white;
     glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
-    glass.n_i = 1.3;
+    glass.n_i = 1.8;
 
     plane.setMaterial(planeMat);
 
-    vec4 axis(0,0,1,0);
+    vec4 axis(0,0,.5,0);
     vec4 translate(0,0,-2,0);
     //plane.rotate(30, axis);
     //plane.translate(translate);
@@ -63,7 +63,7 @@ int main() {
 
     base squareMat;
     squareMat.c = white;
-    squareMat.brightness = 1;
+    squareMat.brightness = 2;
     square.setMaterial(squareMat);
 
     Square* square_pointer = &square;
