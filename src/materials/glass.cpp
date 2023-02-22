@@ -32,8 +32,10 @@ ray Glass::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
         float cos_theta = sqrt(cos_theta2_squared);
         float r0 = (inRay.n_i-outRay.n_i)*(inRay.n_i-outRay.n_i)/((inRay.n_i+outRay.n_i)*(inRay.n_i+outRay.n_i));
         float reflectedPercent = r0+(1-r0)*(1-cos_theta);
+        
+        double intPart;
+        float randomVariable = ((float)rand()/RAND_MAX);
 
-        float randomVariable = rand()%1;
         if(randomVariable > reflectedPercent) {
             outRay.origin -= normal * EPSILON;
             outRay.direction = normal * -1 * cos_theta;
