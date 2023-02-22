@@ -121,5 +121,5 @@ void Mesh::constructBVH() {
     bvh = bvh.transform(modelMatrix);
     //std::cout << "min: " << bvh.min << "\nmax: " << bvh.max << "\n";
     bvh.children = triangleList;
-    
+    bvh = bvh.build();
 }

@@ -106,3 +106,27 @@ BVH BVH::transform(mat4 & m) {
 
     return output;
 }
+
+BVH BVH::build() {
+    return *this;
+}
+
+float BVH::surfaceArea() {
+    //split on the longest axis
+
+    //get centroids of triangles. sort by split axis coordinate
+
+    //potential partitions are between centriods. compute cost of each partition using SAH
+
+    //find minimum cost partition
+
+    //if cost of all partitions is less than the cost of the current box, terminate. else split and recurse
+}
+
+float BVH::costOfSplit(float splitPos, splitAxis axis) {
+    return 0;
+}
+
+float BVH::surfaceArea() {
+    return 0;
+}

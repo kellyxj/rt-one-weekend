@@ -11,6 +11,8 @@ public:
     vec4 max;
     std::vector<Geometry*> children;
 
+    enum splitAxis {x, y, z};
+
     BVH();
     BVH(vec4 & min_, vec4 & max_);
 
@@ -25,6 +27,12 @@ public:
     BVH coalesce(BVH & other);
 
     BVH transform(mat4 & m);
+
+    BVH build();
+
+    float costOfSplit(float splitPos, splitAxis axis);
+
+    float surfaceArea();
 };
 
 #endif
