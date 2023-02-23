@@ -28,8 +28,8 @@ int main() {
   
     start = std::chrono::system_clock::now();
 
-    int nx = 1600;
-    int ny = 1600;
+    int nx = 400;
+    int ny = 400;
     std::ofstream output("../data/image.ppm");
 
     Scene scene;
@@ -44,6 +44,7 @@ int main() {
 
     mirror.c = white;
     glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
+    mirror.n_i = .5;
     glass.n_i = 1.8;
 
     plane.setMaterial(planeMat);
@@ -108,8 +109,8 @@ int main() {
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.maxDepth = 10;
-    rayTracer.sampleRate = 256;
+    rayTracer.maxDepth = 4;
+    rayTracer.sampleRate = 64;
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);

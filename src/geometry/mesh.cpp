@@ -113,13 +113,19 @@ void Mesh::constructBVH() {
 
     for(Geometry* triangle : triangleList) {
         Triangle* triangle_ = dynamic_cast<Triangle*>(triangle);
-        bvh.include(triangle_->v0);
-        bvh.include(triangle_->v1);
-        bvh.include(triangle_->v2);
+
+        //the initial state of the bvh has a leaf node bounding box around each triangle
+        //these will ultimately be deleted during the call to bvh.build()
+        BVH* leafNode = new BVH();
+        leafNode->include(triangle_->v0);
+        leafNode->include(triangle_->v1);
+        leafNode->include(triangle_->v2);
+        *leafNode = leafNode->transform(modelMatrix);
+        //leafNode->children.push_back(triangle);
+        
+        bvh.coalesce(*leafNode);
+        //bvh.children.push_back((Geometry*)leafNode);
+        bvh.children.push_back(triangle);
     }
-    
-    bvh = bvh.transform(modelMatrix);
-    //std::cout << "min: " << bvh.min << "\nmax: " << bvh.max << "\n";
-    bvh.children = triangleList;
-    bvh = bvh.build();
+    bvh = bvh.build(13);
 }

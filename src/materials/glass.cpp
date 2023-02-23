@@ -31,7 +31,7 @@ ray Glass::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
         //Schlick approximation https://en.wikipedia.org/wiki/Schlick%27s_approximation
         float cos_theta = sqrt(cos_theta2_squared);
         float r0 = (inRay.n_i-outRay.n_i)*(inRay.n_i-outRay.n_i)/((inRay.n_i+outRay.n_i)*(inRay.n_i+outRay.n_i));
-        float reflectedPercent = r0+(1-r0)*(1-cos_theta);
+        float reflectedPercent = r0+(1-r0)*pow((1-cos_theta),5);
         
         double intPart;
         float randomVariable = ((float)rand()/RAND_MAX);

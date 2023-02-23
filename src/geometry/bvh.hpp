@@ -2,6 +2,9 @@
 
 #include "geometry.hpp"
 #include <vector>
+#include <algorithm>
+
+enum class splitAxis {x, y, z};
 
 //axis-aligned bounding box
 //since box is axis-aligned, we only need to specify the two opposite corners (min and max)
@@ -9,13 +12,13 @@ class BVH : public Geometry {
 public:
     vec4 min;
     vec4 max;
+    vec4 centroid;
     std::vector<Geometry*> children;
-
-    enum splitAxis {x, y, z};
 
     BVH();
     BVH(vec4 & min_, vec4 & max_);
 
+    vec4 computeCentroid();
     void setMaterial(Material & m);
     vec4 getNormal(vec4 & pos, ray & inRay);
     Hit trace(ray & inRay);
@@ -28,11 +31,9 @@ public:
 
     BVH transform(mat4 & m);
 
-    BVH build();
+    BVH build(int maxDepth);
 
-    float costOfSplit(float splitPos, splitAxis axis);
-
-    float surfaceArea();
+    BVH buildRecursive(int currentDepth, int maxDepth);
 };
 
 #endif

@@ -1,14 +1,22 @@
 #include "bvh.hpp"
+
 BVH::BVH() {
     min = vec4(1.0/EPSILON, 1.0/EPSILON, 1.0/EPSILON);
     min.w = 1;
     max = min * -1;
     max.w = 1;
+    computeCentroid();
 }
 
 BVH::BVH(vec4 & min_, vec4 & max_) {
     min = vec4(min_.x, min_.y, min_.z, 1);
     max = vec4(max_.x, max_.y, max_.z, 1);
+    computeCentroid();
+}
+
+vec4 BVH::computeCentroid() {
+    centroid = vec4(.5*(max.x+min.x), .5*(max.y+min.y), .5*(max.z+min.z), 1);
+    return centroid;
 }
 
 void BVH::setMaterial(Material & m) {
@@ -67,11 +75,14 @@ BVH BVH::include(vec4 & point) {
     max.x = point.x > max.x ? point.x : max.x;
     max.y = point.y > max.y ? point.y : max.y;
     max.z = point.z > max.z ? point.z : max.z;
+    computeCentroid();
 
     return *this;
 }
 
 BVH BVH::coalesce(BVH & other) {
+    include(other.min);
+    include(other.max);
     return *this;
 }
 
@@ -107,26 +118,57 @@ BVH BVH::transform(mat4 & m) {
     return output;
 }
 
-BVH BVH::build() {
-    return *this;
+BVH BVH::build(int maxDepth) {
+    return buildRecursive(0, maxDepth);
 }
 
-float BVH::surfaceArea() {
+BVH BVH::buildRecursive(int depth, int maxDepth) {
+    //return if this box contains 1 triangle
+    int numChildren = children.size();
+    if(numChildren <= 1 || depth >= maxDepth) {
+        return *this;
+    }
+
     //split on the longest axis
+    splitAxis axis = max.y - min.y > max.x - min.x ? splitAxis::y : splitAxis::x;
+    axis = max.z - min.z > max.y - min.y ? splitAxis::z : splitAxis::y;
 
+    float lowerBound;
+    float upperBound;
+
+    if(axis == splitAxis::x) {
+        lowerBound = min.x;
+        upperBound = max.x;
+    }
+    else if(axis == splitAxis::y) {
+        lowerBound = min.y;
+        upperBound = max.y;
+    }
+    else {
+        lowerBound = min.z;
+        upperBound = max.z;
+    }
+    
     //get centroids of triangles. sort by split axis coordinate
-
-    //potential partitions are between centriods. compute cost of each partition using SAH
-
-    //find minimum cost partition
-
-    //if cost of all partitions is less than the cost of the current box, terminate. else split and recurse
-}
-
-float BVH::costOfSplit(float splitPos, splitAxis axis) {
-    return 0;
-}
-
-float BVH::surfaceArea() {
-    return 0;
+    /*
+    std::vector<float> centroidList(numChildren);
+    std::sort(children.begin(), children.end(), [axis](Geometry* lhs, Geometry* rhs) {
+        if(axis == splitAxis::x) {
+            const BVH* lhs_ = dynamic_cast<BVH*>(lhs);
+            const BVH* rhs_ = dynamic_cast<BVH*>(rhs);
+            return lhs_->centroid.x < rhs_->centroid.x;
+        }
+        else if(axis == splitAxis::y) {
+            const BVH* lhs_ = dynamic_cast<BVH*>(lhs);
+            const BVH* rhs_ = dynamic_cast<BVH*>(rhs);
+            return lhs_->centroid.y < rhs_->centroid.y;
+        }
+        else {
+            const BVH* lhs_ = dynamic_cast<BVH*>(lhs);
+            const BVH* rhs_ = dynamic_cast<BVH*>(rhs);
+            return lhs_->centroid.z < rhs_->centroid.z;
+        }
+    });*/
+    
+    return *this;
 }
