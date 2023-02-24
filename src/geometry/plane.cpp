@@ -26,6 +26,7 @@ vec4 Plane::getNormal(vec4 & pos, ray & inRay) {
         v.z = -1;
     }
     vec4 normal = this->normalToWorld.transform(v);
+    normal.w = 0;
     normal.normalize();
     return normal;
 }

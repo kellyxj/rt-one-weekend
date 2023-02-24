@@ -19,6 +19,7 @@ vec4 Triangle::getNormal(vec4 & pos, ray & inRay) {
         normal = normal * -1;
     }
     normal = (parent->normalToWorld).transform(normal);
+    normal.w = 0;
     normal.normalize();
     return normal;
 }
