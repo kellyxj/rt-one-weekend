@@ -10,6 +10,10 @@
 #include "camera.hpp"
 #include "mat4.hpp"
 #include "renderers/rayTracer.hpp"
+#include "util/date.h"
+
+using namespace date;
+using namespace std::chrono;
 
 void testScatter(ray & inRay, vec4 & pos, vec4 & normal, Material* material) {
     ray outRay = material->scatter(inRay, pos, normal);
@@ -28,9 +32,15 @@ int main() {
   
     start = std::chrono::system_clock::now();
 
-    int nx = 1600;
-    int ny = 1600;
-    std::ofstream output("../data/image.ppm");
+    int nx = 400;
+    int ny = 400;
+    std::stringstream ss;
+    ss << start;
+
+    std::string timestamp = ss.str();
+
+    std::string path = "../data/" + timestamp + ".ppm";
+    std::ofstream output(path);
 
     Scene scene;
     scene.ambientLight = .5;
@@ -78,7 +88,7 @@ int main() {
     base sphereMat;
     sphereMat.c = red;
     //sphereMat.brightness = 10;
-    sphere.setMaterial(glass);
+    sphere.setMaterial(mirror);
 
     Sphere* sphere_pointer = &sphere;
     scene.items.push_back(sphere_pointer);
@@ -110,8 +120,8 @@ int main() {
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.maxDepth = 20;
-    rayTracer.sampleRate = 256;
+    rayTracer.maxDepth = 8;
+    rayTracer.sampleRate = 64;
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
