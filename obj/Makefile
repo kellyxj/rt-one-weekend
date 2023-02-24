@@ -9,6 +9,7 @@ edit: $(objects)
 	$(CXX) -o ../bin/main $(objects)
 
 main.o: main.cpp vec4.hpp color.hpp ray.hpp camera.hpp mat4.hpp rayTracer.hpp
+scene.o: scene.cpp geometry.hpp plane.hpp camera.hpp sphere.hpp square.hpp mesh.hpp
 ray.o: ray.cpp vec4.hpp
 camera.o: camera.cpp vec4.hpp ray.hpp
 mat4.o: mat4.cpp vec4.hpp

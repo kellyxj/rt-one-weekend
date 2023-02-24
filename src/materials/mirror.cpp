@@ -23,24 +23,31 @@ ray Mirror::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     float sin_theta2_squared = inRay.n_i * inRay.n_i/(outRay.n_i * outRay.n_i) * (1 - (dot) * (dot));
     float cos_theta2_squared = 1 - sin_theta2_squared;
 
-    float cos_theta = sqrt(cos_theta2_squared);
-    float r0 = (inRay.n_i-outRay.n_i)*(inRay.n_i-outRay.n_i)/((inRay.n_i+outRay.n_i)*(inRay.n_i+outRay.n_i));
-    
-    float a = 3;
-    float alpha = 6;
-    float reflectedPercent = r0 + (1 - r0)*pow((1 - cos_theta), 5)-a *cos_theta*pow((1 - cos_theta),alpha);
-
-    double intPart;
-    float randomVariable = ((float)rand()/RAND_MAX);
-
-    if(randomVariable > reflectedPercent) {
-        outRay.origin -= normal * EPSILON;
-        outRay.direction = normal * -1 * cos_theta;
-        outRay.direction += orthog.normalize() * sqrt(sin_theta2_squared);
-    }
-    else {
+    if(sin_theta2_squared > 1) {
         outRay.origin += normal * EPSILON;
         outRay.direction = inRay.direction - normal * 2 * inRay.direction.dot(normal);
     }
+    else {
+        float cos_theta = sqrt(cos_theta2_squared);
+        float r0 =((inRay.n_i-outRay.n_i)*(inRay.n_i-outRay.n_i)+k*k)/((inRay.n_i+outRay.n_i)*(inRay.n_i+outRay.n_i)+k*k);
+        
+        float a = 3;
+        float alpha = 6;
+        float reflectedPercent = r0 + (1 - r0)*pow((1 - cos_theta), 5)-a *cos_theta*pow((1 - cos_theta),alpha);
+
+        double intPart;
+        float randomVariable = ((float)rand()/RAND_MAX);
+
+        if(randomVariable > reflectedPercent) {
+            outRay.origin -= normal * EPSILON;
+            outRay.direction = vec4();
+        }
+        else {
+            outRay.origin += normal * EPSILON;
+            outRay.direction = inRay.direction - normal * 2 * inRay.direction.dot(normal);
+        }
+    }
+
+    
     return outRay;
 }
