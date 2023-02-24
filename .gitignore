@@ -4,3 +4,4 @@ data/
 /obj/*
 !/obj/
 !/obj/Makefile
+/screenshots/*
