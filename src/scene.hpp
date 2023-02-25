@@ -13,6 +13,8 @@
 
 class Scene {
 public:
+    std::string name; //names must be unique
+
     Color backgroundColor = sky;
     float ambientLight = .25;
     std::vector<Geometry*> items;

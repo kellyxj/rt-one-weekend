@@ -11,6 +11,7 @@
 #include "mat4.hpp"
 #include "renderers/rayTracer.hpp"
 #include "util/date.h"
+#include "util/scene_loader.hpp"
 
 using namespace date;
 using namespace std::chrono;
@@ -43,6 +44,7 @@ int main() {
     std::ofstream output(path);
 
     Scene scene;
+    scene.name = "cornell_box_sphere";
     scene.ambientLight = 0;
     scene.backgroundColor = black;
 
@@ -114,7 +116,7 @@ int main() {
     mesh.constructBVH();
 
     Mesh * mesh_pointer = &mesh;
-    //scene.items.push_back(mesh_pointer);
+    scene.items.push_back(mesh_pointer);
 
     Camera cam(vec4(-2,0,1,1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
@@ -125,7 +127,8 @@ int main() {
     rayTracer.sampleRate = 256;
 
     json json_ = scene.serialize();
-    std::cout << json_.dump();
+    SceneLoader sceneLoader;
+    sceneLoader.createSceneFile(json_);
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);

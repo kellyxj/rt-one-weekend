@@ -2,6 +2,7 @@
 
 json Scene::serialize() {
     json json_ = {
+        {"name", name},
         {"ambientLight", ambientLight},
         {"backgroundColor", {
             {"red", backgroundColor.r},

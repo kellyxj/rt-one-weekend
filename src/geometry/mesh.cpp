@@ -131,7 +131,15 @@ void Mesh::constructBVH() {
 }
 
 json Mesh::serialize() {
-    json json_;
+    json json_ = {
+        {"type", type},
+        {"transform", modelMatrix.serialize()},
+        {"triangleList", json::array()}
+    };
+    for(Geometry* triangle: triangleList) {
+        json_["triangleList"].push_back(triangle->serialize());
+    }
+
     return json_;
 }
 Geometry* Mesh::deserialize(json json_) {

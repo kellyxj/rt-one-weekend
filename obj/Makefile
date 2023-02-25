@@ -1,14 +1,15 @@
-CXXFLAGS=-Wall -O2
+CXXFLAGS=-Wall -O2 -std=c++17
 CXX=g++
+LDLIBS=-lstdc++fs
 
 objects = main.o vec4.o color.o ray.o camera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o \
-triangle.o mesh.o bvh.o
+triangle.o mesh.o bvh.o scene_loader.o
 VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/util
 
 edit: $(objects)
-	$(CXX) -o ../bin/main $(objects)
+	$(CXX) -o ../bin/main $(objects) $(LDLIBS)
 
-main.o: main.cpp vec4.hpp color.hpp ray.hpp camera.hpp mat4.hpp rayTracer.hpp
+main.o: main.cpp vec4.hpp color.hpp ray.hpp camera.hpp mat4.hpp rayTracer.hpp scene_loader.hpp
 scene.o: scene.cpp geometry.hpp plane.hpp camera.hpp sphere.hpp square.hpp mesh.hpp
 ray.o: ray.cpp vec4.hpp
 camera.o: camera.cpp vec4.hpp ray.hpp
@@ -23,6 +24,7 @@ glass.o: glass.cpp material.hpp
 triangle.o: triangle.cpp geometry.hpp
 mesh.o: mesh.cpp triangle.hpp bvh.hpp
 bvh.o: bvh.cpp geometry.hpp
+scene_loader.o: scene_loader.cpp scene.hpp
 
 .PHONY: clean
 clean: 
