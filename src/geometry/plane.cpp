@@ -32,9 +32,14 @@ vec4 Plane::getNormal(vec4 & pos, ray & inRay) {
 }
 
 json Plane::serialize() {
-    json json_;
+    json json_ = {
+        {"type", type},
+        {"transform", modelMatrix.serialize()}
+    };
+
     return json_;
 }
+
 Geometry* Plane::deserialize(json json_) {
 
 }

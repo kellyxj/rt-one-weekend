@@ -79,9 +79,14 @@ Hit Triangle::trace(ray & inRay) {
 }
 
 json Triangle::serialize() {
-    json json_;
+    json json_ = {
+        {"type", type},
+        {"transform", modelMatrix.serialize()}
+    };
+
     return json_;
 }
+
 Geometry* Triangle::deserialize(json json_) {
 
 }

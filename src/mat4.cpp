@@ -202,3 +202,10 @@ vec4 mat4::transform(vec4 & v) {
     output.w = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
     return output;
 }
+
+json mat4::serialize() {
+    json json_ = {
+        {"entries", entries}
+    };
+    return json_;
+}

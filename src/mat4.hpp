@@ -44,6 +44,8 @@ public:
 
     //return this*v
     vec4 transform(vec4 & v);
+
+    json serialize();
 };
 
 inline std::ostream& operator << (std::ostream &os, const mat4 &a) {

@@ -33,9 +33,14 @@ vec4 Square::getNormal(vec4 & pos, ray & inRay) {
 }
 
 json Square::serialize() {
-    json json_;
+    json json_ = {
+        {"type", type},
+        {"transform", modelMatrix.serialize()}
+    };
+
     return json_;
 }
+
 Geometry* Square::deserialize(json json_) {
 
 }
