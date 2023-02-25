@@ -9,8 +9,6 @@
 #include "geometry/square.hpp"
 #include "geometry/mesh.hpp"
 
-#include "util/json.hpp"
-using namespace nlohmann;
 #include <vector>
 
 class Scene {

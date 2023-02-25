@@ -1,12 +1,23 @@
 #include "scene.hpp"
-using namespace nlohmann;
 
 json Scene::serialize() {
-    json json_;
-    json_ = {
+    json json_ = {
         {"ambientLight", ambientLight},
-        {"backgroundColor", {backgroundColor.r, backgroundColor.g, backgroundColor.b}}
+        {"backgroundColor", {
+            {"red", backgroundColor.r},
+            {"green", backgroundColor.g},
+            {"blue", backgroundColor.b}
+        }},
+        {"items", json::array()},
+        {"cameras",json::array()}
     };
+    for(Camera* camera : cameras) {
+        json_["cameras"].push_back(camera->serialize());
+    }
+    for(Geometry* item: items) {
+        json_["items"].push_back(item->serialize());
+    }
+
     return json_;
 }
 

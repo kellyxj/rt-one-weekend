@@ -5,8 +5,13 @@
 
 class Sphere: public Geometry {
 public:
+    GeometryType type = GeometryType::sphere;
+
     Hit trace(ray & inRay);
     vec4 getNormal(vec4 & pos, ray & inRay);
+
+    json serialize();
+    Geometry* deserialize(json json_);
 };
 
 #endif

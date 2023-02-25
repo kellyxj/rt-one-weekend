@@ -77,3 +77,11 @@ Hit Triangle::trace(ray & inRay) {
     }
     return hit;
 }
+
+json Triangle::serialize() {
+    json json_;
+    return json_;
+}
+Geometry* Triangle::deserialize(json json_) {
+
+}

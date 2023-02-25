@@ -130,17 +130,17 @@ BVH BVH::buildRecursive(int depth, int maxDepth) {
     }
 
     //split on the longest axis
-    splitAxis axis = max.y - min.y > max.x - min.x ? splitAxis::y : splitAxis::x;
-    axis = max.z - min.z > max.y - min.y ? splitAxis::z : splitAxis::y;
+    SplitAxis axis = max.y - min.y > max.x - min.x ? SplitAxis::y : SplitAxis::x;
+    axis = max.z - min.z > max.y - min.y ? SplitAxis::z : SplitAxis::y;
 
     float lowerBound;
     float upperBound;
 
-    if(axis == splitAxis::x) {
+    if(axis == SplitAxis::x) {
         lowerBound = min.x;
         upperBound = max.x;
     }
-    else if(axis == splitAxis::y) {
+    else if(axis == SplitAxis::y) {
         lowerBound = min.y;
         upperBound = max.y;
     }
@@ -171,4 +171,12 @@ BVH BVH::buildRecursive(int depth, int maxDepth) {
     });*/
     
     return *this;
+}
+
+json BVH::serialize() {
+    json json_;
+    return json_;
+}
+Geometry* BVH::deserialize(json json_) {
+
 }

@@ -31,3 +31,11 @@ vec4 Square::getNormal(vec4 & pos, ray & inRay) {
     normal.normalize();
     return normal;
 }
+
+json Square::serialize() {
+    json json_;
+    return json_;
+}
+Geometry* Square::deserialize(json json_) {
+
+}

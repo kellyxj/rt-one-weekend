@@ -54,3 +54,13 @@ vec4 & vec4::operator /= (float c){
     w /= c;
     return (*this);
 }
+
+json vec4::serialize() {
+    json json_ = {
+        {"x", x},
+        {"y", y},
+        {"z", z},
+        {"w", w}
+    };
+    return json_;
+}

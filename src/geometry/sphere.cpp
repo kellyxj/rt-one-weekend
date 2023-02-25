@@ -65,3 +65,11 @@ vec4 Sphere::getNormal(vec4 & pos, ray & inRay) {
     normVec.w = 0;
     return normVec.normalize();
 }
+
+json Sphere::serialize() {
+    json json_;
+    return json_;
+}
+Geometry* Sphere::deserialize(json json_) {
+
+}

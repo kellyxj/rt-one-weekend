@@ -55,3 +55,15 @@ void Camera::setUVN() {
 }
 
 //Camera::lookAt(vec4 aim)
+
+json Camera::serialize() {
+    json json_ = {
+        {"width", width},
+        {"height", height},
+        {"eyePoint", eyePoint.serialize()},
+        {"aimPoint", aimPoint.serialize()},
+        {"up", up.serialize()}
+    };
+
+    return json_;
+}

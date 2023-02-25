@@ -129,3 +129,11 @@ void Mesh::constructBVH() {
     }
     bvh = bvh.build(13);
 }
+
+json Mesh::serialize() {
+    json json_;
+    return json_;
+}
+Geometry* Mesh::deserialize(json json_) {
+
+}

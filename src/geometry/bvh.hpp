@@ -4,12 +4,14 @@
 #include <vector>
 #include <algorithm>
 
-enum class splitAxis {x, y, z};
+enum class SplitAxis {x, y, z};
 
 //axis-aligned bounding box
 //since box is axis-aligned, we only need to specify the two opposite corners (min and max)
 class BVH : public Geometry {
 public:
+    GeometryType type = GeometryType::bvh;
+
     vec4 min;
     vec4 max;
     vec4 centroid;
@@ -34,6 +36,9 @@ public:
     BVH build(int maxDepth);
 
     BVH buildRecursive(int currentDepth, int maxDepth);
+
+    json serialize();
+    Geometry* deserialize(json json_);
 };
 
 #endif

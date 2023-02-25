@@ -6,8 +6,12 @@
 #include "../materials/baseMaterial.hpp"
 #include "../hit.hpp"
 #include "../vec4.hpp"
+enum class GeometryType {none, plane, sphere, square, mesh, triangle, bvh};
+
 class Geometry {
 public:
+    GeometryType type = GeometryType::none;
+
     mat4 modelMatrix;
     mat4 worldToModel;
     mat4 normalToWorld;
@@ -29,6 +33,9 @@ public:
 
     virtual Hit trace(ray & inRay) = 0;
     virtual ~Geometry() {}
+
+    virtual json serialize() = 0;
+    virtual Geometry* deserialize(json json_) = 0;
 };
 
 #endif

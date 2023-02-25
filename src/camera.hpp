@@ -76,6 +76,10 @@ public:
     ray getEyeRay(float xPos, float yPos);
 
     void setUVN();
+
+    json serialize();
+
+    Camera desieralize(json json_);
 };
 
 #endif

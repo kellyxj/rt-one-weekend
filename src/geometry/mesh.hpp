@@ -7,6 +7,8 @@
 
 class Mesh : public Geometry {
 public:
+    GeometryType type = GeometryType::mesh;
+
     std::vector<Geometry*> triangleList;
     BVH bvh = BVH();
     
@@ -16,5 +18,8 @@ public:
 
     void loadFromObj(std::string filepath);
     void constructBVH();
+
+    json serialize();
+    Geometry* deserialize(json json_);
 };
 #endif
