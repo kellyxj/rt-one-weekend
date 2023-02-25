@@ -8,6 +8,9 @@
 #include "geometry/sphere.hpp"
 #include "geometry/square.hpp"
 #include "geometry/mesh.hpp"
+
+#include "util/json.hpp"
+using namespace nlohmann;
 #include <vector>
 
 class Scene {
@@ -16,5 +19,8 @@ public:
     float ambientLight = .25;
     std::vector<Geometry*> items;
     std::vector<Camera*> cameras;
+
+    json serialize();
+    Scene deserialize(json json_);
 };
 #endif

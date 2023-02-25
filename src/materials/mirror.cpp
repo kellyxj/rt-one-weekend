@@ -15,7 +15,7 @@ ray Mirror::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
 
     float cos_theta = -dot;
     
-    float a = 3;
+    float a = 1.136;
     float alpha = 6;
     float reflectedPercent = r0 + (1 - r0)*pow((1 - cos_theta), 5)-a *cos_theta*pow((1 - cos_theta),alpha);
 

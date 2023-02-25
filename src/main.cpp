@@ -43,7 +43,8 @@ int main() {
     std::ofstream output(path);
 
     Scene scene;
-    scene.ambientLight = .5;
+    scene.ambientLight = 0;
+    scene.backgroundColor = black;
 
     Plane plane;
     groundGrid planeMat;
@@ -54,7 +55,7 @@ int main() {
 
     mirror.c = white;
     glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
-    mirror.r0 = .94;
+    mirror.r0 = .80;
     glass.n_i = .9;
 
     plane.setMaterial(planeMat);
@@ -113,20 +114,23 @@ int main() {
     mesh.constructBVH();
 
     Mesh * mesh_pointer = &mesh;
-    scene.items.push_back(mesh_pointer);
+    //scene.items.push_back(mesh_pointer);
 
     Camera cam(vec4(-2,0,1,1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.maxDepth = 8;
-    rayTracer.sampleRate = 64;
+    rayTracer.maxDepth = 12;
+    rayTracer.sampleRate = 256;
+
+    json json_ = scene.serialize();
+    std::cout << json_.dump();
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
-    image = rayTracer.takePicture(scene,0);
-    output << image.dump_ppm();
+    //image = rayTracer.takePicture(scene,0);
+    //output << image.dump_ppm();
 
     vec4 origin(0,0,.5,1);
     vec4 direction(1,.01,0,0);
