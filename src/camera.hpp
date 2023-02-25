@@ -2,8 +2,8 @@
 #define __CAMERA_H__
 
 #include <cmath>
-#include "vec4.hpp"
-#include "ray.hpp"
+#include "math/vec4.hpp"
+#include "math/ray.hpp"
 
 class Camera {
 public:

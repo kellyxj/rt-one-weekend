@@ -4,7 +4,7 @@
 #include <cmath>
 #include <ostream>
 #include "vec4.hpp"
-#include "defines.hpp"
+#include "../defines.hpp"
 
 //adapted from https://glmatrix.net/
 class mat4 {

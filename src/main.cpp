@@ -6,9 +6,9 @@
 #include <chrono>
 
 #include "color.hpp"
-#include "ray.hpp"
+#include "math/ray.hpp"
 #include "camera.hpp"
-#include "mat4.hpp"
+#include "math/mat4.hpp"
 #include "renderers/rayTracer.hpp"
 #include "util/date.h"
 #include "util/scene_loader.hpp"
@@ -58,7 +58,7 @@ int main() {
     mirror.c = white;
     glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
     mirror.r0 = .80;
-    glass.n_i = .6;
+    glass.n_i = .96;
 
     plane.setMaterial(planeMat);
 

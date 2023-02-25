@@ -1,11 +1,11 @@
 #ifndef __GEOMETRY_H__
 #define __GEOMETRY_H__
 
-#include "../mat4.hpp"
+#include "../math/mat4.hpp"
 #include "../materials/material.hpp"
 #include "../materials/baseMaterial.hpp"
 #include "../hit.hpp"
-#include "../vec4.hpp"
+#include "../math/vec4.hpp"
 enum class GeometryType {none, plane, sphere, square, mesh, triangle, bvh};
 
 class Geometry {

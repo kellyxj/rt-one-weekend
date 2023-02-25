@@ -2,9 +2,9 @@
 #define __MATERIAL_H__
 
 #include "../defines.hpp"
-#include "../vec4.hpp"
+#include "../math/vec4.hpp"
 #include "../color.hpp"
-#include "../ray.hpp"
+#include "../math/ray.hpp"
 #include <cmath>
 
 enum class MaterialType {none, diffuse, groundGrid, dielectric, conductor};

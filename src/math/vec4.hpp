@@ -3,7 +3,7 @@
 
 #include <ostream>
 
-#include "util/json.hpp"
+#include "../util/json.hpp"
 using json = nlohmann::json;
 
 class mat4;

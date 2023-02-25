@@ -1,7 +1,7 @@
 #ifndef __HIT_H__
 #define __HIT_H__
 
-#include "ray.hpp"
+#include "math/ray.hpp"
 #include "materials/material.hpp"
 
 class Hit {
