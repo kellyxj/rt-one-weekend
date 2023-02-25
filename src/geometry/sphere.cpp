@@ -69,6 +69,7 @@ vec4 Sphere::getNormal(vec4 & pos, ray & inRay) {
 json Sphere::serialize() {
     json json_ = {
         {"type", type},
+        {"material", material->serialize()},
         {"transform", modelMatrix.serialize()}
     };
 

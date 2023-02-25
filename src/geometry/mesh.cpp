@@ -30,8 +30,9 @@ Hit Mesh::trace(ray & inRay) {
     return closest;
 }
 
-void Mesh::loadFromObj(std::string filepath) {
-    std::string inputfile = filepath;
+void Mesh::loadFromObj(std::string obj_name_) {
+    obj_name = obj_name_;
+    std::string inputfile = "../assets/" + obj_name;
     tinyobj::ObjReaderConfig reader_config;
     reader_config.mtl_search_path = ""; // Path to material files
     //N.B.: reader_config.triangulate is true by default
@@ -134,11 +135,8 @@ json Mesh::serialize() {
     json json_ = {
         {"type", type},
         {"transform", modelMatrix.serialize()},
-        {"triangleList", json::array()}
+        {"obj_name", obj_name}
     };
-    for(Geometry* triangle: triangleList) {
-        json_["triangleList"].push_back(triangle->serialize());
-    }
 
     return json_;
 }

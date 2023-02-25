@@ -81,6 +81,7 @@ Hit Triangle::trace(ray & inRay) {
 json Triangle::serialize() {
     json json_ = {
         {"type", type},
+        {"material", material->serialize()},
         {"v0", v0.serialize()},
         {"v1", v1.serialize()},
         {"v2", v2.serialize()}

@@ -5,3 +5,4 @@ data/
 !/obj/
 !/obj/Makefile
 /screenshots/*
+/assets/*

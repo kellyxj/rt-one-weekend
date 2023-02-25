@@ -40,13 +40,13 @@ int main() {
 
     std::string timestamp = ss.str();
 
-    std::string path = "../data/" + timestamp + ".ppm";
-    std::ofstream output(path);
-
     Scene scene;
     scene.name = "cornell_box_sphere";
     scene.ambientLight = 0;
     scene.backgroundColor = black;
+
+    std::string path = "../data/" + scene.name + "/renders/" + timestamp + ".ppm";
+    std::ofstream output(path);
 
     Plane plane;
     groundGrid planeMat;
@@ -58,7 +58,7 @@ int main() {
     mirror.c = white;
     glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
     mirror.r0 = .80;
-    glass.n_i = .9;
+    glass.n_i = .6;
 
     plane.setMaterial(planeMat);
 
@@ -91,13 +91,13 @@ int main() {
     base sphereMat;
     sphereMat.c = red;
     //sphereMat.brightness = 10;
-    sphere.setMaterial(mirror);
+    sphere.setMaterial(glass);
 
     Sphere* sphere_pointer = &sphere;
     scene.items.push_back(sphere_pointer);
     
     Mesh mesh;
-    mesh.loadFromObj("../data/cornell_box.obj");
+    mesh.loadFromObj("cornell_box.obj");
 
     axis = vec4(1,0,0);
     mesh.rotate(90, axis);
@@ -123,8 +123,8 @@ int main() {
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.maxDepth = 12;
-    rayTracer.sampleRate = 256;
+    rayTracer.maxDepth = 20;
+    rayTracer.sampleRate = 1024;
 
     json json_ = scene.serialize();
     SceneLoader sceneLoader;
@@ -132,8 +132,8 @@ int main() {
 
     Image image;
     //image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
-    //image = rayTracer.takePicture(scene,0);
-    //output << image.dump_ppm();
+    image = rayTracer.takePicture(scene,0);
+    output << image.dump_ppm();
 
     vec4 origin(0,0,.5,1);
     vec4 direction(1,.01,0,0);

@@ -30,5 +30,4 @@ scene_loader.o: scene_loader.cpp scene.hpp
 .PHONY: clean
 clean: 
 	rm -rf *.o
-	rm -rf ../data/*.ppm
 	rm ../bin/main

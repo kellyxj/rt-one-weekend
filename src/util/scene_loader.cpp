@@ -2,7 +2,9 @@
 
 void SceneLoader::createSceneFile(json json_) {
     std::string name = json_["name"];
-    std::experimental::filesystem::create_directory("../data/"+name);
+    std::string path = "../data/"+name;
+    std::experimental::filesystem::create_directory(path);
+    std::experimental::filesystem::create_directory(path+"/renders");
 
     writeJson(json_);
 }
