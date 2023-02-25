@@ -17,3 +17,14 @@ ray base::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     ray outRay(pos+normal*EPSILON, randomDirection);
     return outRay;
 }
+
+json base::serialize() {
+    json json_ = {
+        {"type", type},
+        {"color", c.serialize()}
+    };
+    return json_;
+}
+Material* base::deserialize(json json_) {
+
+}

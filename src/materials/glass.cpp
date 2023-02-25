@@ -49,3 +49,15 @@ ray Glass::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     
     return outRay;
 }
+
+json Glass::serialize() {
+    json json_ = {
+        {"type", type},
+        {"n_i", n_i},
+        {"color", c.serialize()}
+    };
+    return json_;
+}
+Material* Glass::deserialize(json json_) {
+    
+}

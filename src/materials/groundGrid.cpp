@@ -31,3 +31,13 @@ ray groundGrid::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     ray outRay(pos+normal*EPSILON, randomDirection);
     return outRay;
 }
+
+json groundGrid::serialize() {
+    json json_ = {
+        {"type", type}
+    };
+    return json_;
+}
+Material* groundGrid::deserialize(json json_) {
+
+}

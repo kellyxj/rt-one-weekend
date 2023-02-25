@@ -2,8 +2,13 @@
 
 class Glass: public Material {
 public:
+    MaterialType type = MaterialType::dielectric;
+
     float n_i;
     Color c;
     Color getColor(vec4 & pos);
     ray scatter(ray & inRay, vec4 & pos, vec4 & normal);
+
+    json serialize();
+    Material * deserialize(json json_);
 };

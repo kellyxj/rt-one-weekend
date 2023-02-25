@@ -15,8 +15,6 @@ ray Mirror::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
 
     float cos_theta = -dot;
     
-    float a = 1.136;
-    float alpha = 6;
     float reflectedPercent = r0 + (1 - r0)*pow((1 - cos_theta), 5)-a *cos_theta*pow((1 - cos_theta),alpha);
 
     double intPart;
@@ -33,4 +31,17 @@ ray Mirror::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
 
     
     return outRay;
+}
+
+json Mirror::serialize() {
+    json json_ = {
+        {"type", type},
+        {"r0", r0},
+        {"alpha", alpha},
+        {"color", c.serialize()}
+    };
+    return json_;
+}
+Material* Mirror::deserialize(json json_) {
+
 }

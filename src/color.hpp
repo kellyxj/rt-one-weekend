@@ -2,6 +2,8 @@
 #define __COLOR_H__
 
 #include <iostream>
+#include "util/json.hpp"
+using json = nlohmann::json;
 
 class Color {
 public:
@@ -9,6 +11,9 @@ public:
     Color(): r(0), g(0), b(0), a(1) {}
     Color(float red, float green, float blue): r(red), g(green), b(blue), a(1) {}
     Color(float red, float green, float blue, float alpha): r(red), g(green), b(blue), a(alpha) {}
+
+    json serialize();
+    Color deserialize(json json_);
 };
 
 inline std::ostream& operator << (std::ostream &os, const Color &c) {
