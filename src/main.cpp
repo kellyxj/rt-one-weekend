@@ -74,11 +74,11 @@ int main()
 
     vec4 scaleAmount(.5, .5, .5);
 
-    RectangleLight light(.25, .25);
+    RectangleLight light(.5, .5);
 
     base *lightMat = new base();
     lightMat->c = white;
-    lightMat->brightness = 400;
+    lightMat->brightness = 100;
 
     light.setMaterial(*lightMat);
     light.translate(translate);
@@ -124,7 +124,7 @@ int main()
     Camera *cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.mode = RenderMode::direct;
+    rayTracer.mode = RenderMode::hemisphere;
 
     rayTracer.maxDepth = 8;
     rayTracer.sampleRate = 1024;

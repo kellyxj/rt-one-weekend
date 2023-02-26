@@ -146,21 +146,18 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
 
                 if (shadowHit.brightness > 0)
                 {
-                    float lambertian = lightVec.dot(hit.normal);
-                    lambertian = lambertian > 0 ? lambertian : 0;
-                    
                     float area = light_->area();
                     float solidAngle = area * shadowHit.normal.dot(lightVec) * -1/(distance * distance);
 
-                    float radiance_r = lambertian * shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).r;
+                    float radiance_r = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).r;
                     radiance_r *= solidAngle;
                     hit.color.r += radiance_r;
 
-                    float radiance_g = lambertian * shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).g;
+                    float radiance_g = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).g;
                     radiance_g *= solidAngle;
                     hit.color.g += radiance_g;
 
-                    float radiance_b = lambertian * shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).b;
+                    float radiance_b = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).b;
                     radiance_b *= solidAngle;
                     hit.color.b += radiance_b;
                 }
