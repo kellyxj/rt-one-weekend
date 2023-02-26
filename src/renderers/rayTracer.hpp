@@ -9,8 +9,11 @@
 #include "../materials/glass.hpp"
 #include "../hit.hpp"
 
+enum class RenderMode {direct, hemisphere, brdf};
+
 class RayTracer {
 public:
+    RenderMode mode = RenderMode::brdf;
     int maxDepth;
     //number of samples per pixel
     int sampleRate;

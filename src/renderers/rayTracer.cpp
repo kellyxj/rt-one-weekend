@@ -125,48 +125,80 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
         hit.color.b += .15;
         hit.color.g += .15;
         */
-        // direct light contribution
-
-        Hit shadowHit;
-        ray shadowRay;
-
         Color hitColor = hit.material->getColor(hit.modelSpacePos);
 
-        for (Geometry *light : scene.lights)
-        {
-            Light *light_ = dynamic_cast<Light *>(light);
+        // direct light contribution
+        if(mode == RenderMode::direct) {
+            Hit shadowHit;
+            ray shadowRay;
 
-            vec4 lightVec;
-            lightVec = light_->getPointOnLight() - hit.pos;
-            float distance = lightVec.length();
-            lightVec.normalize();
-            shadowRay.origin = hit.pos + hit.normal * EPSILON;
-            shadowRay.direction = lightVec;
-            shadowHit = traceShadowRay(scene, shadowRay, shadowHit);
-
-            if (shadowHit.brightness > 0)
+            for (Geometry *light : scene.lights)
             {
+                Light *light_ = dynamic_cast<Light *>(light);
+
+                vec4 lightVec;
+                lightVec = light_->getPointOnLight() - hit.pos;
+                float distance = lightVec.length();
+                lightVec.normalize();
+                shadowRay.origin = hit.pos + hit.normal * EPSILON;
+                shadowRay.direction = lightVec;
+                shadowHit = traceShadowRay(scene, shadowRay, shadowHit);
+
+                if (shadowHit.brightness > 0)
+                {
+                    float lambertian = lightVec.dot(hit.normal);
+                    lambertian = lambertian > 0 ? lambertian : 0;
+                    
+                    float area = light_->area();
+                    float solidAngle = area * shadowHit.normal.dot(lightVec) * -1/(distance * distance);
+
+                    float radiance_r = lambertian * shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).r;
+                    radiance_r *= solidAngle;
+                    hit.color.r += radiance_r;
+
+                    float radiance_g = lambertian * shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).g;
+                    radiance_g *= solidAngle;
+                    hit.color.g += radiance_g;
+
+                    float radiance_b = lambertian * shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).b;
+                    radiance_b *= solidAngle;
+                    hit.color.b += radiance_b;
+                }
+            }
+        }
+        else if(mode == RenderMode::hemisphere) {
+            Hit shadowHit;
+            ray shadowRay;
+
+            base hemisphereSampler;
+            shadowRay = hemisphereSampler.scatter(hit.inRay, hit.pos, hit.normal);
+            shadowHit = traceShadowRay(scene, shadowRay, shadowHit);
+            
+            if(shadowHit.brightness > 0) {
+                vec4 lightVec = shadowHit.pos - hit.pos;
+                float distance = lightVec.length();
+                lightVec.normalize();
+
                 float lambertian = lightVec.dot(hit.normal);
                 lambertian = lambertian > 0 ? lambertian : 0;
-                
-                float area = light_->area();
 
                 float radiance_r = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).r;
-                radiance_r *= area * hitColor.r * lambertian / (distance * distance);
+                radiance_r *= hitColor.r * lambertian;
                 hit.color.r += radiance_r;
 
                 float radiance_g = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).g;
-                radiance_g *= area * hitColor.g * lambertian / (distance * distance);
+                radiance_g *= hitColor.g * lambertian;
                 hit.color.g += radiance_g;
 
                 float radiance_b = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).b;
-                radiance_b *= area * hitColor.b * lambertian / (distance * distance);
+                radiance_b *= hitColor.b * lambertian;
                 hit.color.b += radiance_b;
             }
         }
 
         Hit bounceHit;
         ray reflectedRay;
+
         reflectedRay = hit.material->scatter(hit.inRay, hit.pos, hit.normal);
 
         if (depth < this->maxDepth)
@@ -187,7 +219,7 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
             hit.color.b += hitColor.b * bounceHit.color.b;
         }
 
-        // light sources don't scatter
+        // light sources don't scatter (blackbody assumption)
         if (hit.brightness > 0)
         {
             hit.color = hitColor;

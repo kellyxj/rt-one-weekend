@@ -65,12 +65,12 @@ int main()
 
     plane.setMaterial(planeMat);
 
-    vec4 axis(0, 0, .5, 0);
-    vec4 translate(0, 0, 1.99, 0);
+    vec4 axis(0, 0, 1, 0);
+    vec4 translate(0, 0, 5, 0);
     // plane.rotate(30, axis);
     // plane.translate(translate);
     Plane *plane_pointer = &plane;
-    //scene.items.push_back(plane_pointer);
+    scene.items.push_back(plane_pointer);
 
     vec4 scaleAmount(.5, .5, .5);
 
@@ -78,7 +78,7 @@ int main()
 
     base *lightMat = new base();
     lightMat->c = white;
-    lightMat->brightness = 8;
+    lightMat->brightness = 400;
 
     light.setMaterial(*lightMat);
     light.translate(translate);
@@ -86,13 +86,13 @@ int main()
     scene.lights.push_back(lightPointer);
 
     Sphere sphere;
-    sphere.scale(scaleAmount);
+    //sphere.scale(scaleAmount);
     sphere.translate(axis);
 
     base sphereMat;
-    sphereMat.c = red;
+    sphereMat.c = grey;
     // sphereMat.brightness = 10;
-    sphere.setMaterial(glass);
+    sphere.setMaterial(sphereMat);
 
     Sphere *sphere_pointer = &sphere;
     scene.items.push_back(sphere_pointer);
@@ -117,13 +117,15 @@ int main()
     mesh.constructBVH();
 
     Mesh *mesh_pointer = &mesh;
-    scene.items.push_back(mesh_pointer);
+    //scene.items.push_back(mesh_pointer);
 
-    Camera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, .01, 90, 1);
+    Camera cam(vec4(-5, 0, 2, 1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
     Camera *cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
+    rayTracer.mode = RenderMode::direct;
+
     rayTracer.maxDepth = 8;
     rayTracer.sampleRate = 1024;
 
