@@ -33,8 +33,8 @@ int main() {
   
     start = std::chrono::system_clock::now();
 
-    int nx = 400;
-    int ny = 400;
+    int nx = 1600;
+    int ny = 1600;
     std::stringstream ss;
     ss << start;
 
@@ -58,33 +58,31 @@ int main() {
     mirror.c = white;
     glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
     mirror.r0 = .80;
-    glass.n_i = .96;
+    glass.n_i = 1.6;
 
     plane.setMaterial(planeMat);
 
     vec4 axis(0,0,.5,0);
-    vec4 translate(0,0,-2,0);
+    vec4 translate(0,0,2,0);
     //plane.rotate(30, axis);
     //plane.translate(translate);
     Plane* plane_pointer = &plane;
-    //scene.items.push_back(plane_pointer);
+    scene.items.push_back(plane_pointer);
 
-    translate = vec4(0,0,1.99,0);
-    Square square;
-    vec4 scaleAmount = vec4(.25,.25,.25);
-    square.scale(scaleAmount);
-    square.translate(translate);
+    vec4 scaleAmount(.5, .5, .5);
 
-    base squareMat;
-    squareMat.c = white;
-    squareMat.brightness = 4;
-    square.setMaterial(squareMat);
+    RectangleLight light(1, 1, 6);
 
-    Square* square_pointer = &square;
-    scene.items.push_back(square_pointer);
+    base lightMat;
+    lightMat.c = white;
+    light.c = white;
+
+    light.setMaterial(lightMat);
+    light.translate(translate);
+    Light * lightPointer = &light;
+    scene.lights.push_back(lightPointer);
 
     Sphere sphere;
-    scaleAmount = vec4(.5, .5, .5);
     sphere.scale(scaleAmount);
     sphere.translate(axis);
 
@@ -116,15 +114,15 @@ int main() {
     mesh.constructBVH();
 
     Mesh * mesh_pointer = &mesh;
-    scene.items.push_back(mesh_pointer);
+    //scene.items.push_back(mesh_pointer);
 
     Camera cam(vec4(-2,0,1,1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
     Camera* cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.maxDepth = 20;
-    rayTracer.sampleRate = 1024;
+    rayTracer.maxDepth = 8;
+    rayTracer.sampleRate = 256;
 
     json json_ = scene.serialize();
     SceneLoader sceneLoader;

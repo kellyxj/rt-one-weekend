@@ -8,6 +8,7 @@
 #include "geometry/sphere.hpp"
 #include "geometry/square.hpp"
 #include "geometry/mesh.hpp"
+#include "lights/rectangleLight.hpp"
 
 #include <vector>
 
@@ -19,6 +20,7 @@ public:
     float ambientLight = .25;
     std::vector<Geometry*> items;
     std::vector<Camera*> cameras;
+    std::vector<Light*> lights;
 
     json serialize();
     Scene deserialize(json json_);

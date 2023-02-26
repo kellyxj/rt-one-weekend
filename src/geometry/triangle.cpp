@@ -72,7 +72,7 @@ Hit Triangle::trace(ray & inRay) {
         hit.modelSpacePos = ray.origin + (ray.direction * t);
         hit.normal = getNormal(hit.modelSpacePos, ray);
         hit.material = this->material;
-        hit.brightness = hit.material->brightness;
+        hit.brightness = 0;
         hit.inRay = inRay;
     }
     return hit;

@@ -1,9 +1,22 @@
-#include "math/ray.hpp"
-#include "math/mat4.hpp"
+#include "../math/ray.hpp"
+#include "../math/mat4.hpp"
 #include "../hit.hpp"
+#include "../color.hpp"
+#include "../geometry/geometry.hpp"
 
-class Light {
+enum class LightType {none, rectangle};
+
+class Light : public Geometry{
 public:
+    LightType lightType = LightType::none;
+    Color c;
+    float brightness;
+    Material* material;
+
     virtual vec4 getPointOnLight() = 0;
-    virtual Hit trace(ray & inRay) = 0;
+    virtual float area() = 0;
+    void setMaterial(Material & m);
+
+    virtual json serialize() = 0;
+    virtual Light* deserialize(json json_) = 0;
 };

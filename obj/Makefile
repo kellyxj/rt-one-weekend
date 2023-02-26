@@ -3,14 +3,16 @@ CXX=g++
 LDLIBS=-lstdc++fs
 
 objects = main.o vec4.o color.o ray.o camera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o \
-triangle.o mesh.o bvh.o scene_loader.o
-VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/util:../src/math
+triangle.o mesh.o bvh.o scene_loader.o light.o rectangleLight.o
+VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/util:../src/math:../src/lights
 
 edit: $(objects)
 	$(CXX) -o ../bin/main $(objects) $(LDLIBS)
 
 main.o: main.cpp vec4.hpp color.hpp ray.hpp camera.hpp mat4.hpp rayTracer.hpp scene_loader.hpp
-scene.o: scene.cpp geometry.hpp plane.hpp camera.hpp sphere.hpp square.hpp mesh.hpp
+light.o: light.cpp ray.hpp mat4.hpp hit.hpp color.hpp geometry.hpp
+rectangleLight.o: rectangleLight.cpp light.hpp
+scene.o: scene.cpp geometry.hpp plane.hpp camera.hpp sphere.hpp square.hpp mesh.hpp rectangleLight.hpp
 ray.o: ray.cpp vec4.hpp
 color.o: color.cpp
 camera.o: camera.cpp vec4.hpp ray.hpp

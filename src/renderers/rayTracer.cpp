@@ -65,6 +65,12 @@ Hit RayTracer::traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth) {
             closest=current;
         }
     }
+    for(Geometry* light: scene.lights) {
+        Hit current = light->trace(eyeRay);
+        if(current.t < closest.t) {
+            closest=current;
+        }
+    }
     this->findShade(scene, closest, depth);
     return closest;
 }
@@ -105,22 +111,46 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
         hit.color.b += .15;
         hit.color.g += .15;
         */
+        //direct light contribution
+
+        Hit shadowHit;
+        ray shadowRay;
+
+        Color hitColor = hit.material->getColor(hit.modelSpacePos);
+
+        for(Geometry* light : scene.lights) {
+            Light* light_ = dynamic_cast<Light*>(light);
+
+            vec4 lightVec;
+            lightVec = light_->getPointOnLight() - hit.pos;
+            float distance = lightVec.length();
+            lightVec.normalize();
+            shadowRay.origin = hit.pos + hit.normal * EPSILON;
+            shadowRay.direction = lightVec;
+            shadowHit = traceShadowRay(scene, shadowRay, shadowHit);
+
+            if(shadowHit.brightness > 0) {
+                float lambertian = lightVec.dot(hit.normal);
+                lambertian = lambertian > 0 ? lambertian : 0;
+                hit.color.r += shadowHit.brightness * light_->c.r * light_->area() * hitColor.r * lambertian/(distance * distance);
+                hit.color.g += shadowHit.brightness * light_->c.g * light_->area() * hitColor.g * lambertian/(distance * distance);
+                hit.color.b += shadowHit.brightness * light_->c.b * light_->area() * hitColor.b * lambertian/(distance * distance);
+            }
+        }
+
         Hit bounceHit;
         ray reflectedRay;
         reflectedRay = hit.material->scatter(hit.inRay, hit.pos, hit.normal);
 
-        Color hitColor = hit.material->getColor(hit.modelSpacePos);
-
         if(depth < this->maxDepth) {
             bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth+1);
         }
-        //direct light contribution
+        //BRDF contribution
         if(bounceHit.brightness > 0) {
             hit.color.r += (bounceHit.brightness) * bounceHit.color.r * hitColor.r;
             hit.color.g += (bounceHit.brightness)  * bounceHit.color.g * hitColor.g;
             hit.color.b += (bounceHit.brightness)  * bounceHit.color.b * hitColor.b;
         }
-        //BRDF contribution
         else {
             hit.color.r += hitColor.r * bounceHit.color.r;
             hit.color.g += hitColor.g * bounceHit.color.g;
@@ -141,6 +171,12 @@ Hit RayTracer::traceShadowRay(Scene & scene, ray & shadowRay, Hit & hit) {
         Hit current = item->trace(shadowRay);
         if(current.t < closest.t) {
                 closest = current;
+        }
+    }
+    for(Geometry* light: scene.lights) {
+        Hit current = light->trace(shadowRay);
+        if(current.t < closest.t) {
+            closest = current;
         }
     }
     return closest;
