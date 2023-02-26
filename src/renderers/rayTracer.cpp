@@ -1,13 +1,16 @@
 #include "rayTracer.hpp"
 #include <iostream>
 
-Image RayTracer::takePicture(Scene & scene, int camIndex) {
+Image RayTracer::takePicture(Scene &scene, int camIndex)
+{
     Image output;
     Camera cam = (*scene.cameras[camIndex]);
     output.width = cam.width;
     output.height = cam.height;
-    for(int i = 0; i < output.width; i++) {
-        for(int j = 0; j < output.height; j++) {
+    for (int i = 0; i < output.width; i++)
+    {
+        for (int j = 0; j < output.height; j++)
+        {
             Color c;
             output.pixels.push_back(c);
         }
@@ -15,75 +18,86 @@ Image RayTracer::takePicture(Scene & scene, int camIndex) {
 
     int sampleRate = this->sampleRate;
 
-    for(int j = (cam.height-1); j >= 0; j--) {
+    for (int j = (cam.height - 1); j >= 0; j--)
+    {
         std::cout << j << "\n";
-        for(int i = 0; i < (cam.width); i++) {
-            for(int k = 0; k < sampleRate; k++) {
-                float randX = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
-                float randY = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * (sampleRate > 1 ? 1 : 0);
+        for (int i = 0; i < (cam.width); i++)
+        {
+            for (int k = 0; k < sampleRate; k++)
+            {
+                float randX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (sampleRate > 1 ? 1 : 0);
+                float randY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (sampleRate > 1 ? 1 : 0);
 
                 randX -= .5;
                 randY -= .5;
 
-                ray eyeRay = cam.getEyeRay(i+.5+randX, j+.5+randY);
+                ray eyeRay = cam.getEyeRay(i + .5 + randX, j + .5 + randY);
                 Hit hit;
                 hit = this->traceRay(scene, eyeRay, hit, 0);
 
-                Color c = output.getPixel(i,j);
-                c.r += hit.color.r/sampleRate * cam.exposure;
-                c.g += hit.color.g/sampleRate * cam.exposure;
-                c.b += hit.color.b/sampleRate * cam.exposure;
+                Color c = output.getPixel(i, j);
+                c.r += hit.color.r / sampleRate * cam.exposure;
+                c.g += hit.color.g / sampleRate * cam.exposure;
+                c.b += hit.color.b / sampleRate * cam.exposure;
 
-                //normal map
-                //c.r += (hit.normal.x + 1)/(2*sampleRate);
-                //c.g += (hit.normal.y + 1)/(2*sampleRate);
-                //c.b += (hit.normal.z + 1)/(2*sampleRate);
+                // normal map
+                // c.r += (hit.normal.x + 1)/(2*sampleRate);
+                // c.g += (hit.normal.y + 1)/(2*sampleRate);
+                // c.b += (hit.normal.z + 1)/(2*sampleRate);
 
-                //unnormalized depth map
-                //c.r += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
-                //c.g += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
-                //c.b += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
+                // unnormalized depth map
+                // c.r += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
+                // c.g += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
+                // c.b += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
 
-                output.setPixel(i,j,c);
+                output.setPixel(i, j, c);
             }
-            Color c = output.getPixel(i,j);
-            c.r = (float)pow((double)c.r, 1/cam.gamma);
-            c.g = (float)pow((double)c.g, 1/cam.gamma);
-            c.b = (float)pow((double)c.b, 1/cam.gamma);
-            output.setPixel(i,j,c);
+            Color c = output.getPixel(i, j);
+            c.r = (float)pow((double)c.r, 1 / cam.gamma);
+            c.g = (float)pow((double)c.g, 1 / cam.gamma);
+            c.b = (float)pow((double)c.b, 1 / cam.gamma);
+            output.setPixel(i, j, c);
         }
     }
-        
+
     return output;
 }
 
-Hit RayTracer::traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth) {
+Hit RayTracer::traceRay(Scene &scene, ray &eyeRay, Hit &hit, int depth)
+{
     Hit closest = hit;
-    for(Geometry* item: scene.items) {
+    for (Geometry *item : scene.items)
+    {
         Hit current = item->trace(eyeRay);
-        if(current.t < closest.t) {
-            closest=current;
+        if (current.t < closest.t)
+        {
+            closest = current;
         }
     }
-    for(Geometry* light: scene.lights) {
+    for (Geometry *light : scene.lights)
+    {
         Hit current = light->trace(eyeRay);
-        if(current.t < closest.t) {
-            closest=current;
+        if (current.t < closest.t)
+        {
+            closest = current;
         }
     }
     this->findShade(scene, closest, depth);
     return closest;
 }
 
-void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
-    //missed
-    if(hit.t > 1e10) {
+void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
+{
+    // missed
+    if (hit.t > 1e10)
+    {
         hit.color = scene.backgroundColor;
         hit.brightness = scene.ambientLight;
     }
-    //hit
-    else {
-        //Phong shading
+    // hit
+    else
+    {
+        // Phong shading
         /*
         for(Geometry* light: scene.lights) {
             vec4 lightCenter(0,0,0,1);
@@ -104,22 +118,23 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
                 hit.color.g += hitColor.g * lambertian * light->brightness;
                 hit.color.b += hitColor.b * lambertian * light->brightness;
             }
-            
+
         }
-        
+
         hit.color.r += .15;
         hit.color.b += .15;
         hit.color.g += .15;
         */
-        //direct light contribution
+        // direct light contribution
 
         Hit shadowHit;
         ray shadowRay;
 
         Color hitColor = hit.material->getColor(hit.modelSpacePos);
 
-        for(Geometry* light : scene.lights) {
-            Light* light_ = dynamic_cast<Light*>(light);
+        for (Geometry *light : scene.lights)
+        {
+            Light *light_ = dynamic_cast<Light *>(light);
 
             vec4 lightVec;
             lightVec = light_->getPointOnLight() - hit.pos;
@@ -129,12 +144,16 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
             shadowRay.direction = lightVec;
             shadowHit = traceShadowRay(scene, shadowRay, shadowHit);
 
-            if(shadowHit.brightness > 0) {
+            if (shadowHit.brightness > 0)
+            {
                 float lambertian = lightVec.dot(hit.normal);
                 lambertian = lambertian > 0 ? lambertian : 0;
-                hit.color.r += shadowHit.brightness * light_->c.r * light_->area() * hitColor.r * lambertian/(distance * distance);
-                hit.color.g += shadowHit.brightness * light_->c.g * light_->area() * hitColor.g * lambertian/(distance * distance);
-                hit.color.b += shadowHit.brightness * light_->c.b * light_->area() * hitColor.b * lambertian/(distance * distance);
+                float radiance_r = shadowHit.brightness * shadowHit.material->getColor(shadowHit.modelSpacePos).r;
+                radiance_r *= light_->area() * hitColor.r * lambertian / (distance * distance);
+                float radiance_g = shadowHit.brightness * shadowHit.material->getColor(shadowHit.modelSpacePos).g;
+                radiance_g *= light_->area() * hitColor.g * lambertian / (distance * distance);
+                float radiance_b = shadowHit.brightness * shadowHit.material->getColor(shadowHit.modelSpacePos).b;
+                radiance_b *= light_->area() * hitColor.b * lambertian / (distance * distance);
             }
         }
 
@@ -142,40 +161,49 @@ void RayTracer::findShade(Scene & scene, Hit & hit, int depth) {
         ray reflectedRay;
         reflectedRay = hit.material->scatter(hit.inRay, hit.pos, hit.normal);
 
-        if(depth < this->maxDepth) {
-            bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth+1);
+        if (depth < this->maxDepth)
+        {
+            bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth + 1);
         }
-        //BRDF contribution
-        if(bounceHit.brightness > 0) {
+        // BRDF contribution
+        if (bounceHit.brightness > 0)
+        {
             hit.color.r += (bounceHit.brightness) * bounceHit.color.r * hitColor.r;
-            hit.color.g += (bounceHit.brightness)  * bounceHit.color.g * hitColor.g;
-            hit.color.b += (bounceHit.brightness)  * bounceHit.color.b * hitColor.b;
+            hit.color.g += (bounceHit.brightness) * bounceHit.color.g * hitColor.g;
+            hit.color.b += (bounceHit.brightness) * bounceHit.color.b * hitColor.b;
         }
-        else {
+        else
+        {
             hit.color.r += hitColor.r * bounceHit.color.r;
             hit.color.g += hitColor.g * bounceHit.color.g;
             hit.color.b += hitColor.b * bounceHit.color.b;
         }
 
-        //light sources don't scatter
-        if(hit.brightness > 0) {
+        // light sources don't scatter
+        if (hit.brightness > 0)
+        {
             hit.color = hitColor;
         }
     }
 }
 
-Hit RayTracer::traceShadowRay(Scene & scene, ray & shadowRay, Hit & hit) {
+Hit RayTracer::traceShadowRay(Scene &scene, ray &shadowRay, Hit &hit)
+{
     Hit closest = hit;
 
-    for(Geometry* item: scene.items) {
+    for (Geometry *item : scene.items)
+    {
         Hit current = item->trace(shadowRay);
-        if(current.t < closest.t) {
-                closest = current;
+        if (current.t < closest.t)
+        {
+            closest = current;
         }
     }
-    for(Geometry* light: scene.lights) {
+    for (Geometry *light : scene.lights)
+    {
         Hit current = light->trace(shadowRay);
-        if(current.t < closest.t) {
+        if (current.t < closest.t)
+        {
             closest = current;
         }
     }

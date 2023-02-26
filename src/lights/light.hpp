@@ -4,19 +4,22 @@
 #include "../color.hpp"
 #include "../geometry/geometry.hpp"
 
-enum class LightType {none, rectangle};
+enum class LightType
+{
+    none,
+    rectangle
+};
 
-class Light : public Geometry{
+class Light : public Geometry
+{
 public:
     LightType lightType = LightType::none;
-    Color c;
-    float brightness;
-    Material* material;
+    Material *material;
 
     virtual vec4 getPointOnLight() = 0;
     virtual float area() = 0;
-    void setMaterial(Material & m);
+    void setMaterial(Material &m);
 
     virtual json serialize() = 0;
-    virtual Light* deserialize(json json_) = 0;
+    virtual Light *deserialize(json json_) = 0;
 };

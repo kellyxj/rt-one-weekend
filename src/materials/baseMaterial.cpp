@@ -1,12 +1,14 @@
 #include "baseMaterial.hpp"
 
-Color base::getColor(vec4 & pos) {
+Color base::getColor(vec4 &pos)
+{
     return this->c;
 }
 
-ray base::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
-    float theta = 2*PI*static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-    float phi = 2*PI*static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+ray base::scatter(ray &inRay, vec4 &pos, vec4 &normal)
+{
+    float theta = 2 * PI * static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+    float phi = 2 * PI * static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
     vec4 randomDirection;
     randomDirection += normal.normalize();
     randomDirection.x += cos(phi) * sin(theta);
@@ -14,17 +16,18 @@ ray base::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     randomDirection.z += cos(theta);
     randomDirection.w = 0;
 
-    ray outRay(pos+normal*EPSILON, randomDirection);
+    ray outRay(pos + normal * EPSILON, randomDirection);
     return outRay;
 }
 
-json base::serialize() {
+json base::serialize()
+{
     json json_ = {
         {"type", type},
-        {"color", c.serialize()}
-    };
+        {"brightness", brightness},
+        {"color", c.serialize()}};
     return json_;
 }
-Material* base::deserialize(json json_) {
-
+Material *base::deserialize(json json_)
+{
 }
