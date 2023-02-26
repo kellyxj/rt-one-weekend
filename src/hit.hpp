@@ -15,7 +15,7 @@ public:
     ray inRay;
 
     Material* material;
-    Color color;
+    Color color = black;
 };
 
 inline std::ostream& operator << (std::ostream &os, const Hit &h) {

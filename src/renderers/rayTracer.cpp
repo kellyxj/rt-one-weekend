@@ -148,12 +148,20 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
             {
                 float lambertian = lightVec.dot(hit.normal);
                 lambertian = lambertian > 0 ? lambertian : 0;
-                float radiance_r = shadowHit.brightness * shadowHit.material->getColor(shadowHit.modelSpacePos).r;
-                radiance_r *= light_->area() * hitColor.r * lambertian / (distance * distance);
-                float radiance_g = shadowHit.brightness * shadowHit.material->getColor(shadowHit.modelSpacePos).g;
-                radiance_g *= light_->area() * hitColor.g * lambertian / (distance * distance);
-                float radiance_b = shadowHit.brightness * shadowHit.material->getColor(shadowHit.modelSpacePos).b;
-                radiance_b *= light_->area() * hitColor.b * lambertian / (distance * distance);
+                
+                float area = light_->area();
+
+                float radiance_r = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).r;
+                radiance_r *= area * hitColor.r * lambertian / (distance * distance);
+                hit.color.r += radiance_r;
+
+                float radiance_g = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).g;
+                radiance_g *= area * hitColor.g * lambertian / (distance * distance);
+                hit.color.g += radiance_g;
+
+                float radiance_b = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).b;
+                radiance_b *= area * hitColor.b * lambertian / (distance * distance);
+                hit.color.b += radiance_b;
             }
         }
 

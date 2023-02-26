@@ -70,7 +70,7 @@ int main()
     // plane.rotate(30, axis);
     // plane.translate(translate);
     Plane *plane_pointer = &plane;
-    scene.items.push_back(plane_pointer);
+    //scene.items.push_back(plane_pointer);
 
     vec4 scaleAmount(.5, .5, .5);
 
@@ -78,7 +78,7 @@ int main()
 
     base *lightMat = new base();
     lightMat->c = white;
-    lightMat->brightness = 16;
+    lightMat->brightness = 8;
 
     light.setMaterial(*lightMat);
     light.translate(translate);
@@ -124,7 +124,7 @@ int main()
     Camera *cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.maxDepth = 16;
+    rayTracer.maxDepth = 8;
     rayTracer.sampleRate = 1024;
 
     json json_ = scene.serialize();
