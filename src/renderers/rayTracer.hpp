@@ -2,7 +2,6 @@
 #define __RAYTRACER_H__
 
 //abstract class for generating an image from a camera
-//TODO: implement direct illumination (Whitted) model, path tracer, volume raycaster, and bidirectional path tracer classes
 #include "../scene.hpp"
 #include "../image.hpp"
 #include "../materials/mirror.hpp"
@@ -13,7 +12,6 @@ enum class RenderMode {direct, hemisphere, brdf};
 
 class RayTracer {
 public:
-    RenderMode mode = RenderMode::brdf;
     int maxDepth;
     //number of samples per pixel
     int sampleRate;

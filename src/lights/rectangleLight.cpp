@@ -40,6 +40,7 @@ Hit RectangleLight::trace(ray &inRay)
     if (t0 >= 0 && (modelSpacePos.x > -width / 2 && modelSpacePos.x < width / 2 && modelSpacePos.y > -height / 2 && modelSpacePos.y < height / 2))
     {
         hit.t = t0;
+        hit.geometry = this;
         hit.pos = inRay.origin + (inRay.direction * t0);
         hit.modelSpacePos = modelSpacePos;
         hit.normal = this->getNormal(hit.pos, ray);

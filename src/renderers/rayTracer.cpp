@@ -126,76 +126,84 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
         hit.color.g += .15;
         */
         Color hitColor = hit.material->getColor(hit.modelSpacePos);
+        base hemisphereSampler;
+
+        float lightPdf;
+        float hemispherePdf;
 
         // direct light contribution
-        if(mode == RenderMode::direct) {
-            Hit shadowHit;
-            ray shadowRay;
+        Hit shadowHit;
+        ray shadowRay;
+        //light importance sampling strategy
+        for (Geometry *light : scene.lights)
+        {
+            Light *light_ = dynamic_cast<Light *>(light);
 
-            for (Geometry *light : scene.lights)
-            {
-                Light *light_ = dynamic_cast<Light *>(light);
-
-                vec4 lightVec;
-                lightVec = light_->getPointOnLight() - hit.pos;
-                float distance = lightVec.length();
-                lightVec.normalize();
-                shadowRay.origin = hit.pos + hit.normal * EPSILON;
-                shadowRay.direction = lightVec;
-                shadowHit = traceShadowRay(scene, shadowRay, shadowHit);
-
-                if (shadowHit.brightness > 0)
-                {
-                    float lambertian = lightVec.dot(hit.normal);
-                    lambertian = lambertian > 0 ? lambertian : 0;
-
-                    float area = light_->area();
-                    float solidAngle = area * shadowHit.normal.dot(lightVec) * -1/(distance * distance);
-
-                    float radiance_r = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).r;
-                    radiance_r *= solidAngle;
-                    hit.color.r += radiance_r * lambertian;
-
-                    float radiance_g = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).g;
-                    radiance_g *= solidAngle;
-                    hit.color.g += radiance_g * lambertian;
-
-                    float radiance_b = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).b;
-                    radiance_b *= solidAngle;
-                    hit.color.b += radiance_b * lambertian;
-                }
-            }
-        }
-        else if(mode == RenderMode::hemisphere) {
-            Hit shadowHit;
-            ray shadowRay;
-
-            base hemisphereSampler;
-            shadowRay = hemisphereSampler.scatter(hit.inRay, hit.pos, hit.normal);
+            vec4 lightVec;
+            lightVec = light_->getPointOnLight() - hit.pos;
+            float distance = lightVec.length();
+            lightVec.normalize();
+            shadowRay.origin = hit.pos + hit.normal * EPSILON;
+            shadowRay.direction = lightVec;
             shadowHit = traceShadowRay(scene, shadowRay, shadowHit);
-            
-            if(shadowHit.brightness > 0) {
-                vec4 lightVec = shadowHit.pos - hit.pos;
-                float distance = lightVec.length();
-                lightVec.normalize();
 
+            if (shadowHit.brightness > 0)
+            {
                 float lambertian = lightVec.dot(hit.normal);
                 lambertian = lambertian > 0 ? lambertian : 0;
 
                 float brdf = hit.material->sampleBrdf(hit.inRay, shadowRay, hit.pos);
 
+                float area = light_->area();
+                float solidAngle = area * shadowHit.normal.dot(lightVec) * -1/(distance * distance);
+                lightPdf = solidAngle;
+
+                hemispherePdf = hemisphereSampler.sampleBrdf(hit.inRay, shadowRay, hit.pos);
+                float powerHeuristic = (lightPdf * lightPdf)/(hemispherePdf * hemispherePdf + lightPdf * lightPdf);
+
                 float radiance_r = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).r;
-                radiance_r *= hitColor.r * lambertian;
-                hit.color.r += radiance_r * brdf;
+                radiance_r *= solidAngle * lambertian;
+                hit.color.r += radiance_r * brdf * powerHeuristic;
 
                 float radiance_g = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).g;
-                radiance_g *= hitColor.g * lambertian;
-                hit.color.g += radiance_g * brdf;
+                radiance_g *= solidAngle * lambertian;
+                hit.color.g += radiance_g * brdf * powerHeuristic;
 
                 float radiance_b = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).b;
-                radiance_b *= hitColor.b * lambertian;
-                hit.color.b += radiance_b * brdf;
+                radiance_b *= solidAngle * lambertian;
+                hit.color.b += radiance_b * brdf * powerHeuristic;
             }
+        }
+        //hemisphere direct light sampling strategy
+        shadowRay = hemisphereSampler.scatter(hit.inRay, hit.pos, hit.normal);
+        shadowHit = traceShadowRay(scene, shadowRay, shadowHit);
+        
+        if(shadowHit.brightness > 0) {
+            vec4 lightVec = shadowHit.pos - hit.pos;
+            float distance = lightVec.length();
+            lightVec.normalize();
+
+            float lambertian = lightVec.dot(hit.normal);
+            lambertian = lambertian > 0 ? lambertian : 0;
+
+            float brdf = hit.material->sampleBrdf(hit.inRay, shadowRay, hit.pos);
+
+            hemispherePdf = hemisphereSampler.sampleBrdf(hit.inRay, shadowRay, hit.pos);
+            Light* light = ((Light*)shadowHit.geometry);
+            lightPdf = light->area() * shadowHit.normal.dot(lightVec) * -1/(distance * distance);
+            float powerHeuristic = (hemispherePdf * hemispherePdf)/(hemispherePdf * hemispherePdf + lightPdf * lightPdf);
+
+            float radiance_r = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).r;
+            radiance_r *= hitColor.r * lambertian;
+            hit.color.r += radiance_r * brdf * powerHeuristic;
+
+            float radiance_g = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).g;
+            radiance_g *= hitColor.g * lambertian;
+            hit.color.g += radiance_g * brdf* powerHeuristic;
+
+            float radiance_b = shadowHit.brightness * (shadowHit.material->getColor(shadowHit.modelSpacePos)).b;
+            radiance_b *= hitColor.b * lambertian;
+            hit.color.b += radiance_b * brdf* powerHeuristic;
         }
 
         Hit bounceHit;

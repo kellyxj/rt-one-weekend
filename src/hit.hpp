@@ -2,8 +2,9 @@
 #define __HIT_H__
 
 #include "math/ray.hpp"
+#include "geometry/geometry.hpp"
 #include "materials/material.hpp"
-
+class Geometry;
 class Hit {
 public:
     float t = 1e12;
@@ -13,6 +14,8 @@ public:
     vec4 modelSpacePos;
     vec4 normal;
     ray inRay;
+
+    Geometry* geometry;
 
     Material* material;
     Color color = black;

@@ -124,7 +124,6 @@ int main()
     Camera *cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.mode = RenderMode::direct;
 
     rayTracer.maxDepth = 8;
     rayTracer.sampleRate = 256;

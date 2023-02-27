@@ -10,6 +10,7 @@
 #include "../hit.hpp"
 #include "../math/vec4.hpp"
 enum class GeometryType {none, plane, sphere, square, mesh, triangle, bvh};
+class Hit;
 
 class Geometry {
 public:
