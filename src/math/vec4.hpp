@@ -18,7 +18,7 @@ public:
     vec4 normalize();
     vec4 cross(vec4 &v);
     float dot(vec4 &v);
-    float length();
+    float length_squared();
 
     vec4 operator + (const vec4 & v);
     vec4 & operator += (const vec4 & v);

@@ -2,7 +2,7 @@
 #include "vec4.hpp"
 
 vec4 vec4::normalize() {
-    return (*this) /= sqrt(this->length());
+    return (*this) /= sqrt(this->length_squared());
 }
 vec4 vec4::cross(vec4 &v) {
     return vec4(y*v.z - v.y*z, v.x*z - x*v.z, x*v.y - v.x*y, 0);
@@ -10,7 +10,7 @@ vec4 vec4::cross(vec4 &v) {
 float vec4::dot(vec4 &v){
     return x*v.x + y*v.y + z*v.z + w*v.w;
 }
-float vec4::length() {
+float vec4::length_squared() {
     return this->dot(*this);
 }
 

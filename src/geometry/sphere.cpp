@@ -9,13 +9,13 @@ Hit Sphere::trace(ray & inRay) {
     vec4 center(0,0,0,1);
     vec4 r2s = center-origin;
 
-    float L2 = r2s.length();
+    float L2 = r2s.length_squared();
     float tcaS = dir.dot(r2s);
 
     Hit hit;
     //rays originating inside sphere
     if(L2 <= 1) {
-        float DL2 = dir.length();
+        float DL2 = dir.length_squared();
 
         float tca2 = tcaS * tcaS/DL2;
         float LM2 = L2 - tca2;
@@ -33,7 +33,7 @@ Hit Sphere::trace(ray & inRay) {
     }
     //if tcaS < 0, sphere is behind the camera
     else if(tcaS >= 0) {
-        float DL2 = dir.length();
+        float DL2 = dir.length_squared();
 
         float tca2 = tcaS * tcaS/DL2;
         float LM2 = L2 - tca2;

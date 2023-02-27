@@ -36,8 +36,8 @@ int main()
 
     start = std::chrono::system_clock::now();
 
-    int nx = 400;
-    int ny = 400;
+    int nx = 1600;
+    int ny = 1600;
     std::stringstream ss;
     ss << start;
 
