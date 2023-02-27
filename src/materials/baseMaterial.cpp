@@ -20,6 +20,10 @@ ray base::scatter(ray &inRay, vec4 &pos, vec4 &normal)
     return outRay;
 }
 
+float base::sampleBrdf(ray &inRay, ray& outRay, vec4 &pos) {
+    return 1/(2*PI);
+}
+
 json base::serialize()
 {
     json json_ = {

@@ -10,5 +10,9 @@ json Color::serialize() {
     return json_;
 }
 Color Color::deserialize(json json_){
-
+    r = json_["red"];
+    g = json_["green"];
+    b = json_["blue"];
+    a = json_["alpha"];
+    return *this;
 }

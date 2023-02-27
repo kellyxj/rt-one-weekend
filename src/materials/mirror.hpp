@@ -6,6 +6,7 @@
 class Mirror: public Material {
 public:
     MaterialType type = MaterialType::conductor;
+    bool isDelta =true;
 
     float r0; //reflectance at normal incidence
 
@@ -15,6 +16,7 @@ public:
     Color c;
     Color getColor(vec4 & pos);
     ray scatter(ray & inRay, vec4 & pos, vec4 & normal);
+    float sampleBrdf(ray &inRay, ray& outRay, vec4 &pos);
 
     json serialize();
     Material * deserialize(json json_);

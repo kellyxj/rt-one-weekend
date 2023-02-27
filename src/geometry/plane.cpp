@@ -42,5 +42,30 @@ json Plane::serialize() {
 }
 
 Geometry* Plane::deserialize(json json_) {
+    MaterialType type = json_["material"]["type"];
+    /*
+    switch(type) {
+        case MaterialType::diffuse: {
+            base* m = new base();
+            material = m->deserialize(json_["material"]);
+        }
+        case MaterialType::groundGrid: {
+            groundGrid* m = new groundGrid();
+            material = m->deserialize(json_["material"]);
+        }
+        case MaterialType::dielectric: {
+            Glass* m = new Glass();
+            material = m->deserialize(json_["material"]);
+        }
+        case MaterialType::conductor: {
+            Mirror* m = new Mirror();
+            material = m->deserialize(json_["material"]);
+        }
+        default:
+            break;
+    }
+    material = material->deserialize(json_["material"]);*/
+    modelMatrix = modelMatrix.deserialize(json_["transform"]);
 
+    return this;
 }

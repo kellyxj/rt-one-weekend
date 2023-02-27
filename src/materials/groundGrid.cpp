@@ -18,6 +18,10 @@ Color groundGrid::getColor(vec4 & pos) {
     }
 }
 
+float groundGrid::sampleBrdf(ray &inRay, ray& outRay, vec4 &pos) {
+    return 1/(2*PI);
+}
+
 ray groundGrid::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     float theta = 2*PI*static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     float phi = 2*PI*static_cast <float> (rand()) / static_cast <float> (RAND_MAX);

@@ -33,6 +33,10 @@ ray Mirror::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     return outRay;
 }
 
+float Mirror::sampleBrdf(ray &inRay, ray& outRay, vec4 &pos) {
+    return 0;
+}
+
 json Mirror::serialize() {
     json json_ = {
         {"type", type},

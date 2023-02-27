@@ -17,7 +17,7 @@ ray.o: ray.cpp vec4.hpp
 color.o: color.cpp
 camera.o: camera.cpp vec4.hpp ray.hpp
 mat4.o: mat4.cpp vec4.hpp
-geometry.o: geometry.cpp vec4.hpp mat4.hpp material.hpp hit.hpp baseMaterial.hpp
+geometry.o: geometry.cpp vec4.hpp mat4.hpp material.hpp hit.hpp baseMaterial.hpp glass.hpp mirror.hpp groundGrid.hpp
 plane.o: plane.cpp geometry.hpp
 scene.o: scene.cpp camera.hpp geometry.hpp
 rayTracer.o: rayTracer.cpp scene.hpp image.hpp hit.hpp material.hpp sphere.hpp plane.hpp groundGrid.hpp

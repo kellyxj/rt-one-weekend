@@ -50,6 +50,10 @@ ray Glass::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     return outRay;
 }
 
+float Glass::sampleBrdf(ray &inRay, ray& outRay, vec4 &pos) {
+    return 0;
+}
+
 json Glass::serialize() {
     json json_ = {
         {"type", type},

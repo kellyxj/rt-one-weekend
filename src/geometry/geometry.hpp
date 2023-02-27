@@ -4,6 +4,9 @@
 #include "../math/mat4.hpp"
 #include "../materials/material.hpp"
 #include "../materials/baseMaterial.hpp"
+#include "../materials/glass.hpp" 
+#include "../materials/mirror.hpp"
+#include "../materials/groundGrid.hpp"
 #include "../hit.hpp"
 #include "../math/vec4.hpp"
 enum class GeometryType {none, plane, sphere, square, mesh, triangle, bvh};

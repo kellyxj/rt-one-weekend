@@ -36,8 +36,8 @@ int main()
 
     start = std::chrono::system_clock::now();
 
-    int nx = 1600;
-    int ny = 1600;
+    int nx = 400;
+    int ny = 400;
     std::stringstream ss;
     ss << start;
 
@@ -45,11 +45,11 @@ int main()
 
     Scene scene;
     scene.name = "cornell_box_sphere";
-    scene.ambientLight = 0;
-    scene.backgroundColor = black;
 
     std::string path = "../data/" + scene.name + "/renders/" + timestamp + ".ppm";
     std::ofstream output(path);
+    scene.ambientLight = 0;
+    scene.backgroundColor = black;
 
     Plane plane;
     groundGrid planeMat;
@@ -74,11 +74,11 @@ int main()
 
     vec4 scaleAmount(.5, .5, .5);
 
-    RectangleLight light(.5, .5);
+    RectangleLight light(10, 10);
 
     base *lightMat = new base();
     lightMat->c = white;
-    lightMat->brightness = 100;
+    lightMat->brightness = .5;
 
     light.setMaterial(*lightMat);
     light.translate(translate);
@@ -92,7 +92,7 @@ int main()
     base sphereMat;
     sphereMat.c = grey;
     // sphereMat.brightness = 10;
-    sphere.setMaterial(mirror);
+    sphere.setMaterial(sphereMat);
 
     Sphere *sphere_pointer = &sphere;
     scene.items.push_back(sphere_pointer);
@@ -127,11 +127,15 @@ int main()
     rayTracer.mode = RenderMode::direct;
 
     rayTracer.maxDepth = 8;
-    rayTracer.sampleRate = 1024;
+    rayTracer.sampleRate = 256;
 
     json json_ = scene.serialize();
     SceneLoader sceneLoader;
     sceneLoader.createSceneFile(json_);
+    sceneLoader.writeJson(json_);
+
+    //scene = scene.deserialize(sceneLoader.readJson(scene.name));
+    //std::cout << scene.serialize();
 
     Image image;
     // image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);

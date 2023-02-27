@@ -46,6 +46,7 @@ public:
     vec4 transform(vec4 & v);
 
     json serialize();
+    mat4 deserialize(json json_);
 };
 
 inline std::ostream& operator << (std::ostream &os, const mat4 &a) {
