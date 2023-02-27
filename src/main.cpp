@@ -92,7 +92,7 @@ int main()
     base sphereMat;
     sphereMat.c = grey;
     // sphereMat.brightness = 10;
-    sphere.setMaterial(sphereMat);
+    sphere.setMaterial(mirror);
 
     Sphere *sphere_pointer = &sphere;
     scene.items.push_back(sphere_pointer);
@@ -124,7 +124,7 @@ int main()
     Camera *cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
-    rayTracer.mode = RenderMode::hemisphere;
+    rayTracer.mode = RenderMode::direct;
 
     rayTracer.maxDepth = 8;
     rayTracer.sampleRate = 1024;
