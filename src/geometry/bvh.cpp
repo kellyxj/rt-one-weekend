@@ -178,5 +178,5 @@ json BVH::serialize() {
     return json_;
 }
 Geometry* BVH::deserialize(json json_) {
-
+    
 }

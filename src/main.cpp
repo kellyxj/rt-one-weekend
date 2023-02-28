@@ -65,8 +65,8 @@ int main()
 
     plane.setMaterial(planeMat);
 
-    vec4 axis(0, 0, 1, 0);
-    vec4 translate(0, 0, 5, 0);
+    vec4 axis(0, 0, .5, 0);
+    vec4 translate(0, 0, 1.99, 0);
     // plane.rotate(30, axis);
     // plane.translate(translate);
     Plane *plane_pointer = &plane;
@@ -74,11 +74,11 @@ int main()
 
     vec4 scaleAmount(.5, .5, .5);
 
-    RectangleLight light(10, 10);
+    RectangleLight light(.5, .5);
 
     base *lightMat = new base();
     lightMat->c = white;
-    lightMat->brightness = .5;
+    lightMat->brightness = 16;
 
     light.setMaterial(*lightMat);
     light.translate(translate);
@@ -86,7 +86,7 @@ int main()
     scene.lights.push_back(lightPointer);
 
     Sphere sphere;
-    //sphere.scale(scaleAmount);
+    sphere.scale(scaleAmount);
     sphere.translate(axis);
 
     base sphereMat;
@@ -119,27 +119,27 @@ int main()
     Mesh *mesh_pointer = &mesh;
     //scene.items.push_back(mesh_pointer);
 
-    Camera cam(vec4(-5, 0, 2, 1), 0, 0, nx, ny, .01, 90, 1);
+    Camera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
     Camera *cam_pointer = &cam;
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
 
     rayTracer.maxDepth = 8;
-    rayTracer.sampleRate = 256;
+    rayTracer.sampleRate = 16;
 
     json json_ = scene.serialize();
     SceneLoader sceneLoader;
     sceneLoader.createSceneFile(json_);
     sceneLoader.writeJson(json_);
 
-    //scene = scene.deserialize(sceneLoader.readJson(scene.name));
-    //std::cout << scene.serialize();
+    scene = scene.deserialize(sceneLoader.readJson(scene.name));
+    std::cout << scene.serialize();
 
     Image image;
     // image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
-    image = rayTracer.takePicture(scene, 0);
-    output << image.dump_ppm();
+    //image = rayTracer.takePicture(scene, 0);
+    //output << image.dump_ppm();
 
     vec4 origin(0, 0, .5, 1);
     vec4 direction(1, .01, 0, 0);

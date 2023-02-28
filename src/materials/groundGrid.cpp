@@ -43,5 +43,8 @@ json groundGrid::serialize() {
     return json_;
 }
 Material* groundGrid::deserialize(json json_) {
+    groundGrid* m = new groundGrid();
 
+    m->type = (MaterialType)json_["type"];
+    return m;
 }

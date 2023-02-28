@@ -63,5 +63,16 @@ json Glass::serialize() {
     return json_;
 }
 Material* Glass::deserialize(json json_) {
-    
+    Glass* m = new Glass();
+
+    m->type = (MaterialType)json_["type"];
+
+    auto color_ = json_["color"];
+    Color color;
+    color = color.deserialize(color_);
+
+    m->c = color;
+
+    m->n_i = json_["n_i"];
+    return m;
 }

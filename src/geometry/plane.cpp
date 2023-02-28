@@ -42,30 +42,46 @@ json Plane::serialize() {
 }
 
 Geometry* Plane::deserialize(json json_) {
-    MaterialType type = json_["material"]["type"];
-    /*
+    auto material_ = json_["material"];
+    MaterialType type = (MaterialType)material_["type"];
+
+    Plane* plane = new Plane();
+
     switch(type) {
         case MaterialType::diffuse: {
             base* m = new base();
-            material = m->deserialize(json_["material"]);
+            m = dynamic_cast<base*>(m->deserialize(material_));
+            plane->setMaterial(*m);
+            break;
         }
         case MaterialType::groundGrid: {
             groundGrid* m = new groundGrid();
-            material = m->deserialize(json_["material"]);
+            m = dynamic_cast<groundGrid*>(m->deserialize(material_));
+            plane->setMaterial(*m);
+            break;
         }
         case MaterialType::dielectric: {
             Glass* m = new Glass();
-            material = m->deserialize(json_["material"]);
+            m = dynamic_cast<Glass*>(m->deserialize(material_));
+            plane->setMaterial(*m);
+            break;
         }
         case MaterialType::conductor: {
             Mirror* m = new Mirror();
-            material = m->deserialize(json_["material"]);
+            m = dynamic_cast<Mirror*>(m->deserialize(material_));
+            plane->setMaterial(*m);
+            break;
         }
         default:
             break;
     }
-    material = material->deserialize(json_["material"]);*/
-    modelMatrix = modelMatrix.deserialize(json_["transform"]);
+    auto modelMatrix_ = json_["transform"];
+    mat4 modelMatrix;
+    modelMatrix = modelMatrix.deserialize(modelMatrix_);
+    plane->modelMatrix = modelMatrix;
 
-    return this;
+    plane->worldToModel = modelMatrix.invert();
+    plane->normalToWorld = modelMatrix.transpose();
+
+    return plane;
 }

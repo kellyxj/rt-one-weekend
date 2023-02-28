@@ -91,5 +91,46 @@ json Triangle::serialize() {
 }
 
 Geometry* Triangle::deserialize(json json_) {
+    auto material_ = json_["material"];
+    MaterialType type = (MaterialType)material_["type"];
 
+    Triangle* triangle = new Triangle();
+
+    switch(type) {
+        case MaterialType::diffuse: {
+            base* m = new base();
+            m = dynamic_cast<base*>(m->deserialize(material_));
+            triangle->setMaterial(*m);
+            break;
+        }
+        case MaterialType::groundGrid: {
+            groundGrid* m = new groundGrid();
+            m = dynamic_cast<groundGrid*>(m->deserialize(material_));
+            triangle->setMaterial(*m);
+            break;
+        }
+        case MaterialType::dielectric: {
+            Glass* m = new Glass();
+            m = dynamic_cast<Glass*>(m->deserialize(material_));
+            triangle->setMaterial(*m);
+            break;
+        }
+        case MaterialType::conductor: {
+            Mirror* m = new Mirror();
+            m = dynamic_cast<Mirror*>(m->deserialize(material_));
+            triangle->setMaterial(*m);
+            break;
+        }
+        default:
+            break;
+    }
+    auto modelMatrix_ = json_["transform"];
+    mat4 modelMatrix;
+    modelMatrix = modelMatrix.deserialize(modelMatrix_);
+    triangle->modelMatrix = modelMatrix;
+
+    triangle->worldToModel = modelMatrix.invert();
+    triangle->normalToWorld = modelMatrix.transpose();
+
+    return triangle;
 }

@@ -79,7 +79,7 @@ public:
 
     json serialize();
 
-    Camera desieralize(json json_);
+    Camera deserialize(json json_);
 };
 
 #endif

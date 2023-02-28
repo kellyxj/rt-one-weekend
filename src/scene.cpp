@@ -22,24 +22,37 @@ json Scene::serialize() {
 }
 
 Scene Scene::deserialize(json json_) {
-    name = json_["name"];
-    ambientLight = json_["ambientLight"];
-    backgroundColor = backgroundColor.deserialize(json_["backgroundColor"]);
-    /*
+    Scene scene;
+    scene.name = json_["name"];
+    scene.ambientLight = json_["ambientLight"];
+
+    Color backgroundColor;
+    auto backgroundColor_ = json_["backgroundColor"];
+    backgroundColor = backgroundColor.deserialize(backgroundColor_);
+
+    scene.backgroundColor = backgroundColor.deserialize(json_["backgroundColor"]);
+
+    for(auto camera : json_["cameras"]) {
+        Camera* cam = new Camera();
+        *cam = cam->deserialize(camera);
+
+        scene.cameras.push_back(cam);
+    }
+    
     for(auto item : json_["items"]) {
-        GeometryType type = item["type"];
+        int type_ = item["type"];
+        GeometryType type = (GeometryType)type_;
         switch(type) {
             case GeometryType::plane: {
                 Plane* plane = new Plane();
                 plane = dynamic_cast<Plane*>(plane->deserialize(item));
-                items.push_back(plane);
+                scene.items.push_back(plane);
                 break;
             }
-            /*
             case GeometryType::sphere: {
                 Sphere* sphere = new Sphere();
                 sphere = dynamic_cast<Sphere*>(sphere->deserialize(item));
-                items.push_back(sphere);
+                scene.items.push_back(sphere);
                 break;
             }
             case GeometryType::square: {
@@ -47,19 +60,19 @@ Scene Scene::deserialize(json json_) {
                 square = dynamic_cast<Square*>(square->deserialize(item));
                 items.push_back(square);
                 break;
-            }
+            }/*
             case GeometryType::mesh: {
                 Mesh* mesh = new Mesh();
                 mesh = dynamic_cast<Mesh*>(mesh->deserialize(item));
                 items.push_back(mesh);
                 break;
-            }
+            }*/
             case GeometryType::triangle: {
                 Triangle* triangle = new Triangle();
                 triangle = dynamic_cast<Triangle*>(triangle->deserialize(item));
                 items.push_back(triangle);
                 break;
-            }
+            }/*
             case GeometryType::bvh: {
                 BVH* bvh = new BVH();
                 bvh = dynamic_cast<BVH*>(bvh->deserialize(item));
@@ -67,8 +80,8 @@ Scene Scene::deserialize(json json_) {
                 break;
             }
             default: 
-                break;
+                break;*/
         }
-    }*/
-    return *this;
+    }
+    return scene;
 }

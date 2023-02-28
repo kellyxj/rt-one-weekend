@@ -67,3 +67,26 @@ json Camera::serialize() {
 
     return json_;
 }
+
+Camera Camera::deserialize(json json_) {
+    Camera cam;
+    
+    vec4 eyePoint;
+    auto eyePoint_ = json_["eyePoint"];
+    eyePoint = eyePoint.deserialize(eyePoint_);
+    cam.eyePoint = eyePoint;
+
+    vec4 aimPoint;
+    auto aimPoint_ = json_["aimPoint"];
+    aimPoint = aimPoint.deserialize(aimPoint_);
+    cam.aimPoint = aimPoint;
+
+    vec4 up;
+    auto up_ = json_["up"];
+    up = up.deserialize(up_);
+    cam.up = up;
+
+    cam.setUVN();
+
+    return cam;
+}
