@@ -58,29 +58,29 @@ Scene Scene::deserialize(json json_) {
             case GeometryType::square: {
                 Square* square = new Square();
                 square = dynamic_cast<Square*>(square->deserialize(item));
-                items.push_back(square);
+                scene.items.push_back(square);
                 break;
-            }/*
+            }
             case GeometryType::mesh: {
                 Mesh* mesh = new Mesh();
                 mesh = dynamic_cast<Mesh*>(mesh->deserialize(item));
-                items.push_back(mesh);
+                scene.items.push_back(mesh);
                 break;
-            }*/
+            }
             case GeometryType::triangle: {
                 Triangle* triangle = new Triangle();
                 triangle = dynamic_cast<Triangle*>(triangle->deserialize(item));
-                items.push_back(triangle);
+                scene.items.push_back(triangle);
                 break;
             }/*
             case GeometryType::bvh: {
                 BVH* bvh = new BVH();
                 bvh = dynamic_cast<BVH*>(bvh->deserialize(item));
-                items.push_back(bvh);
+                scene.items.push_back(bvh);
                 break;
-            }
-            default: 
-                break;*/
+            }*/
+            default:
+                break;
         }
     }
     return scene;

@@ -70,7 +70,7 @@ int main()
     // plane.rotate(30, axis);
     // plane.translate(translate);
     Plane *plane_pointer = &plane;
-    scene.items.push_back(plane_pointer);
+    //scene.items.push_back(plane_pointer);
 
     vec4 scaleAmount(.5, .5, .5);
 
@@ -92,7 +92,7 @@ int main()
     base sphereMat;
     sphereMat.c = grey;
     // sphereMat.brightness = 10;
-    sphere.setMaterial(sphereMat);
+    sphere.setMaterial(glass);
 
     Sphere *sphere_pointer = &sphere;
     scene.items.push_back(sphere_pointer);
@@ -117,7 +117,7 @@ int main()
     mesh.constructBVH();
 
     Mesh *mesh_pointer = &mesh;
-    //scene.items.push_back(mesh_pointer);
+    scene.items.push_back(mesh_pointer);
 
     Camera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
@@ -132,6 +132,8 @@ int main()
     SceneLoader sceneLoader;
     sceneLoader.createSceneFile(json_);
     sceneLoader.writeJson(json_);
+
+    //std::cout << json_;
 
     scene = scene.deserialize(sceneLoader.readJson(scene.name));
     std::cout << scene.serialize();

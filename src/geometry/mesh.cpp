@@ -141,5 +141,21 @@ json Mesh::serialize() {
     return json_;
 }
 Geometry* Mesh::deserialize(json json_) {
+    Mesh* mesh = new Mesh();
+    auto obj_name_ = json_["obj_name"];
+    mesh->obj_name = obj_name_;
 
+    mesh->loadFromObj(obj_name_);
+
+    auto modelMatrix_ = json_["transform"];
+    mat4 modelMatrix;
+    modelMatrix = modelMatrix.deserialize(modelMatrix_);
+    mesh->modelMatrix = modelMatrix;
+
+    mesh->worldToModel = modelMatrix.invert();
+    mesh->normalToWorld = modelMatrix.transpose();
+
+    mesh->constructBVH();
+
+    return mesh;
 }
