@@ -81,7 +81,7 @@ Geometry* Plane::deserialize(json json_) {
     plane->modelMatrix = modelMatrix;
 
     plane->worldToModel = modelMatrix.invert();
-    plane->normalToWorld = modelMatrix.transpose();
+    plane->normalToWorld = worldToModel.transpose();
 
     return plane;
 }

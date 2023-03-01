@@ -116,7 +116,7 @@ Geometry* Sphere::deserialize(json json_) {
     sphere->modelMatrix = modelMatrix;
 
     sphere->worldToModel = modelMatrix.invert();
-    sphere->normalToWorld = modelMatrix.transpose();
+    sphere->normalToWorld = worldToModel.transpose();
 
     return sphere;
 }

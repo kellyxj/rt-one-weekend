@@ -62,7 +62,14 @@ json Camera::serialize() {
         {"height", height},
         {"eyePoint", eyePoint.serialize()},
         {"aimPoint", aimPoint.serialize()},
-        {"up", up.serialize()}
+        {"up", up.serialize()},
+        {"left", left},
+        {"right", right}, 
+        {"top", top},
+        {"bottom", bottom},
+        {"near", near},
+        {"exposure", exposure},
+        {"gamma", gamma}
     };
 
     return json_;
@@ -70,6 +77,18 @@ json Camera::serialize() {
 
 Camera Camera::deserialize(json json_) {
     Camera cam;
+
+    cam.width = json_["width"];
+    cam.height = json_["height"];
+
+    cam.left = json_["left"];
+    cam.right = json_["right"];
+    cam.top = json_["top"];
+    cam.bottom = json_["bottom"];
+    cam.near = json_["near"];
+
+    cam.pixelWidth = (float)(right - left)/(float)(width);
+    cam.pixelHeight = (float)(top - bottom)/(float)(height);
     
     vec4 eyePoint;
     auto eyePoint_ = json_["eyePoint"];
@@ -87,6 +106,9 @@ Camera Camera::deserialize(json json_) {
     cam.up = up;
 
     cam.setUVN();
+
+    cam.exposure = json_["exposure"];
+    cam.gamma = json_["gamma"];
 
     return cam;
 }

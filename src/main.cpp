@@ -44,10 +44,8 @@ int main()
     std::string timestamp = ss.str();
 
     Scene scene;
-    scene.name = "cornell_box_sphere";
+    scene.name = "infinity_mirror";
 
-    std::string path = "../data/" + scene.name + "/renders/" + timestamp + ".ppm";
-    std::ofstream output(path);
     scene.ambientLight = 0;
     scene.backgroundColor = black;
 
@@ -59,7 +57,9 @@ int main()
     Mirror mirror;
 
     mirror.c = white;
-    glass.c = Color(.9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1), .9 + .1 * (rand() % 1));
+    glass.c = Color(.9 + .1 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX),
+        .9 + .1 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX),
+        .9 + .1 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
     mirror.r0 = .80;
     glass.n_i = .9;
 
@@ -82,7 +82,7 @@ int main()
 
     light.setMaterial(*lightMat);
     light.translate(translate);
-    Light *lightPointer = &light;
+    RectangleLight *lightPointer = &light;
     scene.lights.push_back(lightPointer);
 
     Sphere sphere;
@@ -113,7 +113,8 @@ int main()
 
     base meshMaterial;
     meshMaterial.c = grey;
-    // mesh.setMaterial(meshMaterial);
+    mirror.c = Color(.6, .8, .6);
+    mesh.setMaterial(mirror);
     mesh.constructBVH();
 
     Mesh *mesh_pointer = &mesh;
@@ -125,23 +126,26 @@ int main()
     scene.cameras.push_back(cam_pointer);
     RayTracer rayTracer;
 
-    rayTracer.maxDepth = 8;
-    rayTracer.sampleRate = 16;
+    rayTracer.maxDepth = 20;
+    rayTracer.sampleRate = 1024;
 
     json json_ = scene.serialize();
     SceneLoader sceneLoader;
     sceneLoader.createSceneFile(json_);
     sceneLoader.writeJson(json_);
 
+    std::string path = "../data/" + scene.name + "/renders/" + timestamp + ".ppm";
+    std::ofstream output(path);
+
     //std::cout << json_;
 
-    scene = scene.deserialize(sceneLoader.readJson(scene.name));
-    std::cout << scene.serialize();
+    //scene = scene.deserialize(sceneLoader.readJson(scene.name));
+    //std::cout << scene.serialize().dump(4);
 
     Image image;
     // image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
-    //image = rayTracer.takePicture(scene, 0);
-    //output << image.dump_ppm();
+    image = rayTracer.takePicture(scene, 0);
+    output << image.dump_ppm();
 
     vec4 origin(0, 0, .5, 1);
     vec4 direction(1, .01, 0, 0);

@@ -9,6 +9,9 @@ VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/u
 edit: $(objects)
 	$(CXX) -o ../bin/main $(objects) $(LDLIBS)
 
+debug: $(objects)
+	$(CXX) -o ../bin/main $(objects) -g $(LDLIBS)
+
 main.o: main.cpp vec4.hpp color.hpp ray.hpp camera.hpp mat4.hpp rayTracer.hpp scene_loader.hpp
 light.o: light.cpp ray.hpp mat4.hpp hit.hpp color.hpp geometry.hpp
 rectangleLight.o: rectangleLight.cpp light.hpp

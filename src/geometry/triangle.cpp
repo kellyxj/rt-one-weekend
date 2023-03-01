@@ -130,7 +130,7 @@ Geometry* Triangle::deserialize(json json_) {
     triangle->modelMatrix = modelMatrix;
 
     triangle->worldToModel = modelMatrix.invert();
-    triangle->normalToWorld = modelMatrix.transpose();
+    triangle->normalToWorld = worldToModel.transpose();
 
     return triangle;
 }

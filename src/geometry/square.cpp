@@ -82,7 +82,7 @@ Geometry* Square::deserialize(json json_) {
     square->modelMatrix = modelMatrix;
 
     square->worldToModel = modelMatrix.invert();
-    square->normalToWorld = modelMatrix.transpose();
+    square->normalToWorld = worldToModel.transpose();
 
     return square;
 }

@@ -83,5 +83,20 @@ Scene Scene::deserialize(json json_) {
                 break;
         }
     }
+
+    for(auto light_ : json_["lights"]) {
+        int type_ = light_["type"];
+        LightType type = (LightType)type_;
+        switch(type) {
+            case LightType::rectangle:{
+                RectangleLight* light = new RectangleLight();
+                light = dynamic_cast<RectangleLight*>(light->deserialize(light_));
+                scene.lights.push_back(light);
+                break;
+            }
+            default:
+                break;
+        }
+    }
     return scene;
 }

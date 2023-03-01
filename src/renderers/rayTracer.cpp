@@ -32,6 +32,7 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
                 randY -= .5;
 
                 ray eyeRay = cam.getEyeRay(i + .5 + randX, j + .5 + randY);
+
                 Hit hit;
                 hit = this->traceRay(scene, eyeRay, hit, 0);
 

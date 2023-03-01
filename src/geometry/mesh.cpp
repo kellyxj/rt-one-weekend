@@ -153,7 +153,7 @@ Geometry* Mesh::deserialize(json json_) {
     mesh->modelMatrix = modelMatrix;
 
     mesh->worldToModel = modelMatrix.invert();
-    mesh->normalToWorld = modelMatrix.transpose();
+    mesh->normalToWorld = worldToModel.transpose();
 
     mesh->constructBVH();
 

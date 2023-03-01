@@ -3,7 +3,7 @@
 class RectangleLight : public Light
 {
 public:
-    LightType type = LightType::rectangle;
+    LightType lightType = LightType::rectangle;
     // always centered at the origin
     // can be transformed since light inherits from geometry
     float width = 0;
