@@ -2,22 +2,53 @@
 #define __COLOR_H__
 
 #include <iostream>
+#include <vector>
 #include "util/json.hpp"
 using json = nlohmann::json;
 
 class Color {
 public:
-    float r, g, b, a;
-    Color(): r(0), g(0), b(0), a(1) {}
-    Color(float red, float green, float blue): r(red), g(green), b(blue), a(1) {}
-    Color(float red, float green, float blue, float alpha): r(red), g(green), b(blue), a(alpha) {}
+    //image::dump_ppm() will use the first 3 color channels listed in entries for now
+    std::vector<float> channels;
+    Color() {
+        channels.push_back(0);
+        channels.push_back(0);
+        channels.push_back(0);
+    }
+    Color(float red, float green, float blue) {
+        channels.push_back(red);
+        channels.push_back(green);
+        channels.push_back(blue);
+    }
+
+    //for now, all these operators assume the spectra have the same number of channels
+    Color operator + (const Color & c);
+    Color & operator += (const Color & c);
+    Color operator - (const Color & c);
+    Color & operator -= (const Color & c);
+    Color operator * (float c);
+    Color & operator *= (float c);
+    Color operator * (const Color & c);
+    Color & operator *= (const Color & c);
+    Color operator / (float c);
+    Color & operator /= (float c);
 
     json serialize();
     Color deserialize(json json_);
 };
 
 inline std::ostream& operator << (std::ostream &os, const Color &c) {
-    os << "(" << c.r << ", " << c.g << ", " << c.b << ", " << c.a << ")";
+    os << "(";
+    auto actual_delim = ", ";
+    auto delim = "";
+
+    for (const auto& elem : c.channels) {
+        std::cout << delim << elem;
+        delim = actual_delim;
+    }
+
+    os << ")";
+
     return os;
 }
 

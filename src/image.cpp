@@ -4,25 +4,25 @@ Color Image::getPixel(int x, int y) {
     return this->pixels[y*width+x];
 }
 void Image::setPixel(int x, int y, Color c) {
-    this->pixels[y*width+x].r = c.r;
-    this->pixels[y*width+x].g = c.g;
-    this->pixels[y*width+x].b = c.b;
-    this->pixels[y*width+x].a = c.a;
+    this->pixels[y*width+x] = c;
 }
 std::string Image::dump_ppm() {
     std::string output = "P3\n" + std::to_string(this->width) + " " + std::to_string(this->height) + "\n255\n";
     for(int j = this->height-1; j >= 0; j--) {
         for(int i = 0; i < this->width; i++) {
             Color c = this->getPixel(i,j);
-            c.r = 255*c.r;
-            c.g = 255*c.g;
-            c.b = 255*c.b;
+            float r = c.channels[0];
+            float g = c.channels[1];
+            float b = c.channels[2];
+            r = 255*r;
+            g = 255*g;
+            b = 255*b;
 
-            c.r = c.r > 255 ? 255 : c.r;
-            c.g = c.g > 255 ? 255 : c.g;
-            c.b = c.b > 255 ? 255 : c.b;
+            r = r > 255 ? 255 : r;
+            g = g > 255 ? 255 : g;
+            b = b > 255 ? 255 : b;
 
-            output += std::to_string(int(c.r)) + " " + std::to_string(int(c.g)) + " " + std::to_string(int(c.b)) + "\n";
+            output += std::to_string(int(r)) + " " + std::to_string(int(g)) + " " + std::to_string(int(b)) + "\n";
         }
     }
     return output;

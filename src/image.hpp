@@ -8,6 +8,14 @@ public:
     int height;
     std::vector<Color> pixels;
 
+    Image(int w, int h) {
+        width = w;
+        height = h;
+        for(int i = 0; i < w * h; i++) {
+            pixels.push_back(black);
+        }
+    }
+
     //bottom left: (0,0). top right: (width-1, height-1)
     Color getPixel(int x,int y);
     void setPixel(int x, int y, Color c);

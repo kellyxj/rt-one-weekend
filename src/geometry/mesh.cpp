@@ -97,9 +97,9 @@ void Mesh::loadFromObj(std::string obj_name_) {
                 tinyobj::material_t mat = materials[shapes[s].mesh.material_ids[f]];  
                 base* triangleMat = new base();
                 //diffuse only for now
-                triangleMat->c.r = mat.diffuse[0];
-                triangleMat->c.g = mat.diffuse[1];
-                triangleMat->c.b = mat.diffuse[2];
+                triangleMat->c.channels.push_back(mat.diffuse[0]);
+                triangleMat->c.channels.push_back(mat.diffuse[1]);
+                triangleMat->c.channels.push_back(mat.diffuse[2]);
                 triangle->setMaterial(*triangleMat);
             }
             

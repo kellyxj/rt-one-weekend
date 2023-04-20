@@ -36,23 +36,23 @@ int main()
 
     start = std::chrono::system_clock::now();
 
-    int nx = 1600;
-    int ny = 1600;
+    int nx = 400;
+    int ny = 400;
     std::stringstream ss;
     ss << start;
 
     std::string timestamp = ss.str();
 
     Scene scene;
-    scene.name = "infinity_mirror";
+    scene.name = "sphere";
 
-    scene.ambientLight = 0;
-    scene.backgroundColor = black;
+    scene.ambientLight = .5;
+    scene.backgroundColor = white;
 
     Plane plane;
     groundGrid planeMat;
 
-    // base sphereMat;
+    //base sphereMat;
     Glass glass;
     Mirror mirror;
 
@@ -69,8 +69,7 @@ int main()
     vec4 translate(0, 0, 1.99, 0);
     // plane.rotate(30, axis);
     // plane.translate(translate);
-    Plane *plane_pointer = &plane;
-    //scene.items.push_back(plane_pointer);
+    scene.items.push_back(&plane);
 
     vec4 scaleAmount(.5, .5, .5);
 
@@ -78,27 +77,25 @@ int main()
 
     base *lightMat = new base();
     lightMat->c = white;
-    lightMat->brightness = 16;
+    lightMat->brightness = .5;
 
     light.setMaterial(*lightMat);
     light.translate(translate);
-    RectangleLight *lightPointer = &light;
-    scene.lights.push_back(lightPointer);
+    //scene.lights.push_back(&light);
 
     Sphere sphere;
-    sphere.scale(scaleAmount);
     sphere.translate(axis);
+    sphere.scale(scaleAmount);
 
     base sphereMat;
-    sphereMat.c = grey;
+    sphereMat.c = red;
     // sphereMat.brightness = 10;
-    sphere.setMaterial(glass);
+    sphere.setMaterial(sphereMat);
 
-    Sphere *sphere_pointer = &sphere;
-    scene.items.push_back(sphere_pointer);
+    scene.items.push_back(&sphere);
 
     Mesh mesh;
-    mesh.loadFromObj("cornell_box.obj");
+    mesh.loadFromObj("cornell_box_cube.obj");
 
     axis = vec4(1, 0, 0);
     mesh.rotate(90, axis);
@@ -114,25 +111,23 @@ int main()
     base meshMaterial;
     meshMaterial.c = grey;
     mirror.c = Color(.6, .8, .6);
-    mesh.setMaterial(mirror);
+    //mesh.setMaterial(mirror);
     mesh.constructBVH();
 
-    Mesh *mesh_pointer = &mesh;
-    scene.items.push_back(mesh_pointer);
+    //scene.items.push_back(&mesh);
 
     Camera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
-    Camera *cam_pointer = &cam;
-    scene.cameras.push_back(cam_pointer);
+    scene.cameras.push_back(&cam);
     RayTracer rayTracer;
 
-    rayTracer.maxDepth = 20;
-    rayTracer.sampleRate = 1024;
+    rayTracer.maxDepth = 10;
+    rayTracer.sampleRate = 64;
 
-    json json_ = scene.serialize();
+    /*json json_ = scene.serialize();
     SceneLoader sceneLoader;
     sceneLoader.createSceneFile(json_);
-    sceneLoader.writeJson(json_);
+    sceneLoader.writeJson(json_);*/
 
     std::string path = "../data/" + scene.name + "/renders/" + timestamp + ".ppm";
     std::ofstream output(path);
@@ -142,7 +137,7 @@ int main()
     //scene = scene.deserialize(sceneLoader.readJson(scene.name));
     //std::cout << scene.serialize().dump(4);
 
-    Image image;
+    Image image(nx, ny);
     // image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
     image = rayTracer.takePicture(scene, 0);
     output << image.dump_ppm();
