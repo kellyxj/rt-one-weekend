@@ -10,6 +10,7 @@
 #include "cameras/pinholeCamera.hpp"
 #include "math/mat4.hpp"
 #include "renderers/rayTracer.hpp"
+#include "renderers/spectralRenderer.hpp"
 #include "util/date.h"
 #include "util/scene_loader.hpp"
 
@@ -61,7 +62,9 @@ int main()
         .9 + .1 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX),
         .9 + .1 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
     mirror.r0 = .80;
-    glass.n_i = .9;
+    glass.n_i.spectrum.channels[0] = 1.11;
+    glass.n_i.spectrum.channels[1] = 1.1;
+    glass.n_i.spectrum.channels[2] = 1.09;
 
     plane.setMaterial(planeMat);
 
@@ -119,7 +122,7 @@ int main()
     PinholeCamera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
     scene.cameras.push_back((Camera*)&cam);
-    RayTracer rayTracer;
+    SpectralRenderer rayTracer;
 
     rayTracer.maxDepth = 10;
     rayTracer.sampleRate = 64;

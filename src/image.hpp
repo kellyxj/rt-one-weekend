@@ -7,12 +7,14 @@ public:
     int width;
     int height;
     std::vector<Color> pixels;
+    std::vector<Color> sensitivityFunction;
 
     Image(int w, int h) {
         width = w;
         height = h;
         for(int i = 0; i < w * h; i++) {
             pixels.push_back(black);
+            sensitivityFunction.push_back(white);
         }
     }
 

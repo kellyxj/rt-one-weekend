@@ -76,6 +76,24 @@ Color & Color::operator /= (float c){
     return (*this);
 }
 
+bool Color::operator == (const Color & c) {
+    bool isSame = true;
+    int size = channels.size();
+    for(int i = 0; i < size; i++) {
+        isSame = isSame && channels[i] == c.channels[i];
+    }
+    return isSame;
+}
+
+float Color::dot(const Color & c) {
+    float output = 0;
+    int size = channels.size();
+    for(int i = 0; i < size; i++) {
+        output += channels[i] * c.channels[i];
+    }
+    return output;
+}
+
 json Color::serialize() {
     json json_ {
         {"entries", channels}

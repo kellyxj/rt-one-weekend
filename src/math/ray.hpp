@@ -1,17 +1,23 @@
 #ifndef __RAY_H__
 #define __RAY_H__
 #include "vec4.hpp"
+#include "../color.hpp"
+#include "../materials/indexOfRefraction.hpp"
 
 class ray {
 public:
     vec4 origin;
     vec4 direction;
-    float n_i = 1.0;
+    Color color;
+    IOR n_i;
 
     ray(): origin(vec4()), direction(vec4()) {
-
+        n_i.spectrum = white;
+        color = black;
     }
     ray(vec4 o, vec4 dir): origin(o){
+        n_i.spectrum = white;
+        color = black;
         direction = dir.normalize();
     }
 };

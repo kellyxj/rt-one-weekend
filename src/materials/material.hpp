@@ -5,6 +5,7 @@
 #include "../math/vec4.hpp"
 #include "../color.hpp"
 #include "../math/ray.hpp"
+#include "indexOfRefraction.hpp"
 #include <cmath>
 
 enum class MaterialType

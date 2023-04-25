@@ -11,15 +11,19 @@ ray Glass::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     vec4 orthog = dir - parallel;
 
     ray outRay(pos, parallel+orthog);
+    outRay.color = inRay.color;
 
     //assuming only air-medium interfaces
-    if(inRay.n_i == 1) {
+    if(inRay.n_i.spectrum == white) {
         outRay.n_i = n_i;
     }
     else {
-        outRay.n_i = 1;
+        outRay.n_i.spectrum = white;
     }
-    float sin_theta2_squared = inRay.n_i * inRay.n_i/(outRay.n_i * outRay.n_i) * (1 - (dot) * (dot));
+    float incidentIndex = inRay.n_i.spectrum.dot(inRay.color);
+    float outgoingIndex = outRay.n_i.spectrum.dot(inRay.color);
+
+    float sin_theta2_squared = incidentIndex * incidentIndex/(outgoingIndex * outgoingIndex) * (1 - (dot) * (dot));
     float cos_theta2_squared = 1 - sin_theta2_squared;
 
     //total internal reflection case
@@ -30,7 +34,7 @@ ray Glass::scatter(ray & inRay, vec4 & pos, vec4 & normal) {
     else {
         //Schlick approximation https://en.wikipedia.org/wiki/Schlick%27s_approximation
         float cos_theta = -dot;
-        float r0 = (inRay.n_i-outRay.n_i)*(inRay.n_i-outRay.n_i)/((inRay.n_i+outRay.n_i)*(inRay.n_i+outRay.n_i));
+        float r0 = (incidentIndex-outgoingIndex)*(incidentIndex-outgoingIndex)/((incidentIndex+outgoingIndex)*(incidentIndex+outgoingIndex));
         float reflectedPercent = r0+(1-r0)*pow((1-cos_theta),5);
         
         double intPart;
@@ -57,7 +61,7 @@ float Glass::sampleBrdf(ray &inRay, ray& outRay, vec4 &pos) {
 json Glass::serialize() {
     json json_ = {
         {"type", type},
-        {"n_i", n_i},
+        {"n_i", n_i.spectrum.serialize()},
         {"color", c.serialize()}
     };
     return json_;

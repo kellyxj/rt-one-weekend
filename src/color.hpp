@@ -33,6 +33,10 @@ public:
     Color operator / (float c);
     Color & operator /= (float c);
 
+    float dot(const Color & c);
+
+    bool operator == (const Color & c);
+
     json serialize();
     Color deserialize(json json_);
 };

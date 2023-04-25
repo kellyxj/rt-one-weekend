@@ -8,7 +8,7 @@ public:
     MaterialType type = MaterialType::dielectric;
     bool isDelta =true;
 
-    float n_i;
+    IOR n_i;
     Color c;
     Color getColor(vec4 & pos);
     ray scatter(ray & inRay, vec4 & pos, vec4 & normal);
