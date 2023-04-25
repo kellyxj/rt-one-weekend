@@ -39,7 +39,6 @@ public:
     virtual ~Geometry() {}
 
     virtual json serialize() = 0;
-    virtual Geometry* deserialize(json json_) = 0;
 };
 
 #endif

@@ -30,7 +30,6 @@ public:
     vec4 & operator /= (float c);
 
     json serialize();
-    vec4 deserialize(json json_);
 };
 
 inline std::ostream& operator << (std::ostream &os, const vec4 &t) {

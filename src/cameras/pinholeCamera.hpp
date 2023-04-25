@@ -1,11 +1,9 @@
-#ifndef __CAMERA_H__
-#define __CAMERA_H__
+#ifndef __PINHOLE_CAMERA_H__
+#define __PINHOLE_CAMERA_H__
 
-#include <cmath>
-#include "math/vec4.hpp"
-#include "math/ray.hpp"
+#include "camera.hpp"
 
-class Camera {
+class PinholeCamera : public Camera {
 public:
     vec4 eyePoint;
     vec4 aimPoint;
@@ -17,8 +15,6 @@ public:
     vec4 uAxis;
     vec4 vAxis;
     vec4 nAxis;
-
-    float gamma;
     
     float left;
     float right;
@@ -26,15 +22,7 @@ public:
     float bottom;
     float near;
 
-    int width;
-    int height;
-
-    float pixelWidth;
-    float pixelHeight;
-
-    float exposure = 1;
-
-    Camera() {
+    PinholeCamera() {
         eyePoint = vec4(-10, 0, 1, 1);
         aimPoint = vec4(0, 0, 1, 1);
         up = vec4(0, 0, 1, 0);
@@ -56,9 +44,12 @@ public:
         setUVN();
     }
 
-    Camera(vec4 eye, float pan, float tilt, int w, int h, float near, float fovy, float aspect): eyePoint(eye), panAngle(pan), tiltAngle(tilt), width(w), height(h) {
+    PinholeCamera(vec4 eye, float pan, float tilt, int w, int h, float near, float fovy, float aspect): eyePoint(eye), panAngle(pan), tiltAngle(tilt) {
         setLookDirection(pan, tilt);
         rayPerspective(fovy, aspect, near);
+
+        width = w;
+        height = h;
 
         pixelWidth = (float)(right - left)/(float)(width);
         pixelHeight = (float)(top - bottom)/(float)(height);
@@ -79,7 +70,7 @@ public:
 
     json serialize();
 
-    Camera deserialize(json json_);
+    Camera* deserialize(json json_);
 };
 
 #endif

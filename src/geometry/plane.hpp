@@ -9,5 +9,4 @@ public:
     vec4 getNormal(vec4 & pos, ray & inRay);
 
     json serialize();
-    Geometry* deserialize(json json_);
 };

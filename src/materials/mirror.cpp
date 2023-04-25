@@ -46,18 +46,3 @@ json Mirror::serialize() {
     };
     return json_;
 }
-Material* Mirror::deserialize(json json_) {
-    Mirror* m = new Mirror();
-
-    m->type = (MaterialType)json_["type"];
-
-    auto color_ = json_["color"];
-    Color color;
-    color = color.deserialize(color_);
-
-    m->c = color;
-
-    m->r0 = json_["r0"];
-    m->alpha = json_["alpha"];
-    return m;
-}

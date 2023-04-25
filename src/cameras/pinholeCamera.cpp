@@ -1,12 +1,10 @@
-#include "camera.hpp"
+#include "pinholeCamera.hpp"
 
-#include "defines.hpp"
-
-void Camera::setEyePosition(vec4 pos) {
+void PinholeCamera::setEyePosition(vec4 pos) {
     eyePoint = pos;
 }
 
-void Camera::setLookDirection(float pan, float tilt) {
+void PinholeCamera::setLookDirection(float pan, float tilt) {
     tiltAngle = tilt;
     panAngle = pan;
     aimPoint = vec4(eyePoint.x+cos(PI*panAngle/180)*cos(PI*tiltAngle/180),
@@ -22,7 +20,7 @@ void Camera::setLookDirection(float pan, float tilt) {
 }
 
 //define the absolute size of the image plane and its distance from the aperture
-void Camera::rayFrustum(float _left, float _right, float _top, float _bottom, float _near) {
+void PinholeCamera::rayFrustum(float _left, float _right, float _top, float _bottom, float _near) {
     left = _left;
     right = _right;
     top = _top;
@@ -30,14 +28,14 @@ void Camera::rayFrustum(float _left, float _right, float _top, float _bottom, fl
     near = _near;
 }
 
-void Camera::rayPerspective(float fovy, float aspect, float _near) {
+void PinholeCamera::rayPerspective(float fovy, float aspect, float _near) {
     float _top = _near * tan(.5 * fovy * PI/180);
     rayFrustum(-_top * aspect, _top * aspect, _top, -_top, _near);
 }
 
 //return the ray from the camera's aperture to (xPos, yPos) on the image/near plane
 //NB: in the image plane's coordinate system, each pixel is one unit wide by one unit tall
-ray Camera::getEyeRay(float xPos, float yPos) {
+ray PinholeCamera::getEyeRay(float xPos, float yPos) {
     float posU = left + xPos * pixelWidth;
     float posV = bottom + yPos * pixelHeight;
 
@@ -48,7 +46,7 @@ ray Camera::getEyeRay(float xPos, float yPos) {
     return eyeRay;
 }
 
-void Camera::setUVN() {
+void PinholeCamera::setUVN() {
     nAxis = (eyePoint - aimPoint).normalize();
     uAxis = (up.cross(nAxis)).normalize();
     vAxis = nAxis.cross(uAxis);
@@ -56,7 +54,7 @@ void Camera::setUVN() {
 
 //Camera::lookAt(vec4 aim)
 
-json Camera::serialize() {
+json PinholeCamera::serialize() {
     json json_ = {
         {"width", width},
         {"height", height},
@@ -73,42 +71,4 @@ json Camera::serialize() {
     };
 
     return json_;
-}
-
-Camera Camera::deserialize(json json_) {
-    Camera cam;
-
-    cam.width = json_["width"];
-    cam.height = json_["height"];
-
-    cam.left = json_["left"];
-    cam.right = json_["right"];
-    cam.top = json_["top"];
-    cam.bottom = json_["bottom"];
-    cam.near = json_["near"];
-
-    cam.pixelWidth = (float)(right - left)/(float)(width);
-    cam.pixelHeight = (float)(top - bottom)/(float)(height);
-    
-    vec4 eyePoint;
-    auto eyePoint_ = json_["eyePoint"];
-    eyePoint = eyePoint.deserialize(eyePoint_);
-    cam.eyePoint = eyePoint;
-
-    vec4 aimPoint;
-    auto aimPoint_ = json_["aimPoint"];
-    aimPoint = aimPoint.deserialize(aimPoint_);
-    cam.aimPoint = aimPoint;
-
-    vec4 up;
-    auto up_ = json_["up"];
-    up = up.deserialize(up_);
-    cam.up = up;
-
-    cam.setUVN();
-
-    cam.exposure = json_["exposure"];
-    cam.gamma = json_["gamma"];
-
-    return cam;
 }

@@ -21,6 +21,5 @@ public:
     void constructBVH();
 
     json serialize();
-    Geometry* deserialize(json json_);
 };
 #endif

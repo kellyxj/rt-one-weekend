@@ -7,7 +7,7 @@
 
 #include "color.hpp"
 #include "math/ray.hpp"
-#include "camera.hpp"
+#include "cameras/pinholeCamera.hpp"
 #include "math/mat4.hpp"
 #include "renderers/rayTracer.hpp"
 #include "util/date.h"
@@ -90,12 +90,12 @@ int main()
     base sphereMat;
     sphereMat.c = red;
     // sphereMat.brightness = 10;
-    sphere.setMaterial(sphereMat);
+    sphere.setMaterial(glass);
 
     scene.items.push_back(&sphere);
 
     Mesh mesh;
-    mesh.loadFromObj("cornell_box_cube.obj");
+    //mesh.loadFromObj("cornell_box_cube.obj");
 
     axis = vec4(1, 0, 0);
     mesh.rotate(90, axis);
@@ -116,18 +116,18 @@ int main()
 
     //scene.items.push_back(&mesh);
 
-    Camera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, .01, 90, 1);
+    PinholeCamera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
-    scene.cameras.push_back(&cam);
+    scene.cameras.push_back((Camera*)&cam);
     RayTracer rayTracer;
 
     rayTracer.maxDepth = 10;
     rayTracer.sampleRate = 64;
 
-    /*json json_ = scene.serialize();
+    json json_ = scene.serialize();
     SceneLoader sceneLoader;
     sceneLoader.createSceneFile(json_);
-    sceneLoader.writeJson(json_);*/
+    sceneLoader.writeJson(json_);
 
     std::string path = "../data/" + scene.name + "/renders/" + timestamp + ".ppm";
     std::ofstream output(path);

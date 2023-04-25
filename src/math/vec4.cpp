@@ -64,11 +64,3 @@ json vec4::serialize() {
     };
     return json_;
 }
-
-vec4 vec4::deserialize(json json_) {
-    x = json_["x"];
-    y = json_["y"];
-    z = json_["z"];
-    w = json_["w"];
-    return *this;
-}

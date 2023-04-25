@@ -209,11 +209,3 @@ json mat4::serialize() {
     };
     return json_;
 }
-
-mat4 mat4::deserialize(json json_) {
-    int size = json_["entries"].size();
-    for(int i = 0; i < size; i++) {
-        entries[i] = json_["entries"][i];
-    }
-    return *this;
-}

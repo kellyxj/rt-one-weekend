@@ -2,9 +2,9 @@ CXXFLAGS=-Wall -O2 -std=c++17
 CXX=g++
 LDLIBS=-lstdc++fs
 
-objects = main.o vec4.o color.o ray.o camera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o \
+objects = main.o vec4.o color.o ray.o pinholeCamera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o \
 triangle.o mesh.o bvh.o scene_loader.o light.o rectangleLight.o
-VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/util:../src/math:../src/lights
+VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/util:../src/math:../src/lights:../src/cameras
 
 edit: $(objects)
 	$(CXX) -o ../bin/main $(objects) $(LDLIBS)
@@ -19,10 +19,10 @@ scene.o: scene.cpp geometry.hpp plane.hpp camera.hpp sphere.hpp square.hpp mesh.
 ray.o: ray.cpp vec4.hpp
 color.o: color.cpp
 camera.o: camera.cpp vec4.hpp ray.hpp
+pinholeCamera.o: pinholeCamera.cpp camera.hpp
 mat4.o: mat4.cpp vec4.hpp
 geometry.o: geometry.cpp vec4.hpp mat4.hpp material.hpp hit.hpp baseMaterial.hpp glass.hpp mirror.hpp groundGrid.hpp
 plane.o: plane.cpp geometry.hpp
-scene.o: scene.cpp camera.hpp geometry.hpp
 rayTracer.o: rayTracer.cpp scene.hpp image.hpp geometry.hpp hit.hpp material.hpp sphere.hpp plane.hpp groundGrid.hpp
 square.o: square.cpp geometry.hpp
 mirror.o: mirror.cpp material.hpp

@@ -3,8 +3,8 @@
 
 Image RayTracer::takePicture(Scene &scene, int camIndex)
 {
-    Camera cam = (*scene.cameras[camIndex]);
-    Image output(cam.width, cam.height);
+    Camera* cam = (scene.cameras[camIndex]);
+    Image output(cam->width, cam->height);
     for (int i = 0; i < output.width; i++)
     {
         for (int j = 0; j < output.height; j++)
@@ -16,10 +16,10 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
 
     int sampleRate = this->sampleRate;
 
-    for (int j = (cam.height - 1); j >= 0; j--)
+    for (int j = (cam->height - 1); j >= 0; j--)
     {
         std::cout << j << "\n";
-        for (int i = 0; i < (cam.width); i++)
+        for (int i = 0; i < (cam->width); i++)
         {
             for (int k = 0; k < sampleRate; k++)
             {
@@ -29,13 +29,13 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
                 randX -= .5;
                 randY -= .5;
 
-                ray eyeRay = cam.getEyeRay(i + .5 + randX, j + .5 + randY);
+                ray eyeRay = cam->getEyeRay(i + .5 + randX, j + .5 + randY);
 
                 Hit hit;
                 hit = this->traceRay(scene, eyeRay, hit, 0);
 
                 Color c = output.getPixel(i, j);
-                c += hit.color / sampleRate * cam.exposure;
+                c += hit.color / sampleRate * cam->exposure;
 
                 // normal map
                 // c.r += (hit.normal.x + 1)/(2*sampleRate);
@@ -51,7 +51,7 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
             }
             Color c = output.getPixel(i, j);
             for(auto entry : c.channels) {
-                entry = (float)pow((double)entry, 1/cam.gamma);
+                entry = (float)pow((double)entry, 1/cam->gamma);
             }
             output.setPixel(i, j, c);
         }

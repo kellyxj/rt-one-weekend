@@ -18,6 +18,5 @@ public:
     Hit trace(ray & inRay);
 
     json serialize();
-    Geometry* deserialize(json json_);
 };
 #endif

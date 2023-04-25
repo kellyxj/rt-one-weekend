@@ -32,17 +32,3 @@ json base::serialize()
         {"color", c.serialize()}};
     return json_;
 }
-Material *base::deserialize(json json_)
-{
-    base* m = new base();
-
-    m->type = (MaterialType)json_["type"];
-    m->brightness = json_["brightness"];
-
-    auto color_ = json_["color"];
-    Color color;
-    color = color.deserialize(color_);
-
-    m->c = color;
-    return m;
-}

@@ -19,5 +19,4 @@ public:
     vec4 getNormal(vec4 &pos, ray &inRay);
 
     json serialize();
-    Light *deserialize(json json_);
 };

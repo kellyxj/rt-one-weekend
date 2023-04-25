@@ -38,7 +38,6 @@ public:
     BVH buildRecursive(int currentDepth, int maxDepth);
 
     json serialize();
-    Geometry* deserialize(json json_);
 };
 
 #endif

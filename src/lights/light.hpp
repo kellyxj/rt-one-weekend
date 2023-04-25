@@ -19,5 +19,4 @@ public:
     virtual float area() = 0;
 
     virtual json serialize() = 0;
-    virtual Light *deserialize(json json_) = 0;
 };

@@ -19,7 +19,6 @@ public:
     float sampleBrdf(ray &inRay, ray& outRay, vec4 &pos);
 
     json serialize();
-    Material * deserialize(json json_);
 };
 
 #endif

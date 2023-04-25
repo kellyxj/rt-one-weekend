@@ -4,7 +4,7 @@
 //A scene consists of geometry objects, lights, and at least one camera
 #include "geometry/geometry.hpp"
 #include "geometry/plane.hpp"
-#include "camera.hpp"
+#include "cameras/camera.hpp"
 #include "geometry/sphere.hpp"
 #include "geometry/square.hpp"
 #include "geometry/mesh.hpp"
@@ -23,6 +23,5 @@ public:
     std::vector<Light*> lights;
 
     json serialize();
-    Scene deserialize(json json_);
 };
 #endif
