@@ -9,6 +9,8 @@
 #include "../materials/groundGrid.hpp"
 #include "../hit.hpp"
 #include "../math/vec4.hpp"
+#include "../animation/translateAnimation.hpp"
+
 enum class GeometryType {none, plane, sphere, square, mesh, triangle, bvh};
 class Hit;
 
@@ -37,6 +39,8 @@ public:
 
     virtual Hit trace(ray & inRay) = 0;
     virtual ~Geometry() {}
+
+    std::vector<Animation*> animationList;
 
     virtual json serialize() = 0;
 };

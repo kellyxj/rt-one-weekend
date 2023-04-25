@@ -3,8 +3,8 @@ CXX=g++
 LDLIBS=-lstdc++fs
 
 objects = main.o vec4.o color.o ray.o pinholeCamera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o \
-triangle.o mesh.o bvh.o scene_loader.o light.o rectangleLight.o
-VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/util:../src/math:../src/lights:../src/cameras
+triangle.o mesh.o bvh.o scene_loader.o light.o rectangleLight.o translateAnimation.o
+VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/util:../src/math:../src/lights:../src/cameras:../src/animation
 
 edit: $(objects)
 	$(CXX) -o ../bin/main $(objects) $(LDLIBS)
@@ -31,6 +31,7 @@ triangle.o: triangle.cpp geometry.hpp
 mesh.o: mesh.cpp triangle.hpp bvh.hpp
 bvh.o: bvh.cpp geometry.hpp
 scene_loader.o: scene_loader.cpp scene.hpp
+translateAnimation.o: translateAnimation.cpp animation.hpp
 
 .PHONY: clean
 clean: 

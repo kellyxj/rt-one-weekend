@@ -87,6 +87,12 @@ int main()
     sphere.translate(axis);
     sphere.scale(scaleAmount);
 
+    TranslateAnimation anim(0, 1);
+    mat4 transform = anim.evaluate(2);
+    sphere.modelMatrix = sphere.modelMatrix.multiply(transform);
+    sphere.worldToModel = sphere.modelMatrix.invert();
+    sphere.normalToWorld = sphere.worldToModel.transpose();
+
     base sphereMat;
     sphereMat.c = red;
     // sphereMat.brightness = 10;
