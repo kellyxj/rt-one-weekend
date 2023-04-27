@@ -8,6 +8,7 @@
 #include "color.hpp"
 #include "math/ray.hpp"
 #include "cameras/pinholeCamera.hpp"
+#include "cameras/realisticCamera.hpp"
 #include "math/mat4.hpp"
 #include "renderers/rayTracer.hpp"
 #include "util/date.h"
@@ -116,9 +117,10 @@ int main()
 
     //scene.items.push_back(&mesh);
 
-    PinholeCamera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, .01, 90, 1);
+    RealisticCamera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, 1, 90, 1);
     cam.gamma = 2;
-    scene.cameras.push_back((Camera*)&cam);
+    cam.apertureSize = .01;
+    scene.cameras.push_back(&cam);
     RayTracer rayTracer;
 
     rayTracer.maxDepth = 10;

@@ -8,11 +8,6 @@
 
 class Camera {
 public:
-    virtual ray getEyeRay(float xPos, float yPos) = 0;
-    virtual json serialize() = 0;
-
-    virtual ~Camera() {}
-
     int width;
     int height;
 
@@ -21,6 +16,13 @@ public:
 
     float gamma;
     float exposure = 1;
+
+    virtual ray getEyeRay(float xPos, float yPos) = 0;
+    virtual json serialize() = 0;
+
+    virtual ~Camera() {}
+
+    
 };
 
 #endif
