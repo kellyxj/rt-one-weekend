@@ -58,9 +58,7 @@ int main()
     Mirror mirror;
 
     mirror.c = white;
-    glass.c = Color(.9 + .1 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX),
-        .9 + .1 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX),
-        .9 + .1 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+    glass.c = white;
     mirror.r0 = .80;
     glass.n_i = .9;
 
