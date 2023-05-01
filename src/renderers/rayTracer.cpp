@@ -18,7 +18,7 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
 
     for (int j = (cam->height - 1); j >= 0; j--)
     {
-        std::cout << j << "\n";
+        if (!(j%10)) std::cout << 1.0-float(j)/float(cam->height) << "\n";
         for (int i = 0; i < (cam->width); i++)
         {
             for (int k = 0; k < sampleRate; k++)

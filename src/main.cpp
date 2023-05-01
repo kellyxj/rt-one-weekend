@@ -9,6 +9,7 @@
 #include "math/ray.hpp"
 #include "cameras/pinholeCamera.hpp"
 #include "cameras/realisticCamera.hpp"
+#include "cameras/thinLensCamera.hpp"
 #include "math/mat4.hpp"
 #include "renderers/rayTracer.hpp"
 #include "util/date.h"
@@ -115,14 +116,15 @@ int main()
 
     //scene.items.push_back(&mesh);
 
-    RealisticCamera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, 1, 90, 1);
+    ThinLensCamera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, 1, 90, 1);
     cam.gamma = 2;
-    cam.apertureSize = .01;
+    cam.apertureRadius = .10;
+    cam.focalDistance = 3.0;
     scene.cameras.push_back(&cam);
     RayTracer rayTracer;
 
     rayTracer.maxDepth = 10;
-    rayTracer.sampleRate = 64;
+    rayTracer.sampleRate = 256;
 
     json json_ = scene.serialize();
     SceneLoader sceneLoader;

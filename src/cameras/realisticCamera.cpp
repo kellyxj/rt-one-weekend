@@ -44,8 +44,8 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
     eyeRay.origin = eyePoint + (uAxis * posU) + (vAxis * posV) + (nAxis * near);
     eyeRay.direction = eyePoint - eyeRay.origin;
     eyeRay.direction.w = 0;
-    eyeRay.direction += uAxis * apertureSize * static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-    eyeRay.direction += vAxis * apertureSize * static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+    eyeRay.direction += uAxis * apertureRadius * static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+    eyeRay.direction += vAxis * apertureRadius * static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
     eyeRay.direction = eyeRay.direction.normalize();
     return eyeRay;
 }

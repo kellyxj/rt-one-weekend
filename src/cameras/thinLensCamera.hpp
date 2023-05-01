@@ -1,9 +1,9 @@
-#ifndef __REALISTIC_CAMERA_H__
-#define __REALISTIC_CAMERA_H__
+#ifndef __THIN_LENS_CAMERA_H__
+#define __THIN_LENS_CAMERA_H__
 
 #include "camera.hpp"
 
-class RealisticCamera : public Camera {
+class ThinLensCamera : public Camera {
 public:
     vec4 eyePoint;
     vec4 aimPoint;
@@ -12,6 +12,7 @@ public:
     float panAngle;
     float tiltAngle;
     float apertureRadius = 1;
+    float focalDistance = 1;
 
     vec4 uAxis;
     vec4 vAxis;
@@ -23,7 +24,7 @@ public:
     float bottom;
     float near;
 
-    RealisticCamera() {
+    ThinLensCamera() {
         eyePoint = vec4(-10, 0, 1, 1);
         aimPoint = vec4(0, 0, 1, 1);
         up = vec4(0, 0, 1, 0);
@@ -45,7 +46,7 @@ public:
         setUVN();
     }
 
-    RealisticCamera(vec4 eye, float pan, float tilt, int w, int h, float near, float fovy, float aspect): eyePoint(eye), panAngle(pan), tiltAngle(tilt) {
+    ThinLensCamera(vec4 eye, float pan, float tilt, int w, int h, float near, float fovy, float aspect): eyePoint(eye), panAngle(pan), tiltAngle(tilt) {
         setLookDirection(pan, tilt);
         rayPerspective(fovy, aspect, near);
 
@@ -73,5 +74,17 @@ public:
 
     Camera* deserialize(json json_);
 };
+
+// Temporary (?) class to store x, y position
+class Posn2D {
+public: 
+    float x, y;
+
+    Posn2D(float a, float b): x(a), y(b) {}
+
+};
+
+Posn2D naiveDiskSample();
+Posn2D uniformDiskSample();
 
 #endif
