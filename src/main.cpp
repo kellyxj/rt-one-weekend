@@ -10,6 +10,7 @@
 #include "cameras/pinholeCamera.hpp"
 #include "cameras/realisticCamera.hpp"
 #include "cameras/thinLensCamera.hpp"
+#include "cameras/environmentCamera.hpp"
 #include "math/mat4.hpp"
 #include "renderers/rayTracer.hpp"
 #include "util/date.h"
@@ -38,7 +39,7 @@ int main()
 
     start = std::chrono::system_clock::now();
 
-    int nx = 400;
+    int nx = 800;
     int ny = 400;
     std::stringstream ss;
     ss << start;
@@ -90,7 +91,7 @@ int main()
     base sphereMat;
     sphereMat.c = red;
     // sphereMat.brightness = 10;
-    sphere.setMaterial(glass);
+    sphere.setMaterial(mirror);
 
     scene.items.push_back(&sphere);
 
@@ -116,15 +117,20 @@ int main()
 
     //scene.items.push_back(&mesh);
 
-    ThinLensCamera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, 1, 90, 1);
+    // ThinLensCamera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, 1, 90, 1);
+    // cam.gamma = 2;
+    // cam.apertureRadius = .10;
+    // cam.focalDistance = 3.0;
+    // scene.cameras.push_back(&cam);
+
+    EnvironmentCamera cam(vec4(-2, 0, 1, 1), nx, ny);
     cam.gamma = 2;
-    cam.apertureRadius = .10;
-    cam.focalDistance = 3.0;
     scene.cameras.push_back(&cam);
+
     RayTracer rayTracer;
 
     rayTracer.maxDepth = 10;
-    rayTracer.sampleRate = 256;
+    rayTracer.sampleRate = 64;
 
     json json_ = scene.serialize();
     SceneLoader sceneLoader;

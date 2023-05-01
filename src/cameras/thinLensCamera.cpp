@@ -103,7 +103,7 @@ Posn2D naiveDiskSample() {
     }
 }
 
-// Generates a uniform sampled position by assuming uniform area concentric rings
+// Generates a uniform sampled position on a unit disk by assuming uniform area concentric rings
 // The side effect of this is that area is not mapped uniformally. (i.e. outer rings are thinner)
 Posn2D uniformDiskSample() {
     float r = sqrt(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));

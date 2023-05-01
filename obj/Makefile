@@ -3,7 +3,7 @@ CXX=g++
 LDLIBS=-lstdc++fs
 
 objects = main.o vec4.o color.o ray.o pinholeCamera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o \
-triangle.o mesh.o bvh.o scene_loader.o light.o rectangleLight.o realisticCamera.o thinLensCamera.o
+triangle.o mesh.o bvh.o scene_loader.o light.o rectangleLight.o realisticCamera.o thinLensCamera.o environmentCamera.o
 VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/util:../src/math:../src/lights:../src/cameras
 
 edit: $(objects)
@@ -33,6 +33,7 @@ bvh.o: bvh.cpp geometry.hpp
 scene_loader.o: scene_loader.cpp scene.hpp
 realisticCamera.o: realisticCamera.cpp camera.hpp
 thinLensCamera.o: thinLensCamera.cpp camera.hpp
+environmentCamera.o: environmentCamera.cpp camera.hpp
 
 .PHONY: clean
 clean: 

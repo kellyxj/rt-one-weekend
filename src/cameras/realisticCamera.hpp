@@ -11,7 +11,7 @@ public:
 
     float panAngle;
     float tiltAngle;
-    float apertureRadius = 1;
+    float apertureRadius = 1; // Note: techinically not a radius *yet* (we're just random sampling over a square rn)
 
     vec4 uAxis;
     vec4 vAxis;
