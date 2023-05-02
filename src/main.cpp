@@ -123,7 +123,7 @@ int main()
     // cam.focalDistance = 3.0;
     // scene.cameras.push_back(&cam);
 
-    EnvironmentCamera cam(vec4(-2, 0, 1, 1), nx, ny);
+    EnvironmentCamera cam(vec4(-2, 0, 1, 1), nx, ny, 0, 0);
     cam.gamma = 2;
     scene.cameras.push_back(&cam);
 

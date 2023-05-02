@@ -7,18 +7,21 @@ class EnvironmentCamera : public Camera {
 public:
     vec4 eyePoint;
     
-    float left;
-    float right;
-    float top;
-    float bottom;
+    // stored internally as radians
+    float panAngle;
+    // stored internally as radians
+    float tiltAngle;
+
+    float left = 0;
+    float right = 1;
+    float bottom = 0;
+    float top = 1;
 
     EnvironmentCamera() {
         eyePoint = vec4(-10, 0, 1, 1);
 
-        left = 0;
-        right = 1;
-        top = 1;
-        bottom = 0;
+        panAngle = 0;
+        tiltAngle = 0;
 
         width = 512;
         height = 512;
@@ -26,23 +29,21 @@ public:
         pixelHeight = (float)(top - bottom)/(float)(height);
     }
 
-    EnvironmentCamera(vec4 eye, int w, int h): eyePoint(eye) {
-
-        eyePoint = vec4(-10, 0, 1, 1);
-
-        left = 0;
-        right = 1;
-        top = 1;
-        bottom = 0;
+    // Input pan and tilt as degrees!
+    EnvironmentCamera(vec4 eye, int w, int h, float pan, float tilt): eyePoint(eye) {
+        panAngle = PI*pan/180.0;
+        tiltAngle = PI*tilt/180.0;
 
         width = w;
         height = h;
-
         pixelWidth = (float)(right - left)/(float)(width);
         pixelHeight = (float)(top - bottom)/(float)(height);
     }
 
     void setEyePosition(vec4 pos);
+    
+    // Input pan and tilt as degrees!
+    void setLookDirection(float pan, float tilt);
 
     ray getEyeRay(float xPos, float yPos);
 

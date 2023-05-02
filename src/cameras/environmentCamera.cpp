@@ -4,16 +4,27 @@ void EnvironmentCamera::setEyePosition(vec4 pos) {
     eyePoint = pos;
 }
 
+void EnvironmentCamera::setLookDirection(float pan, float tilt) {
+    panAngle = PI*pan/180.0;
+    tiltAngle = PI*tilt/180.0;
+}
+
 ray EnvironmentCamera::getEyeRay(float xPos, float yPos) {
     float posU = left + xPos * pixelWidth;
     float posV = bottom + yPos * pixelHeight;
 
-    float theta = PI * posV;
-    float phi = 2 * PI * posU;
+    // azimuthal angle
+    float phi = 2 * PI * posU + panAngle; 
+
+    // inclination wrt +z axis
+    float theta = PI * posV + tiltAngle;
 
     ray eyeRay;
     eyeRay.origin = eyePoint;
-    eyeRay.direction = vec4(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
+
+    // Since the inclination angle starts along +z, we negate the z component
+    eyeRay.direction = vec4(sin(theta) * cos(phi), sin(theta) * sin(phi), -cos(theta));
+    
     return eyeRay;
 }
 
