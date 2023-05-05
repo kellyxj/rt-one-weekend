@@ -11,11 +11,13 @@ public:
     //image::dump_ppm() will use the first 3 color channels listed in entries for now
     std::vector<float> channels;
     Color() {
+        channels.reserve(3);
         channels.push_back(0);
         channels.push_back(0);
         channels.push_back(0);
     }
     Color(float red, float green, float blue) {
+        channels.reserve(3);
         channels.push_back(red);
         channels.push_back(green);
         channels.push_back(blue);
