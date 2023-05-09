@@ -30,6 +30,7 @@ public:
     }
 
     // Input pan and tilt as degrees!
+    // Keep the tilt at 0 or things go wrong...
     EnvironmentCamera(vec4 eye, int w, int h, float pan, float tilt): eyePoint(eye) {
         panAngle = PI*pan/180.0;
         tiltAngle = PI*tilt/180.0;

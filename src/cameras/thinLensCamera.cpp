@@ -41,8 +41,8 @@ ray ThinLensCamera::getEyeRay(float xPos, float yPos) {
     float posV = bottom + yPos * pixelHeight;
 
     ray eyeRay;
-    eyeRay.origin = eyePoint + (uAxis * posU) + (vAxis * posV) + (nAxis * near);
-    eyeRay.direction = eyePoint - eyeRay.origin;
+    eyeRay.origin = eyePoint;
+    eyeRay.direction = (uAxis * posU) + (vAxis * posV) - (nAxis * near);
     eyeRay.direction.w = 0;
 
     if (apertureRadius > 0) {
