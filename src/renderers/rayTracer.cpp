@@ -1,7 +1,8 @@
 #include "rayTracer.hpp"
 #include <iostream>
+#include <cmath>
 
-Image RayTracer::takePicture(Scene &scene, int camIndex)
+Image RayTracer::takePicture(Scene &scene, int camIndex, float t)
 {
     Camera* cam = (scene.cameras[camIndex]);
     Image output(cam->width, cam->height);
@@ -12,6 +13,25 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
             Color c;
             output.pixels.push_back(c);
         }
+    }
+
+    std::vector<Geometry*> itemsOrig = scene.items;
+
+    // before we trace, transform all objects according to their animations
+    for (Geometry *item : scene.items)
+    {
+        for (Animation *anim : item->animationList) {
+
+            // find current animation
+            mat4 transMat = anim->evaluate(t);
+            // model * a_1 * a_2 * ... * a_n
+            item->modelMatrix = item->modelMatrix.multiply(transMat);
+        }
+
+        // set other two matrices
+        item->worldToModel = item->modelMatrix.invert();
+        item->normalToWorld = item->worldToModel.transpose();
+
     }
 
     int sampleRate = this->sampleRate;
@@ -32,7 +52,7 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
                 ray eyeRay = cam->getEyeRay(i + .5 + randX, j + .5 + randY);
 
                 Hit hit;
-                hit = this->traceRay(scene, eyeRay, hit, 0);
+                hit = this->traceRay(scene, eyeRay, hit, 0, t);
 
                 Color c = output.getPixel(i, j);
                 c += hit.color / sampleRate * cam->exposure;
@@ -57,10 +77,36 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
         }
     }
 
+    // undo transforms, (don't want to permanently change the objects)
+    scene.items = itemsOrig;
+
     return output;
 }
 
-Hit RayTracer::traceRay(Scene &scene, ray &eyeRay, Hit &hit, int depth)
+std::vector<Image*> RayTracer::takeVideo(Scene & scene, int camIndex, float start, float duration, int frameRate)
+{
+    Camera* cam = (scene.cameras[camIndex]);
+    
+    std::vector<Image*> frames;
+
+    float t = start;
+
+    // we cant have a decimal number of frames, so round up
+    int numFrames = ceil(duration * frameRate);
+
+    for (int i = 0; i < numFrames; i++) {
+
+        Image img(cam->width, cam->height);
+        img = takePicture(scene, camIndex, t);
+        frames.push_back(&img);
+
+        t += 1.0 / frameRate;
+    }
+
+    return frames;
+}
+
+Hit RayTracer::traceRay(Scene &scene, ray &eyeRay, Hit &hit, int depth, float t)
 {
     Hit closest = hit;
     for (Geometry *item : scene.items)
@@ -70,6 +116,8 @@ Hit RayTracer::traceRay(Scene &scene, ray &eyeRay, Hit &hit, int depth)
         {
             closest = current;
         }
+
+
     }
     for (Geometry *light : scene.lights)
     {
@@ -79,11 +127,11 @@ Hit RayTracer::traceRay(Scene &scene, ray &eyeRay, Hit &hit, int depth)
             closest = current;
         }
     }
-    this->findShade(scene, closest, depth);
+    this->findShade(scene, closest, depth, t);
     return closest;
 }
 
-void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
+void RayTracer::findShade(Scene &scene, Hit &hit, int depth, float t)
 {
     // missed
     if (hit.t > 1e10)
@@ -142,7 +190,7 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
             lightVec.normalize();
             shadowRay.origin = hit.pos + hit.normal * EPSILON;
             shadowRay.direction = lightVec;
-            shadowHit = traceShadowRay(scene, shadowRay, shadowHit);
+            shadowHit = traceShadowRay(scene, shadowRay, shadowHit, t);
 
             if (shadowHit.brightness > 0)
             {
@@ -167,7 +215,7 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
         //hemisphere direct light sampling strategy
         shadowRay = hemisphereSampler.scatter(hit.inRay, hit.pos, hit.normal);
         shadowHit.brightness = 0;
-        shadowHit = traceShadowRay(scene, shadowRay, shadowHit);
+        shadowHit = traceShadowRay(scene, shadowRay, shadowHit, t);
         
         if(shadowHit.brightness > 0) {
             vec4 lightVec = shadowHit.pos - hit.pos;
@@ -197,7 +245,7 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
 
         if (depth < this->maxDepth)
         {
-            bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth + 1);
+            bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth + 1, t);
         }
         // BRDF contribution
         if (bounceHit.brightness > 0)
@@ -217,7 +265,7 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
     }
 }
 
-Hit RayTracer::traceShadowRay(Scene &scene, ray &shadowRay, Hit &hit)
+Hit RayTracer::traceShadowRay(Scene &scene, ray &shadowRay, Hit &hit, float t)
 {
     Hit closest = hit;
 

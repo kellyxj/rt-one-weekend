@@ -87,11 +87,12 @@ int main()
     sphere.translate(axis);
     sphere.scale(scaleAmount);
 
-    TranslateAnimation anim(0, 1);
-    mat4 transform = anim.evaluate(2);
-    sphere.modelMatrix = sphere.modelMatrix.multiply(transform);
-    sphere.worldToModel = sphere.modelMatrix.invert();
-    sphere.normalToWorld = sphere.worldToModel.transpose();
+    TranslateAnimation anim(vec4(0, 1, 0, 0), 1);
+    sphere.animationList.push_back(&anim);
+    //mat4 transform = anim.evaluate(2);
+    //sphere.modelMatrix = sphere.modelMatrix.multiply(transform);
+    //sphere.worldToModel = sphere.modelMatrix.invert();
+    //sphere.normalToWorld = sphere.worldToModel.transpose();
 
     base sphereMat;
     sphereMat.c = red;
@@ -138,15 +139,41 @@ int main()
     std::string path = "../data/" + scene.name + "/renders/" + timestamp + ".ppm";
     std::ofstream output(path);
 
+    //std::string path;
+    //std::ofstream output(path);
+
     //std::cout << json_;
 
     //scene = scene.deserialize(sceneLoader.readJson(scene.name));
     //std::cout << scene.serialize().dump(4);
 
-    Image image(nx, ny);
+    //Image image(nx, ny);
     // image = dynamic_cast<PathTracer*>(&rayTracer)->takePicture(scene, 0);
-    image = rayTracer.takePicture(scene, 0);
-    output << image.dump_ppm();
+
+    //image = rayTracer.takePicture(scene, 0, 1);
+    //output << image.dump_ppm();
+
+    std::vector<Image*> frames = rayTracer.takeVideo(scene, 0, 0, 1, 1);
+
+    std::cout << "size: " << frames.size() << "\n";
+
+    
+    for (int i = 0; i < frames.size(); i++) {
+        //Image image(nx, ny);
+        //image = *frames[i];
+        Image* image = frames[i];
+        image->dump_ppm();
+        std::cout<< "image width: " << std::to_string(image->width) << "\n";
+        //std::cout << "frame: " << i << "\n";
+        path = "../data/" + scene.name + "/renders/" + timestamp + "/" + std::to_string(i) + ".ppm";
+        //std::ofstream output(path);
+        //output << frames[i]->dump_ppm();
+    }
+
+    //std::cout << typeid(frames[0]).name() << "\n";
+
+    //frames[0].dump_ppm();
+    
 
     vec4 origin(0, 0, .5, 1);
     vec4 direction(1, .01, 0, 0);

@@ -6,7 +6,6 @@
 class Animation {
 public:
     float speed = 0;
-    int direction = 0;
 
     virtual mat4 evaluate(float t) = 0;
 };
