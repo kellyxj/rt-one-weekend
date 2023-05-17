@@ -48,7 +48,7 @@ int main()
 
     RayTracer rayTracer;
     rayTracer.maxDepth = 10;
-    rayTracer.sampleRate = 128;
+    rayTracer.sampleRate = 1;
 
     Scene scene;
     scene.name = "sphere";
@@ -65,6 +65,25 @@ int main()
     EnvironmentCamera cam1(vec4(-3, 0, 0.5, 1), nx, ny, 180, 0);
     cam1.gamma = 2;
     scene.cameras.push_back(&cam1);
+
+    std::vector<RealisticCamera::LensElementInterface> lenses;
+    // lenses.push_back(RealisticCamera::LensElementInterface(35.98738, 1.21638, 1.54, 23.716/2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(11.69718, 9.9957, 1, 17.996/2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(13.08714, 5.12622, 1.772, 12.364/2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-22.63294, 1.76924, 1.617, 9.812/2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(71.05802, 0.8184, 1, 9.152/2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(0, 2.27766, 0, 8.756/2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-9.58584, 2.435254, 1.617, 8.184/2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-11.28864, 0.11506, 1, 9.152/2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-166.7765, 3.09606, 1.713, 10.648/2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-7.5911, 1.32682, 1.805, 11.44/2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-16.7662, 3.98068, 1, 12.276/2));
+    lenses.push_back(RealisticCamera::LensElementInterface(-7.70286, 1.21638, 1.617, 13.42/2));
+    lenses.push_back(RealisticCamera::LensElementInterface(-11.98328, 20.0, 1, 17.996/2));
+    // RealisticCamera cam2(lenses, vec4(-3,0,0.5,1), 0, 0, nx, ny, 0.5);
+    RealisticCamera cam2(lenses, vec4(-3,0,0.5,1), 0, 0, 1, 1, 5.0/1000.0); // ! Currently 1x1 resolution for testing
+    cam2.gamma = 2;
+    scene.cameras.push_back(&cam2);
 
     // generic vec4 names
     vec4 translate;
@@ -199,7 +218,7 @@ int main()
 
     // * Create and save ray traced image
     Image image(nx, ny);
-    image = rayTracer.takePicture(scene, 0);
+    image = rayTracer.takePicture(scene, 2);
     output << image.dump_ppm();
 
 /*  

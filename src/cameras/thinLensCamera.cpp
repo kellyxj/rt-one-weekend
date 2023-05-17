@@ -34,29 +34,31 @@ void ThinLensCamera::rayPerspective(float fovy, float aspect, float _near) {
     rayFrustum(-_top * aspect, _top * aspect, _top, -_top, _near);
 }
 
-//return the ray from the camera's aperture to (xPos, yPos) on the image/near plane
-//NB: in the image plane's coordinate system, each pixel is one unit wide by one unit tall
+// Generate a ray that passes through a simulated thin lens at pixel xPos, yPos
 ray ThinLensCamera::getEyeRay(float xPos, float yPos) {
     float posU = left + xPos * pixelWidth;
     float posV = bottom + yPos * pixelHeight;
 
     ray eyeRay;
+    // We are assuming the film plane lies in front of the camera origin
     eyeRay.origin = eyePoint;
     eyeRay.direction = (uAxis * posU) + (vAxis * posV) - (nAxis * near);
     eyeRay.direction.w = 0;
 
     if (apertureRadius > 0) {
-        // Determine the point where the ray hit the lens
+        // Generate the point where the ray hit the lens
         Posn2D circleSample = uniformDiskSample();
         float circleX = apertureRadius * circleSample.x;
         float circleY = apertureRadius * circleSample.y;
 
-        // Compute where that point lies on the plane of focus
+        // Compute where the ray from that point lies on the plane of focus
         float ft = focalDistance / sqrt((eyePoint - aimPoint).length_squared());
         vec4 pFocus = eyeRay.origin + (eyeRay.direction * ft);
 
-        // Update the ray according to computed thin lens effect
+        // * Update the ray according to computed thin lens effect
+        // The ray now originates at the point where it hit the lens
         eyeRay.origin = eyePoint + (uAxis * circleX) + (vAxis * circleY);
+        // And moves towards the point on the plane of focus
         eyeRay.direction = pFocus - eyeRay.origin;
     }
 
