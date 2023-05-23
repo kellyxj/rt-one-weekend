@@ -1,8 +1,6 @@
 #include "realisticCamera.hpp"
 #include <iostream>
 
-bool debugMode = true;
-
 void RealisticCamera::setEyePosition(vec4 pos) {
     eyePoint = pos;
 }
@@ -27,8 +25,6 @@ void RealisticCamera::setUVN() {
     nAxis = (eyePoint - aimPoint).normalize();
     uAxis = (up.cross(nAxis)).normalize();
     vAxis = nAxis.cross(uAxis);
-    lookatMatrix = lookatMatrix.lookat(aimPoint, eyePoint, up);
-    // std::cout << "Matrix: \n" << lookatMatrix << "\n";
 }
 
 void RealisticCamera::computeProperties() {
@@ -43,22 +39,6 @@ void RealisticCamera::computeProperties() {
     for (const LensElementInterface &element : elementInterfaces)
         lensFrontZ += element.thickness;
     rearElementRadius = elementInterfaces.back().apertureRadius;
-
-    if (debugMode) std::cout 
-    << "\nCamera Info:"
-    << "\nlensRearZ:   " << lensRearZ 
-    << "\nlensFrontZ:  " << lensFrontZ 
-    << "\nAspect:      " << aspect 
-    << "\nwidth:       " << width 
-    << "\nheight:      " << height 
-    << "\npixelWidth:  " << pixelWidth 
-    << "\npixelHeight: " << pixelHeight 
-    << "\nboundsX0:    " << bounds.x.x 
-    << "\nboundsX1:    " << bounds.x.y 
-    << "\nboundsY0:    " << bounds.y.x 
-    << "\nboundsY1:    " << bounds.y.y 
-    << "\ndiagonal:    " << diagonal 
-    << "\n\n" << std::endl; 
 }
 
 // Return the origin and direction of the ray that has been ray-traced through the lens system
@@ -69,14 +49,11 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
     float posU = bounds.x.x + xPos * pixelWidth;
     float posV = bounds.y.x + yPos * pixelHeight;
 
-    // We will trace the ray in camera lensCoords and then convert
-    // to world coords after. For lensCoords, the z=0 is at the sensor
-    // plane and the lenses extend to the left along -z
     ray rLens;
-    rLens.origin = vec4(posU,posV,0);
-
-    // This is where the resulting ray will be stored
     ray rOut;
+
+    // Everything is being kept in world space coordinates!
+    rLens.origin = eyePoint + uAxis*posU + vAxis*posV;
 
     // Keep looping until you find a ray that makes it out of the lens system
     while(true) {
@@ -87,21 +64,16 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
         vec4 rearElementPosn = vec4(rearElementSample.x,rearElementSample.y,0);
 
         rearElementPosn *= rearElementRadius;
-        rearElementPosn += vec4(0,0,-lensRearZ); // ! negative? (i.e. why is NOT negative...?)
+        rearElementPosn += vec4(0,0,lensRearZ);
 
-        rLens.direction = rearElementPosn - rLens.origin; // ! should we normalize (or does it not matter)?
+        rearElementPosn = rearElementPosn + eyePoint;
 
-        if (debugMode) std::cout 
-        << "RayOrigin: " << rLens.origin 
-        << "\nRearElementPosn: " << rearElementPosn 
-        << "\nrLensDirection: " << rLens.direction << "\n";
+        rLens.direction = rearElementPosn - rLens.origin;
 
         bool rayExitedLenses = traceLensesFromSensor(rLens, rOut);
         if (rayExitedLenses) {
-            if (debugMode) std::cout << "MADE IT OUT!\n\n";
             break;
         }
-        if (debugMode) std::cout << "\n\nlooping...\n";
     }
 
     return rOut;
@@ -110,55 +82,51 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
 bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
     
-    // We need to keep track of the z posn of the current element
+    // We need to keep track of the z posn (along the n-axis) of the current element
     float elementZ = 0;
 
-    // Now we trace that ray through the lens elements 
-    // (this is closely following pbr's implementation)
-    for (int i = elementInterfaces.size() - 1; i >= 0; --i) {
-
-        if (debugMode) std::cout << "Now tracing element " << i << "\n";
+    // Now we trace that ray through the lens elements in outward order from the camera sensor
+    for (int i = 0; i < elementInterfaces.size(); ++i) {
 
         const LensElementInterface &element = elementInterfaces[i];
-        elementZ -= element.thickness;
-        float t; // parameterized intersection value
-        vec4 n; // normal
+        elementZ += element.thickness;
+
+        Hit lensHit;
 
         // Aperture stops are represented with lens elements of radius 0
         bool isStop = (element.curvatureRadius == 0);
 
+        vec4 lensCenter = eyePoint + nAxis * (elementZ + element.curvatureRadius);
+
         if (isStop) {
-
-            // ray-plane intersection with plane perp. to z axis
-            t = (elementZ - rLens.origin.z) / rLens.direction.z;
-
-        } else {
-
-            // generate the sphere that we will intersect the ray with
+            Plane apertureStop;
+            apertureStop.rotate((180.0/PI) * acos(up.dot(nAxis)), uAxis); // ! Maybe wrong
+            apertureStop.translate(lensCenter);
+            lensHit = apertureStop.trace(rLens);
+        } 
+        else {
             float radius = element.curvatureRadius;
+            float absRadius = abs(radius);
 
-            // elementZ represents the left/rightmost part of the sphere
-            // We need to add the radius to get to the center. Note that the sign
-            // of the radius will determine if elementZ is the left/rightmost part
-            float zCenter = elementZ + element.curvatureRadius;
+            Sphere lens;
+            lens.translate(lensCenter);
+            vec4 scaleAmount;
+            scaleAmount = vec4(absRadius, absRadius, absRadius);
+            lens.scale(scaleAmount);
+            Glass glass;
+            glass.n_i = element.IoR;
+            lens.setMaterial(glass);
+            Hit lensHit = lens.trace(rLens);
 
-            if (debugMode) std::cout 
-            << "zCenter: " << zCenter << "\n"
-            << "radius: " << radius << "\n";
-
-            // The call to intersectSphericalElement will do the actual ray tracing
-            // and update t and n for us.
-            if (!intersectSphericalElement(radius, zCenter, rLens, &t, &n)) {
-                if (debugMode) std::cout << "FAILED INTERSECT!\n";
-                return false;
-            }
+            // ! This only returns the first hit..., we need it to return both!
         }
 
+        // check if ray hit lens
+        if (lensHit.t > 1e10) return false;
+
         // check if intersection is within bounds of element aperture
-        vec4 pHit = rLens.origin + (rLens.direction * t);
-        float r2 = pHit.x * pHit.x + pHit.y * pHit.y;
+        float r2 = lensHit.pos - lensCenter
         if (r2 > element.apertureRadius * element.apertureRadius) {
-            if (debugMode) std::cout << "FAILED APERTURE BOUNDS!\n";
             return false;
         }
         rLens.origin = pHit;
@@ -176,7 +144,6 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
             float IoRT = (i > 0 && elementInterfaces[i-1].IoR != 0) ? elementInterfaces[i-1].IoR : 1;
 
             if (!refract((rLens.direction * -1).normalize(), n, IoRI/IoRT, &w)) { // ! rLens.direction * -1?
-                if (debugMode) std::cout << "FAILED INTERNAL REFLECT!\n";
                 return false;
             }
             // vec4 normalizedW = w.normalize();
@@ -197,103 +164,6 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
     // std::cout << "Origin: " << rOut.origin << " Direction: " << rOut.direction << "\n";
 
     return true;
-}
-
-bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray inRay, float *t, vec4 *n) {
-
-    // solve for intersection points t0 and t1
-    // This is solving for [D^2 t^2 + 2 O D t + O^2 - R^2 = 0] so that A = D^2, B = 2 O D, C = O^2 - R^2
-    // where D = direction vector of the ray, O = vector from ray origin to sphere center, R = sphere radius
-    vec4 o = vec4(0,0,zCenter) - inRay.origin; // vector from ray origin to center of the sphere
-    float A = inRay.direction.length_squared();
-    float B = 2 * inRay.direction.dot(o);
-    float C = o.length_squared() - radius*radius;
-    float t0, t1;
-
-    if (debugMode) std::cout 
-    << "O: " << o
-    << "\nA: " << A 
-    << " B: " << B 
-    << " C: " << C 
-    << "\n";
-
-    if (!quadratic(A,B,C,&t0,&t1)) return false;
-
-    if (debugMode) std::cout 
-    << "passed quadratic!\n"
-    << "t0: " << t0 
-    << "; t1: " << t1 << "\n";
-
-    // select the appropriate t based on ray direction and element curvature
-    bool useCloserT = (inRay.direction.z > 0) ^ (radius < 0);
-
-    if (debugMode) std::cout
-    << "UseCloserT? " << useCloserT << "\n";
-
-    *t = useCloserT ? std::min(t0,t1) : std::max(t0,t1);
-
-    if (debugMode) std::cout
-    << "closerT: " << *t << "\n";
-
-    if (*t < 0) return false;
-
-    if (debugMode) std::cout
-    << "passed intersection test!\n";
-
-    // compute surface normal at intersection point
-    *n = (o + inRay.direction * (*t)).normalize();
-
-    // We want the dot prod to be negative such that inRay.direction is opposite the normal
-    if (inRay.direction.dot(*n) > 0) {
-        *n = *n * -1;
-
-        if (debugMode) std::cout
-        << "flipping direction of surface normal...\n";
-    }
-
-    return true;
-}
-
-inline bool RealisticCamera::quadratic(float a, float b, float c, float *t0, float *t1) {
-    
-    // use doubles to minimize floating point error, especially for sqrt
-    double discriminant = (double)b*(double)b - 4*(double)a*(double)c;
-    
-    if (debugMode) std::cout 
-    << "Discriminant: " << discriminant << "\n";
-    
-    if (discriminant < 0) return false;
-    double rootDiscriminant = sqrt(discriminant);
-
-    double q;
-    if (b < 0) q = -0.5 * (b - rootDiscriminant);
-    else q = -0.5 * (b + rootDiscriminant);
-
-    *t0 = q/a;
-    *t1 = c/q;
-
-    // make sure t0 < t1
-    if (*t0 > *t1) std::swap(*t0, *t1);
-    return true;
-}
-
-bool RealisticCamera::refract(const vec4 &wi, const vec4 &n, float IoR, vec4 *wt) {
-    
-    vec4 n_ = n;
-    vec4 wi_ = wi;
-    float cosThetaI = n_.dot(wi_);
-
-    float sin2ThetaI = std::max(0.f, 1.f - cosThetaI * cosThetaI);
-    float sin2ThetaT = IoR*IoR*sin2ThetaI;
-
-    // ignore total internal reflection case
-    if (sin2ThetaT >= 1) return false;
-
-    float cosThetaT = sqrt(1 - sin2ThetaT);
-
-    *wt = (wi_*-1)*IoR + n_*(IoR*cosThetaI - cosThetaT);
-
-    return true; 
 }
 
 json RealisticCamera::serialize() {

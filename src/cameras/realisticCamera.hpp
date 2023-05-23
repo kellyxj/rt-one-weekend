@@ -3,6 +3,9 @@
 
 #include "camera.hpp"
 #include "../math/mat4.hpp"
+#include "../geometry/sphere.hpp"
+#include "../geometry/plane.hpp"
+#include "../materials/glass.hpp"
 
 class RealisticCamera : public Camera {
 

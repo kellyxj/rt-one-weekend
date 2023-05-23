@@ -54,7 +54,7 @@ int main()
     scene.name = "sphere";
     scene.ambientLight = 0.5;
     scene.backgroundColor = white;
-    
+
     // * Scene Camera(s)
     ThinLensCamera cam0(vec4(-3, 0, 0.5, 1), 0, 0, nx, ny, 1, 90, nx/ny);
     cam0.gamma = 2;
