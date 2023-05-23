@@ -2,6 +2,7 @@
 #define __REALISTIC_CAMERA_H__
 
 #include "camera.hpp"
+#include "../math/mat4.hpp"
 
 class RealisticCamera : public Camera {
 
@@ -22,13 +23,14 @@ public:
 
         // Values are input as mm but stored as m!
         LensElementInterface(float curvatureRadius, float thickness, float IoR, float apertureRadius)
-        : curvatureRadius(curvatureRadius/1000), thickness(thickness/1000), IoR(IoR), apertureRadius(apertureRadius/1000) {};
+        : curvatureRadius(curvatureRadius/1000.0), thickness(thickness/1000.0), IoR(IoR), apertureRadius(apertureRadius/1000.0) {};
     };
 
     std::vector<LensElementInterface> elementInterfaces;
 
+    // Note: input diagonal size in mm!
     RealisticCamera(std::vector<LensElementInterface> lenses, vec4 eye, float pan, float tilt, int w, int h, float diagonal)
-    : elementInterfaces(lenses), eyePoint(eye), panAngle(pan), tiltAngle(tilt), diagonal(diagonal) {
+    : elementInterfaces(lenses), eyePoint(eye), panAngle(pan), tiltAngle(tilt), diagonal(diagonal/1000.0) {
         setLookDirection(pan, tilt);
         width = w;
         height = h;
@@ -54,6 +56,7 @@ private:
     vec4 eyePoint;
     vec4 aimPoint;
     vec4 up;
+    mat4 lookatMatrix;
 
     float panAngle;
     float tiltAngle;
@@ -83,8 +86,8 @@ private:
         
         // Default
         Bounds2f() {
-            x = Point2f(0,0); 
-            y = Point2f(0,0);
+            x = Point2f(.0,.0); 
+            y = Point2f(.0,.0);
         };
     };
 

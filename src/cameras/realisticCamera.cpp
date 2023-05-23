@@ -27,6 +27,8 @@ void RealisticCamera::setUVN() {
     nAxis = (eyePoint - aimPoint).normalize();
     uAxis = (up.cross(nAxis)).normalize();
     vAxis = nAxis.cross(uAxis);
+    lookatMatrix = lookatMatrix.lookat(aimPoint, eyePoint, up);
+    // std::cout << "Matrix: \n" << lookatMatrix << "\n";
 }
 
 void RealisticCamera::computeProperties() {
@@ -85,9 +87,9 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
         vec4 rearElementPosn = vec4(rearElementSample.x,rearElementSample.y,0);
 
         rearElementPosn *= rearElementRadius;
-        rearElementPosn += vec4(0,0,lensRearZ);
+        rearElementPosn += vec4(0,0,-lensRearZ); // ! negative? (i.e. why is NOT negative...?)
 
-        rLens.direction = rearElementPosn - rLens.origin;
+        rLens.direction = rearElementPosn - rLens.origin; // ! should we normalize (or does it not matter)?
 
         if (debugMode) std::cout 
         << "RayOrigin: " << rLens.origin 
@@ -96,10 +98,10 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
         bool rayExitedLenses = traceLensesFromSensor(rLens, rOut);
         if (rayExitedLenses) {
-            if (debugMode) std::cout << "Made it out\n";
+            if (debugMode) std::cout << "MADE IT OUT!\n\n";
             break;
         }
-        if (debugMode) std::cout << "looping...\n";
+        if (debugMode) std::cout << "\n\nlooping...\n";
     }
 
     return rOut;
@@ -136,14 +138,18 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
             float radius = element.curvatureRadius;
 
             // elementZ represents the left/rightmost part of the sphere
-            // We need to add the radius to get to the center. Note that a 
-            // negative radius will determine if elementZ is the left/rightmost part
+            // We need to add the radius to get to the center. Note that the sign
+            // of the radius will determine if elementZ is the left/rightmost part
             float zCenter = elementZ + element.curvatureRadius;
+
+            if (debugMode) std::cout 
+            << "zCenter: " << zCenter << "\n"
+            << "radius: " << radius << "\n";
 
             // The call to intersectSphericalElement will do the actual ray tracing
             // and update t and n for us.
             if (!intersectSphericalElement(radius, zCenter, rLens, &t, &n)) {
-                if (debugMode) std::cout << "\nFAILED INTERSECT!\n";
+                if (debugMode) std::cout << "FAILED INTERSECT!\n";
                 return false;
             }
         }
@@ -152,7 +158,7 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
         vec4 pHit = rLens.origin + (rLens.direction * t);
         float r2 = pHit.x * pHit.x + pHit.y * pHit.y;
         if (r2 > element.apertureRadius * element.apertureRadius) {
-            if (debugMode) std::cout << "\nFAILED APERTURE BOUNDS!\n";
+            if (debugMode) std::cout << "FAILED APERTURE BOUNDS!\n";
             return false;
         }
         rLens.origin = pHit;
@@ -169,20 +175,26 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
             // next element's IoR (else case assumes air interface)
             float IoRT = (i > 0 && elementInterfaces[i-1].IoR != 0) ? elementInterfaces[i-1].IoR : 1;
 
-            // ! May need to multiply by rLens direction by -1
-            if (!refract((rLens.direction).normalize(), n, IoRI/IoRT, &w)) {
-                if (debugMode) std::cout << "\nFAILED INTERNAL REFLECT!\n";
+            if (!refract((rLens.direction * -1).normalize(), n, IoRI/IoRT, &w)) { // ! rLens.direction * -1?
+                if (debugMode) std::cout << "FAILED INTERNAL REFLECT!\n";
                 return false;
             }
+            // vec4 normalizedW = w.normalize();
+            // std::cout << "dotProd: " << rLens.direction.normalize().dot(normalizedW) << "\n";
             rLens.direction = w;
+            // std::cout << "preOrigin: " << rLens.origin << " preDirection: " << rLens.direction << "\n";
         }
     }
 
-    // ! This may be missing a check (look at pbr)
+    // ! This may be missing a nullptr check (look at pbr) 
+    // -- though we can't directly implement that here
     rOut = rLens;
 
     // convert the origin and ray direction from lens coords to camera coords
-    // rOut = //TODO
+    rOut.direction = lookatMatrix.transform(rOut.direction);
+    rOut.origin = lookatMatrix.transform(rOut.origin);
+
+    // std::cout << "Origin: " << rOut.origin << " Direction: " << rOut.direction << "\n";
 
     return true;
 }
@@ -199,8 +211,7 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     float t0, t1;
 
     if (debugMode) std::cout 
-    << "InRayDirection: " << inRay.direction 
-    << "\nO: " << o
+    << "O: " << o
     << "\nA: " << A 
     << " B: " << B 
     << " C: " << C 
@@ -208,12 +219,26 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
 
     if (!quadratic(A,B,C,&t0,&t1)) return false;
 
-    if (debugMode) std::cout << "passed quadratic!\n";
+    if (debugMode) std::cout 
+    << "passed quadratic!\n"
+    << "t0: " << t0 
+    << "; t1: " << t1 << "\n";
 
     // select the appropriate t based on ray direction and element curvature
     bool useCloserT = (inRay.direction.z > 0) ^ (radius < 0);
-    *t = useCloserT? std::min(t0,t1) : std::max(t0,t1);
+
+    if (debugMode) std::cout
+    << "UseCloserT? " << useCloserT << "\n";
+
+    *t = useCloserT ? std::min(t0,t1) : std::max(t0,t1);
+
+    if (debugMode) std::cout
+    << "closerT: " << *t << "\n";
+
     if (*t < 0) return false;
+
+    if (debugMode) std::cout
+    << "passed intersection test!\n";
 
     // compute surface normal at intersection point
     *n = (o + inRay.direction * (*t)).normalize();
@@ -221,6 +246,9 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     // We want the dot prod to be negative such that inRay.direction is opposite the normal
     if (inRay.direction.dot(*n) > 0) {
         *n = *n * -1;
+
+        if (debugMode) std::cout
+        << "flipping direction of surface normal...\n";
     }
 
     return true;
@@ -230,7 +258,10 @@ inline bool RealisticCamera::quadratic(float a, float b, float c, float *t0, flo
     
     // use doubles to minimize floating point error, especially for sqrt
     double discriminant = (double)b*(double)b - 4*(double)a*(double)c;
-    if (debugMode) std::cout << "Discriminant: " << discriminant << "\n";
+    
+    if (debugMode) std::cout 
+    << "Discriminant: " << discriminant << "\n";
+    
     if (discriminant < 0) return false;
     double rootDiscriminant = sqrt(discriminant);
 
@@ -238,7 +269,6 @@ inline bool RealisticCamera::quadratic(float a, float b, float c, float *t0, flo
     if (b < 0) q = -0.5 * (b - rootDiscriminant);
     else q = -0.5 * (b + rootDiscriminant);
 
-    // "more stable form"... (?)
     *t0 = q/a;
     *t1 = c/q;
 

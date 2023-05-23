@@ -43,8 +43,8 @@ int main()
 
     // * General scene settings
     // resolution
-    int nx = 800;
-    int ny = 800;
+    int nx = 2;
+    int ny = 2;
 
     RayTracer rayTracer;
     rayTracer.maxDepth = 10;
@@ -68,8 +68,8 @@ int main()
 
     std::vector<RealisticCamera::LensElementInterface> lenses;
     // lenses.push_back(RealisticCamera::LensElementInterface(35.98738, 1.21638, 1.54, 23.716/2));
-    // lenses.push_back(RealisticCamera::LensElementInterface(11.69718, 9.9957, 1, 17.996/2));
-    // lenses.push_back(RealisticCamera::LensElementInterface(13.08714, 5.12622, 1.772, 12.364/2));
+    lenses.push_back(RealisticCamera::LensElementInterface(11.69718, 9.9957, 1, 17.996/2));
+    lenses.push_back(RealisticCamera::LensElementInterface(13.08714, 5.12622, 1.772, 12.364/2));
     // lenses.push_back(RealisticCamera::LensElementInterface(-22.63294, 1.76924, 1.617, 9.812/2));
     // lenses.push_back(RealisticCamera::LensElementInterface(71.05802, 0.8184, 1, 9.152/2));
     // lenses.push_back(RealisticCamera::LensElementInterface(0, 2.27766, 0, 8.756/2));
@@ -78,10 +78,9 @@ int main()
     // lenses.push_back(RealisticCamera::LensElementInterface(-166.7765, 3.09606, 1.713, 10.648/2));
     // lenses.push_back(RealisticCamera::LensElementInterface(-7.5911, 1.32682, 1.805, 11.44/2));
     // lenses.push_back(RealisticCamera::LensElementInterface(-16.7662, 3.98068, 1, 12.276/2));
-    lenses.push_back(RealisticCamera::LensElementInterface(-7.70286, 1.21638, 1.617, 13.42/2));
-    lenses.push_back(RealisticCamera::LensElementInterface(-11.98328, 20.0, 1, 17.996/2));
-    // RealisticCamera cam2(lenses, vec4(-3,0,0.5,1), 0, 0, nx, ny, 0.5);
-    RealisticCamera cam2(lenses, vec4(-3,0,0.5,1), 0, 0, 1, 1, 5.0/1000.0); // ! Currently 1x1 resolution for testing
+    // lenses.push_back(RealisticCamera::LensElementInterface(-7.70286, 1.21638, 1.617, 13.42/2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-11.98328, 20.0, 1, 17.996/2));
+    RealisticCamera cam2(lenses, vec4(-3,0,0.5,1), 0, 0, nx, ny, 5.0); 
     cam2.gamma = 2;
     scene.cameras.push_back(&cam2);
 
