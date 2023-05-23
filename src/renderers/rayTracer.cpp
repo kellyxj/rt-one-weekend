@@ -4,6 +4,7 @@
 
 Image RayTracer::takePicture(Scene &scene, int camIndex, float t)
 {
+
     Camera* cam = (scene.cameras[camIndex]);
     Image output(cam->width, cam->height);
     for (int i = 0; i < output.width; i++)
@@ -15,11 +16,12 @@ Image RayTracer::takePicture(Scene &scene, int camIndex, float t)
         }
     }
 
-    std::vector<Geometry*> itemsOrig = scene.items;
+    //std::cout << "matrix 1:\n" << scene.items[1]->modelMatrix << "\n";
 
     // before we trace, transform all objects according to their animations
     for (Geometry *item : scene.items)
     {
+
         for (Animation *anim : item->animationList) {
 
             // find current animation
@@ -38,7 +40,7 @@ Image RayTracer::takePicture(Scene &scene, int camIndex, float t)
 
     for (int j = (cam->height - 1); j >= 0; j--)
     {
-        std::cout << j << "\n";
+        //std::cout << j << "\n";
         for (int i = 0; i < (cam->width); i++)
         {
             for (int k = 0; k < sampleRate; k++)
@@ -77,17 +79,30 @@ Image RayTracer::takePicture(Scene &scene, int camIndex, float t)
         }
     }
 
-    // undo transforms, (don't want to permanently change the objects)
-    scene.items = itemsOrig;
+    for (Geometry *item : scene.items)
+    {
+        for (int i = item->animationList.size() - 1; i >= 0; i--) {
+
+            // find current animation
+            mat4 transMat = item->animationList[i]->evaluate(t);
+            transMat = transMat.invert();
+            // model * a_1 * a_2 * ... * a_n
+            item->modelMatrix = item->modelMatrix.multiply(transMat);
+        }
+
+        item->worldToModel = item->modelMatrix.invert();
+        item->normalToWorld = item->worldToModel.transpose();
+    }
+    //std::cout << "matrix 2:\n" << scene.items[1]->modelMatrix << "\n";
 
     return output;
 }
 
-std::vector<Image*> RayTracer::takeVideo(Scene & scene, int camIndex, float start, float duration, int frameRate)
+std::vector<Image> RayTracer::takeVideo(Scene & scene, int camIndex, float start, float duration, int frameRate)
 {
     Camera* cam = (scene.cameras[camIndex]);
     
-    std::vector<Image*> frames;
+    std::vector<Image> frames;
 
     float t = start;
 
@@ -96,9 +111,11 @@ std::vector<Image*> RayTracer::takeVideo(Scene & scene, int camIndex, float star
 
     for (int i = 0; i < numFrames; i++) {
 
+        std::cout << i << ", t: " << t << "\n";
+
         Image img(cam->width, cam->height);
         img = takePicture(scene, camIndex, t);
-        frames.push_back(&img);
+        frames.push_back(img);
 
         t += 1.0 / frameRate;
     }

@@ -87,7 +87,7 @@ int main()
     sphere.translate(axis);
     sphere.scale(scaleAmount);
 
-    TranslateAnimation anim(vec4(0, 1, 0, 0), 1);
+    TranslateAnimation anim(vec4(1, 0, 0, 0), 1);
     sphere.animationList.push_back(&anim);
     //mat4 transform = anim.evaluate(2);
     //sphere.modelMatrix = sphere.modelMatrix.multiply(transform);
@@ -136,8 +136,8 @@ int main()
     sceneLoader.createSceneFile(json_);
     sceneLoader.writeJson(json_);
 
-    std::string path = "../data/" + scene.name + "/renders/" + timestamp + ".ppm";
-    std::ofstream output(path);
+    //std::string path = "../data/" + scene.name + "/renders/" + timestamp + ".ppm";
+    //std::ofstream output(path);
 
     //std::string path;
     //std::ofstream output(path);
@@ -153,21 +153,21 @@ int main()
     //image = rayTracer.takePicture(scene, 0, 1);
     //output << image.dump_ppm();
 
-    std::vector<Image*> frames = rayTracer.takeVideo(scene, 0, 0, 1, 1);
+    int framerate = 4;
+
+    std::vector<Image> frames = rayTracer.takeVideo(scene, 0, 0, 5, framerate);
 
     std::cout << "size: " << frames.size() << "\n";
 
     
     for (int i = 0; i < frames.size(); i++) {
-        //Image image(nx, ny);
-        //image = *frames[i];
-        Image* image = frames[i];
-        image->dump_ppm();
-        std::cout<< "image width: " << std::to_string(image->width) << "\n";
+        //std::cout<< "image width: " << std::to_string(frames[i].width) << "\n";
         //std::cout << "frame: " << i << "\n";
-        path = "../data/" + scene.name + "/renders/" + timestamp + "/" + std::to_string(i) + ".ppm";
-        //std::ofstream output(path);
-        //output << frames[i]->dump_ppm();
+        //std::string path = "../data/" + scene.name + "/renders/" + timestamp + "/" + std::to_string(i) + ".ppm";
+        std::string path = "../data/" + scene.name + "/renders/" + std::to_string(i) + ".ppm";
+        std::ofstream output(path);
+        output << frames[i].dump_ppm();
+        output.close();
     }
 
     //std::cout << typeid(frames[0]).name() << "\n";
@@ -188,5 +188,9 @@ int main()
 
     std::cout << "finished computation at " << std::ctime(&end_time)
               << "elapsed time: " << elapsed_seconds.count() << "s\n";
-    output.close();
+
+
+    //ffmpeg -r 4 -f image2 -i %d.ppm -vcodec libx264 -crf 4 -pix_fmt yuv420p output.mp4
+    std::cout << "ffmpeg -r " << framerate << " -f image2 -i %d.ppm -vcodec libx264 -crf " << framerate << " -pix_fmt yuv420p output.mp4\n";
+    //output.close();
 }
