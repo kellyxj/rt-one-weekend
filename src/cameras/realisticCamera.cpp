@@ -1,8 +1,6 @@
 #include "realisticCamera.hpp"
 #include <iostream>
 
-bool debugMode = true;
-
 void RealisticCamera::setEyePosition(vec4 pos) {
     eyePoint = pos;
 }
@@ -28,42 +26,27 @@ void RealisticCamera::setUVN() {
     uAxis = (up.cross(nAxis)).normalize();
     vAxis = nAxis.cross(uAxis);
     lookatMatrix = lookatMatrix.lookat(aimPoint, eyePoint, up);
-    // std::cout << "Matrix: \n" << lookatMatrix << "\n";
 }
 
 void RealisticCamera::computeProperties() {
     aspect = float(height) / float(width);
     float x = sqrt(diagonal * diagonal / (1 + aspect * aspect));
     float y = aspect * x;
-    bounds = Bounds2f(Point2f(-x/2,x/2), Point2f(-y/2,y/2));
+
+    bounds = Bounds2f(Point2f(-x/2.0,x/2.0), Point2f(-y/2.0,y/2.0));
     pixelWidth = (bounds.x.y - bounds.x.x) / float(width);
     pixelHeight = (bounds.y.y - bounds.y.x) / float(height);
+    
     lensRearZ = elementInterfaces.back().thickness;
+    
     lensFrontZ = 0;
     for (const LensElementInterface &element : elementInterfaces)
         lensFrontZ += element.thickness;
+    
     rearElementRadius = elementInterfaces.back().apertureRadius;
-
-    if (debugMode) std::cout 
-    << "\nCamera Info:"
-    << "\nlensRearZ:   " << lensRearZ 
-    << "\nlensFrontZ:  " << lensFrontZ 
-    << "\nAspect:      " << aspect 
-    << "\nwidth:       " << width 
-    << "\nheight:      " << height 
-    << "\npixelWidth:  " << pixelWidth 
-    << "\npixelHeight: " << pixelHeight 
-    << "\nboundsX0:    " << bounds.x.x 
-    << "\nboundsX1:    " << bounds.x.y 
-    << "\nboundsY0:    " << bounds.y.x 
-    << "\nboundsY1:    " << bounds.y.y 
-    << "\ndiagonal:    " << diagonal 
-    << "\n\n" << std::endl; 
 }
 
-// Return the origin and direction of the ray that has been ray-traced through the lens system
 ray RealisticCamera::getEyeRay(float xPos, float yPos) {
-
     // generate ray origin on sensor
     // Note: xPos, yPos are already randomized within pixel
     float posU = bounds.x.x + xPos * pixelWidth;
@@ -71,7 +54,7 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
     // We will trace the ray in camera lensCoords and then convert
     // to world coords after. For lensCoords, the z=0 is at the sensor
-    // plane and the lenses extend to the left along -z
+    // plane and the lenses extend to the 'left' along -z
     ray rLens;
     rLens.origin = vec4(posU,posV,0);
 
@@ -80,28 +63,20 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
     // Keep looping until you find a ray that makes it out of the lens system
     while(true) {
-
         // Note: For now, our initial ray can hit any point on the first lens element
         // I.e. no exit pupil calculation (yet)
         Point2f rearElementSample = uniformDiskSample();
         vec4 rearElementPosn = vec4(rearElementSample.x,rearElementSample.y,0);
 
         rearElementPosn *= rearElementRadius;
-        rearElementPosn += vec4(0,0,-lensRearZ); // ! negative? (i.e. why is NOT negative...?)
+        rearElementPosn += vec4(0,0,-lensRearZ);
 
-        rLens.direction = rearElementPosn - rLens.origin; // ! should we normalize (or does it not matter)?
-
-        if (debugMode) std::cout 
-        << "RayOrigin: " << rLens.origin 
-        << "\nRearElementPosn: " << rearElementPosn 
-        << "\nrLensDirection: " << rLens.direction << "\n";
+        rLens.direction = rearElementPosn - rLens.origin;
 
         bool rayExitedLenses = traceLensesFromSensor(rLens, rOut);
         if (rayExitedLenses) {
-            if (debugMode) std::cout << "MADE IT OUT!\n\n";
             break;
         }
-        if (debugMode) std::cout << "\n\nlooping...\n";
     }
 
     return rOut;
@@ -113,16 +88,17 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
     // We need to keep track of the z posn of the current element
     float elementZ = 0;
 
-    // Now we trace that ray through the lens elements 
-    // (this is closely following pbr's implementation)
+    // Now we trace that ray (backwards) through the lens elements 
     for (int i = elementInterfaces.size() - 1; i >= 0; --i) {
 
-        if (debugMode) std::cout << "Now tracing element " << i << "\n";
+        // Transform ray from camera coords to lens coords
+        rLens.direction.z *= -1;
+        rLens.origin.z *= -1;
 
         const LensElementInterface &element = elementInterfaces[i];
         elementZ -= element.thickness;
-        float t; // parameterized intersection value
-        vec4 n; // normal
+        float t;
+        vec4 n;
 
         // Aperture stops are represented with lens elements of radius 0
         bool isStop = (element.curvatureRadius == 0);
@@ -134,22 +110,15 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
 
         } else {
 
-            // generate the sphere that we will intersect the ray with
             float radius = element.curvatureRadius;
 
             // elementZ represents the left/rightmost part of the sphere
-            // We need to add the radius to get to the center. Note that the sign
-            // of the radius will determine if elementZ is the left/rightmost part
+            // If radius is negative, we'll take the closer hit, else further
             float zCenter = elementZ + element.curvatureRadius;
-
-            if (debugMode) std::cout 
-            << "zCenter: " << zCenter << "\n"
-            << "radius: " << radius << "\n";
 
             // The call to intersectSphericalElement will do the actual ray tracing
             // and update t and n for us.
             if (!intersectSphericalElement(radius, zCenter, rLens, &t, &n)) {
-                if (debugMode) std::cout << "FAILED INTERSECT!\n";
                 return false;
             }
         }
@@ -158,44 +127,43 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
         vec4 pHit = rLens.origin + (rLens.direction * t);
         float r2 = pHit.x * pHit.x + pHit.y * pHit.y;
         if (r2 > element.apertureRadius * element.apertureRadius) {
-            if (debugMode) std::cout << "FAILED APERTURE BOUNDS!\n";
             return false;
         }
         rLens.origin = pHit;
 
-        // update ray direction using snell's law
+        // if not an aperture stop...
         if (!isStop) {
 
             // where we will store the outgoing direction
             vec4 w;
 
-            // current element's IoR
-            float IoRI = element.IoR;
+            // current element's index of refraction
+            float etaI = element.eta;
 
-            // next element's IoR (else case assumes air interface)
-            float IoRT = (i > 0 && elementInterfaces[i-1].IoR != 0) ? elementInterfaces[i-1].IoR : 1;
+            // next element's eta (else case assumes air interface)
+            float etaT = (i > 0 && elementInterfaces[i-1].eta != 0) ? elementInterfaces[i-1].eta : 1;
 
-            if (!refract((rLens.direction * -1).normalize(), n, IoRI/IoRT, &w)) { // ! rLens.direction * -1?
-                if (debugMode) std::cout << "FAILED INTERNAL REFLECT!\n";
+            // compute the refracted ray direction
+            if (!refract((rLens.direction * -1).normalize(), n, etaI/etaT, &w)) {
                 return false;
             }
-            // vec4 normalizedW = w.normalize();
-            // std::cout << "dotProd: " << rLens.direction.normalize().dot(normalizedW) << "\n";
             rLens.direction = w;
-            // std::cout << "preOrigin: " << rLens.origin << " preDirection: " << rLens.direction << "\n";
         }
     }
 
-    // ! This may be missing a nullptr check (look at pbr) 
-    // -- though we can't directly implement that here
+    // transform back from lens coords to camera coords
+    rLens.direction.z *= -1;
+    rLens.origin.x *= -1;
+    rLens.origin.w = 1; // ! tried setting elsewhere but it seems to break things...
     rOut = rLens;
 
     // convert the origin and ray direction from lens coords to camera coords
     rOut.direction = lookatMatrix.transform(rOut.direction);
+    // mat4 translateMat;
+    // translateMat = translateMat.translate(eyePoint);
+    // rOut.origin = translateMat.transform(rOut.origin);
+    // std::cout << rOut.origin << "\n\n";
     rOut.origin = lookatMatrix.transform(rOut.origin);
-
-    // std::cout << "Origin: " << rOut.origin << " Direction: " << rOut.direction << "\n";
-
     return true;
 }
 
@@ -210,35 +178,14 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     float C = o.length_squared() - radius*radius;
     float t0, t1;
 
-    if (debugMode) std::cout 
-    << "O: " << o
-    << "\nA: " << A 
-    << " B: " << B 
-    << " C: " << C 
-    << "\n";
-
     if (!quadratic(A,B,C,&t0,&t1)) return false;
-
-    if (debugMode) std::cout 
-    << "passed quadratic!\n"
-    << "t0: " << t0 
-    << "; t1: " << t1 << "\n";
 
     // select the appropriate t based on ray direction and element curvature
     bool useCloserT = (inRay.direction.z > 0) ^ (radius < 0);
 
-    if (debugMode) std::cout
-    << "UseCloserT? " << useCloserT << "\n";
-
     *t = useCloserT ? std::min(t0,t1) : std::max(t0,t1);
 
-    if (debugMode) std::cout
-    << "closerT: " << *t << "\n";
-
     if (*t < 0) return false;
-
-    if (debugMode) std::cout
-    << "passed intersection test!\n";
 
     // compute surface normal at intersection point
     *n = (o + inRay.direction * (*t)).normalize();
@@ -246,9 +193,6 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     // We want the dot prod to be negative such that inRay.direction is opposite the normal
     if (inRay.direction.dot(*n) > 0) {
         *n = *n * -1;
-
-        if (debugMode) std::cout
-        << "flipping direction of surface normal...\n";
     }
 
     return true;
@@ -258,9 +202,6 @@ inline bool RealisticCamera::quadratic(float a, float b, float c, float *t0, flo
     
     // use doubles to minimize floating point error, especially for sqrt
     double discriminant = (double)b*(double)b - 4*(double)a*(double)c;
-    
-    if (debugMode) std::cout 
-    << "Discriminant: " << discriminant << "\n";
     
     if (discriminant < 0) return false;
     double rootDiscriminant = sqrt(discriminant);

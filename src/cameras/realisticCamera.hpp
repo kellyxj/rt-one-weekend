@@ -15,15 +15,15 @@ public:
         // distance along Z to the next element to the right
         float thickness;
 
-        // IoR of the medium to the right of the interface
-        float IoR;
+        // eta = index of refraction of the medium to the right of the interface
+        float eta;
 
         // The element's symmetric extent away from the z-axis
         float apertureRadius;
 
         // Values are input as mm but stored as m!
-        LensElementInterface(float curvatureRadius, float thickness, float IoR, float apertureRadius)
-        : curvatureRadius(curvatureRadius/1000.0), thickness(thickness/1000.0), IoR(IoR), apertureRadius(apertureRadius/1000.0) {};
+        LensElementInterface(float curvatureRadius, float thickness, float eta, float apertureRadius)
+        : curvatureRadius(curvatureRadius/1000.0), thickness(thickness/1000.0), eta(eta), apertureRadius(apertureRadius/1000.0) {};
     };
 
     std::vector<LensElementInterface> elementInterfaces;
@@ -66,7 +66,6 @@ private:
     vec4 nAxis;
     
     // ! May eventually want to move these type of structs out...
-    
     struct Point2f {
         float x;
         float y;
@@ -91,10 +90,6 @@ private:
         };
     };
 
-    // int resX;
-    // int resY;
-    // float pixelWidth;
-    // float pixelHeight;
     float diagonal;
     float aspect;
     float lensRearZ;

@@ -208,12 +208,15 @@ mat4 mat4::lookat(vec4 aimPt, vec4 eyePt, vec4 up) {
     vec4 uAxis = (up.cross(nAxis)).normalize();
     vec4 vAxis = nAxis.cross(uAxis);
 
+    // m is the cameraToWorld matrix
     mat4 m = (*this);
-    m[0] = uAxis.x,     m[4] = uAxis.y,     m[8] = uAxis.z; 
-    m[1] = vAxis.x,     m[5] = vAxis.y,     m[9] = vAxis.z; 
-    m[2] = nAxis.x,     m[6] = nAxis.y,     m[10] = nAxis.z; 
-    m[3] = eyePt.x,     m[7] = eyePt.y,     m[11] = eyePt.z;
-    return m;
+    m[0] = uAxis.x,     m[4] = vAxis.x,     m[8] = nAxis.x,     m[12] = eyePt.x; 
+    m[1] = uAxis.y,     m[5] = vAxis.y,     m[9] = nAxis.y,     m[13] = eyePt.y; 
+    m[2] = uAxis.z,     m[6] = vAxis.z,     m[10] = nAxis.z,    m[14] = eyePt.z;
+    m[3] = 0,           m[7] = 0,           m[11] = 0,          m[15] = 1;
+
+    return m.invert();
+    // return m;
 }
 
 json mat4::serialize() {
