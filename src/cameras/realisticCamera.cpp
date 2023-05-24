@@ -61,12 +61,7 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
         // Note: For now, our initial ray can hit any point on the first lens element
         // I.e. no exit pupil calculation (yet)
         Point2f rearElementSample = uniformDiskSample();
-        vec4 rearElementPosn = vec4(rearElementSample.x,rearElementSample.y,0);
-
-        rearElementPosn *= rearElementRadius;
-        rearElementPosn += vec4(0,0,lensRearZ);
-
-        rearElementPosn = rearElementPosn + eyePoint;
+        vec4 rearElementPosn = eyePoint + uAxis*rearElementSample.x + vAxis*rearElementSample.y + nAxis*rearElementRadius;
 
         rLens.direction = rearElementPosn - rLens.origin;
 
@@ -99,10 +94,19 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
         vec4 lensCenter = eyePoint + nAxis * (elementZ + element.curvatureRadius);
 
         if (isStop) {
-            Plane apertureStop;
-            apertureStop.rotate((180.0/PI) * acos(up.dot(nAxis)), uAxis); // ! Maybe wrong
-            apertureStop.translate(lensCenter);
+            // represent aperture stop plane using a "near-infinte" radius sphere
+            Sphere apertureStop;
+            vec4 infTranslate = eyePoint + nAxis * 1e12;
+            vec4 infRadiusScale = vec4(1,1,1,0)*1e12;
+            apertureStop.translate(infTranslate);
+            apertureStop.scale(infRadiusScale);
             lensHit = apertureStop.trace(rLens);
+
+            // // ... or use an actual plane?
+            // Plane apertureStop;
+            // apertureStop.rotate((180.0/PI) * acos(up.dot(nAxis)), uAxis); // ! Maybe wrong
+            // apertureStop.translate(lensCenter);
+            // lensHit = apertureStop.trace(rLens);
         } 
         else {
             float radius = element.curvatureRadius;
@@ -116,9 +120,10 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
             Glass glass;
             glass.n_i = element.IoR;
             lens.setMaterial(glass);
-            Hit lensHit = lens.trace(rLens);
+            lensHit = lens.trace(rLens);
 
             // ! This only returns the first hit..., we need it to return both!
+            // Make a special sphere-ish class that returns both?
         }
 
         // check if ray hit lens
