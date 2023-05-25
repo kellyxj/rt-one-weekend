@@ -29,7 +29,7 @@ public:
     mat4 rotate(float angle, const vec4 & axis);
 
     // camera to world transform
-    mat4 lookat(vec4 aimPt, vec4 eyePt, vec4 up);
+    mat4 cameraToWorld(vec4 aimPt, vec4 eyePt, vec4 up);
 
     float &operator[] (int index) {
         return entries[index];

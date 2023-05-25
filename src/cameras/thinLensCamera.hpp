@@ -75,16 +75,4 @@ public:
     Camera* deserialize(json json_);
 };
 
-// Temporary (?) class to store x, y position
-class Posn2D {
-public: 
-    float x, y;
-
-    Posn2D(float a, float b): x(a), y(b) {}
-
-};
-
-Posn2D naiveDiskSample();
-Posn2D uniformDiskSample();
-
 #endif

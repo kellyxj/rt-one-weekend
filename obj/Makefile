@@ -3,7 +3,7 @@ CXX=g++
 LDLIBS=-lstdc++fs
 
 objects = main.o vec4.o color.o ray.o pinholeCamera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o \
-triangle.o mesh.o bvh.o scene_loader.o light.o rectangleLight.o realisticCamera.o thinLensCamera.o environmentCamera.o
+triangle.o mesh.o bvh.o scene_loader.o light.o rectangleLight.o realisticCamera.o thinLensCamera.o environmentCamera.o cameraHelpers.o
 VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/util:../src/math:../src/lights:../src/cameras
 
 edit: $(objects)
@@ -18,7 +18,7 @@ rectangleLight.o: rectangleLight.cpp light.hpp
 scene.o: scene.cpp geometry.hpp plane.hpp camera.hpp sphere.hpp square.hpp mesh.hpp rectangleLight.hpp
 ray.o: ray.cpp vec4.hpp
 color.o: color.cpp
-camera.o: camera.cpp vec4.hpp ray.hpp
+camera.o: camera.cpp cameraHelpers.hpp vec4.hpp ray.hpp
 pinholeCamera.o: pinholeCamera.cpp camera.hpp
 mat4.o: mat4.cpp vec4.hpp
 geometry.o: geometry.cpp vec4.hpp mat4.hpp material.hpp hit.hpp baseMaterial.hpp glass.hpp mirror.hpp groundGrid.hpp
@@ -34,6 +34,7 @@ scene_loader.o: scene_loader.cpp scene.hpp
 realisticCamera.o: realisticCamera.cpp camera.hpp
 thinLensCamera.o: thinLensCamera.cpp camera.hpp
 environmentCamera.o: environmentCamera.cpp camera.hpp
+cameraHelpers.o: cameraHelpers.cpp cameraHelpers.hpp
 
 .PHONY: clean
 clean: 

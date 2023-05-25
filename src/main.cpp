@@ -43,12 +43,12 @@ int main()
 
     // * General scene settings
     // resolution
-    int nx = 200;
-    int ny = 200;
+    int nx = 800;
+    int ny = 800;
 
     RayTracer rayTracer;
     rayTracer.maxDepth = 10;
-    rayTracer.sampleRate = 64;
+    rayTracer.sampleRate = 16;
 
     Scene scene;
     scene.name = "sphere";
@@ -56,23 +56,23 @@ int main()
     scene.backgroundColor = white;
     
     // * Scene Camera(s)
-    ThinLensCamera cam0(vec4(-3, 0, 0.5, 1), 0, 0, nx, ny, 1, 90, nx/ny);
+    EnvironmentCamera cam0(vec4(-3, 0, 0.5, 1), nx, ny, 180, 0);
     cam0.gamma = 2;
-    cam0.apertureRadius = 0.1;
-    cam0.focalDistance = 3;
     scene.cameras.push_back(&cam0);
 
-    EnvironmentCamera cam1(vec4(-3, 0, 0.5, 1), nx, ny, 180, 0);
+    PinholeCamera cam1(vec4(-3, 0, 0.5, 1), 0, 0, nx, ny, 1, 90, nx/ny);
     cam1.gamma = 2;
     scene.cameras.push_back(&cam1);
 
-    PinholeCamera cam2(vec4(-3, 0, 0.5, 1), 0, 0, nx, ny, 1, 90, nx/ny);
+    ThinLensCamera cam2(vec4(-3, 0, 0.5, 1), 0, 0, nx, ny, 1, 90, nx/ny);
     cam2.gamma = 2;
+    cam2.apertureRadius = 0.1;
+    cam2.focalDistance = 3;
     scene.cameras.push_back(&cam2);
 
     std::vector<RealisticCamera::LensElementInterface> lenses;
-    // lenses.push_back(RealisticCamera::LensElementInterface(-500.0, 1000, 1.0, 200.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(500.0, 1000.0, 1.0, 200.0));
+    lenses.push_back(RealisticCamera::LensElementInterface(-10000.0, 100.0, 1.0, 200.0));
+    lenses.push_back(RealisticCamera::LensElementInterface(10000.0, 100.0, 1.0, 1.0));
     RealisticCamera cam3(lenses, vec4(-3,0,0.5,1), 0, 0, nx, ny, 5.0); 
     cam3.gamma = 2;
     scene.cameras.push_back(&cam3);
@@ -92,7 +92,7 @@ int main()
 
     Glass lens;
     lens.c = white;
-    lens.n_i = 1.67;
+    lens.n_i = 1.0;
 
     Mirror mirror;
     mirror.c = white;
@@ -155,7 +155,7 @@ int main()
     scene.items.push_back(&sphere2);
 
     // Sphere lensSphere;
-    // translate = vec4(-2, 0, 0.5, 1);
+    // translate = vec4(-1, 0, 0.5, 1);
     // lensSphere.translate(translate);
     // lensSphere.setMaterial(lens);
     // scene.items.push_back(&lensSphere);
@@ -176,7 +176,7 @@ int main()
 
     // * Create and save ray traced image
     Image image(nx, ny);
-    image = rayTracer.takePicture(scene, 3);
+    image = rayTracer.takePicture(scene, 2);
     output << image.dump_ppm();
 
 /*  

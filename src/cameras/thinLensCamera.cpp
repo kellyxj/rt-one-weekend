@@ -47,7 +47,7 @@ ray ThinLensCamera::getEyeRay(float xPos, float yPos) {
 
     if (apertureRadius > 0) {
         // Generate the point where the ray hit the lens
-        Posn2D circleSample = uniformDiskSample();
+        Point2f circleSample = uniformDiskSample();
         float circleX = apertureRadius * circleSample.x;
         float circleY = apertureRadius * circleSample.y;
 
@@ -91,24 +91,4 @@ json ThinLensCamera::serialize() {
     };
 
     return json_;
-}
-
-// Naive disk sample keeps generating random positions in unit square until 
-// it generates a point that lies in the unit circle
-Posn2D naiveDiskSample() {
-    while (true) { // This could be dangerous...
-        float randX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        float randY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        if (randX*randX + randY*randY <= 1) {
-            return Posn2D(randX, randY);
-        }
-    }
-}
-
-// Generates a uniform sampled position on a unit disk by assuming uniform area concentric rings
-// The side effect of this is that area is not mapped uniformally. (i.e. outer rings are thinner)
-Posn2D uniformDiskSample() {
-    float r = sqrt(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
-    float theta = 2 * PI * static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-    return Posn2D(r * cos(theta), r * sin(theta));
 }

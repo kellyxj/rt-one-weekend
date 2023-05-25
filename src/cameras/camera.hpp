@@ -5,6 +5,7 @@
 #include "../math/vec4.hpp"
 #include "../math/ray.hpp"
 #include "../defines.hpp"
+#include "cameraHelpers.hpp"
 
 class Camera {
 public:

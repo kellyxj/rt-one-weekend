@@ -25,7 +25,7 @@ void RealisticCamera::setUVN() {
     nAxis = (eyePoint - aimPoint).normalize();
     uAxis = (up.cross(nAxis)).normalize();
     vAxis = nAxis.cross(uAxis);
-    lookatMatrix = lookatMatrix.lookat(aimPoint, eyePoint, up);
+    camToWorldMatrix = camToWorldMatrix.cameraToWorld(aimPoint, eyePoint, up);
 }
 
 void RealisticCamera::computeProperties() {
@@ -37,13 +37,15 @@ void RealisticCamera::computeProperties() {
     pixelWidth = (bounds.x.y - bounds.x.x) / float(width);
     pixelHeight = (bounds.y.y - bounds.y.x) / float(height);
     
-    lensRearZ = elementInterfaces.back().thickness;
-    
-    lensFrontZ = 0;
-    for (const LensElementInterface &element : elementInterfaces)
-        lensFrontZ += element.thickness;
-    
-    rearElementRadius = elementInterfaces.back().apertureRadius;
+    if (elementInterfaces.size() > 0) {
+        lensRearZ = elementInterfaces.back().thickness;
+        
+        lensFrontZ = 0;
+        for (const LensElementInterface &element : elementInterfaces)
+            lensFrontZ += element.thickness;
+        
+        rearElementRadius = elementInterfaces.back().apertureRadius;
+    }
 }
 
 ray RealisticCamera::getEyeRay(float xPos, float yPos) {
@@ -65,11 +67,16 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
     while(true) {
         // Note: For now, our initial ray can hit any point on the first lens element
         // I.e. no exit pupil calculation (yet)
-        Point2f rearElementSample = uniformDiskSample();
-        vec4 rearElementPosn = vec4(rearElementSample.x,rearElementSample.y,0);
+        vec4 rearElementPosn;
 
-        rearElementPosn *= rearElementRadius;
-        rearElementPosn += vec4(0,0,-lensRearZ);
+        if (elementInterfaces.size() > 0) {
+            Point2f rearElementSample = uniformDiskSample();
+            rearElementPosn = vec4(rearElementSample.x,rearElementSample.y,0);
+            rearElementPosn *= rearElementRadius;
+            rearElementPosn += vec4(0,0,-lensRearZ);
+        } else { // this case should be about equivalent to pinhole...
+            rearElementPosn = vec4(0,0,-diagonal);
+        }
 
         rLens.direction = rearElementPosn - rLens.origin;
 
@@ -85,15 +92,15 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
 bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
     
+    // Transform ray from camera coords to lens coords
+    rLens.direction.z *= -1;
+    rLens.origin.z *= -1;
+
     // We need to keep track of the z posn of the current element
     float elementZ = 0;
 
     // Now we trace that ray (backwards) through the lens elements 
     for (int i = elementInterfaces.size() - 1; i >= 0; --i) {
-
-        // Transform ray from camera coords to lens coords
-        rLens.direction.z *= -1;
-        rLens.origin.z *= -1;
 
         const LensElementInterface &element = elementInterfaces[i];
         elementZ -= element.thickness;
@@ -153,17 +160,15 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
 
     // transform back from lens coords to camera coords
     rLens.direction.z *= -1;
-    rLens.origin.x *= -1;
-    rLens.origin.w = 1; // ! tried setting elsewhere but it seems to break things...
+    rLens.origin.z *= -1;
+
+    // the origin is a point so we need to set it as such for transformations
+    rLens.origin.w = 1;
     rOut = rLens;
 
     // convert the origin and ray direction from lens coords to camera coords
-    rOut.direction = lookatMatrix.transform(rOut.direction);
-    // mat4 translateMat;
-    // translateMat = translateMat.translate(eyePoint);
-    // rOut.origin = translateMat.transform(rOut.origin);
-    // std::cout << rOut.origin << "\n\n";
-    rOut.origin = lookatMatrix.transform(rOut.origin);
+    rOut.direction = camToWorldMatrix.transform(rOut.direction);
+    rOut.origin = camToWorldMatrix.transform(rOut.origin);
     return true;
 }
 
@@ -196,45 +201,6 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     }
 
     return true;
-}
-
-inline bool RealisticCamera::quadratic(float a, float b, float c, float *t0, float *t1) {
-    
-    // use doubles to minimize floating point error, especially for sqrt
-    double discriminant = (double)b*(double)b - 4*(double)a*(double)c;
-    
-    if (discriminant < 0) return false;
-    double rootDiscriminant = sqrt(discriminant);
-
-    double q;
-    if (b < 0) q = -0.5 * (b - rootDiscriminant);
-    else q = -0.5 * (b + rootDiscriminant);
-
-    *t0 = q/a;
-    *t1 = c/q;
-
-    // make sure t0 < t1
-    if (*t0 > *t1) std::swap(*t0, *t1);
-    return true;
-}
-
-bool RealisticCamera::refract(const vec4 &wi, const vec4 &n, float IoR, vec4 *wt) {
-    
-    vec4 n_ = n;
-    vec4 wi_ = wi;
-    float cosThetaI = n_.dot(wi_);
-
-    float sin2ThetaI = std::max(0.f, 1.f - cosThetaI * cosThetaI);
-    float sin2ThetaT = IoR*IoR*sin2ThetaI;
-
-    // ignore total internal reflection case
-    if (sin2ThetaT >= 1) return false;
-
-    float cosThetaT = sqrt(1 - sin2ThetaT);
-
-    *wt = (wi_*-1)*IoR + n_*(IoR*cosThetaI - cosThetaT);
-
-    return true; 
 }
 
 json RealisticCamera::serialize() {
