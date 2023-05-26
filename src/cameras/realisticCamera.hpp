@@ -22,8 +22,8 @@ public:
         float apertureRadius;
 
         // Values are input as mm but stored as m!
-        LensElementInterface(float curvatureRadius, float thickness, float eta, float apertureRadius)
-        : curvatureRadius(curvatureRadius/1000.0), thickness(thickness/1000.0), eta(eta), apertureRadius(apertureRadius/1000.0) {};
+        LensElementInterface(float curvatureRadius, float thickness, float eta, float apertureDiameter)
+        : curvatureRadius(curvatureRadius/1000.0), thickness(thickness/1000.0), eta(eta), apertureRadius(apertureDiameter/2000.0) {};
     };
 
     std::vector<LensElementInterface> elementInterfaces;
@@ -36,6 +36,7 @@ public:
         height = h;
         computeProperties();
 
+        computeExitPupilBounds(64);
     }
 
     void setEyePosition(vec4 pos);
@@ -72,8 +73,16 @@ private:
     float rearElementRadius;
     Bounds2f bounds;
 
+    std::vector<Bounds2f> exitPupilBounds;
+
     // Compute properties of the camera like its aspect ratio, physical bounds, and lens z-bounds
     void computeProperties();
+
+    // Compute the bounds of the exit pupil along radial positions away from the center of the sensor
+    void computeExitPupilBounds(int nSamples);
+
+    // Computes the bounds for the exit pupil for distance x0 to x1 away from the center of the sensor
+    Bounds2f boundExitPupil(float pFilmX0, float pFilmX1) const;
 
     // Computes intersections with element in turn, terminating the ray and returning
     // false if its path is blocked along the way through the lens system. Otherwise, 

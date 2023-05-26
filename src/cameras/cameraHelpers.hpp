@@ -44,4 +44,12 @@ bool quadratic(float a, float b, float c, float *t0, float *t1);
 // Note: returns false if the ray is totally internally reflects, else true
 bool refract (const vec4 &wi, const vec4 &n, float eta, vec4 *wt);
 
+// Linearly interpolate between two provided values
+float lerp(float t, float v1, float v2);
+
+// ParallelFor loop implementation closely following pbrt's 
+// implementation (like much of the rest of this)
+// For more info see pbrt's section A.6.4
+// TODO
+
 #endif

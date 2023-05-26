@@ -58,24 +58,26 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
     // to world coords after. For lensCoords, the z=0 is at the sensor
     // plane and the lenses extend to the 'left' along -z
     ray rLens;
-    rLens.origin = vec4(posU,posV,0);
+    rLens.origin = vec4(posU,posV,0,1);
 
     // This is where the resulting ray will be stored
     ray rOut;
 
     // Keep looping until you find a ray that makes it out of the lens system
     while(true) {
-        // Note: For now, our initial ray can hit any point on the first lens element
-        // I.e. no exit pupil calculation (yet)
+        
+        // We are currently assuming the camera coords where objects are out 
+        // in the world along +z (which is why we use +lensRearZ, for example). This 
+        // will explicitly be reversed when we traceLensesFromSensor.
         vec4 rearElementPosn;
 
         if (elementInterfaces.size() > 0) {
             Point2f rearElementSample = uniformDiskSample();
             rearElementPosn = vec4(rearElementSample.x,rearElementSample.y,0);
             rearElementPosn *= rearElementRadius;
-            rearElementPosn += vec4(0,0,-lensRearZ);
+            rearElementPosn += vec4(0,0,lensRearZ, 1); // set w=1 after scaling!
         } else { // this case should be about equivalent to pinhole...
-            rearElementPosn = vec4(0,0,-diagonal);
+            rearElementPosn = vec4(0,0,diagonal,1);
         }
 
         rLens.direction = rearElementPosn - rLens.origin;
@@ -91,7 +93,7 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
 
 bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
-    
+
     // Transform ray from camera coords to lens coords
     rLens.direction.z *= -1;
     rLens.origin.z *= -1;
@@ -177,7 +179,7 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     // solve for intersection points t0 and t1
     // This is solving for [D^2 t^2 + 2 O D t + O^2 - R^2 = 0] so that A = D^2, B = 2 O D, C = O^2 - R^2
     // where D = direction vector of the ray, O = vector from ray origin to sphere center, R = sphere radius
-    vec4 o = vec4(0,0,zCenter) - inRay.origin; // vector from ray origin to center of the sphere
+    vec4 o = vec4(0,0,zCenter,1) - inRay.origin; // vector from ray origin to center of the sphere
     float A = inRay.direction.length_squared();
     float B = 2 * inRay.direction.dot(o);
     float C = o.length_squared() - radius*radius;
@@ -195,12 +197,71 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     // compute surface normal at intersection point
     *n = (o + inRay.direction * (*t)).normalize();
 
-    // We want the dot prod to be negative such that inRay.direction is opposite the normal
-    if (inRay.direction.dot(*n) > 0) {
+    // We want the normal to be in the same direction as the outgoing vector
+    if (inRay.direction.dot(*n) < 0) {
         *n = *n * -1;
     }
 
     return true;
+}
+
+void RealisticCamera::computeExitPupilBounds(int nSamples) {
+    exitPupilBounds.resize(nSamples);
+    
+    // ParallelFor([&](int i) { // TODO
+    // }, nSamples);
+    
+    for (int i = 0; i < nSamples; ++i) {
+        float r0 = (float)i / nSamples * diagonal/2.0;
+        float r1 = (float)(i+1) / nSamples * diagonal/2.0;
+        exitPupilBounds[i] = boundExitPupil(r0, r1);
+    }
+}
+
+Bounds2f RealisticCamera::boundExitPupil(float pFilmX0, float pFilmX1) const {
+    
+    Bounds2f pupilBounds;
+
+    // Sample a collection of points on the rear lens to find exit pupil
+    const int nSamples = 1024*1024;
+    int nExitingRays = 0;
+
+    // Compute bounding box of projection of rear element on sampling plane
+    Bounds2f projRearBounds(Point2f(-1.5f*rearElementRadius, -1.5f*rearElementRadius), 
+                            Point2f( 1.5f*rearElementRadius,  1.5f*rearElementRadius));
+
+    for (int i = 0; i < nSamples; ++i) {
+
+        // Find loccation of sample points on x segment and rear lens element
+        vec4 pFilm = vec4(lerp((i+0.5f)/nSamples, pFilmX0, pFilmX1), 0, 0);
+        
+        // Note: here pbrt uses a special function to calculate inverse roots
+        // TODO: implement the faster inverse root method
+        // float u[2] = {radicalInverse(0, i), radicalInverse(1, i)};
+
+        float u[2] = {1/sqrt(i), 1/cbrt(i)};
+        vec4 pRear(lerp(u[0], projRearBounds.pMin.x, projRearBounds.pMax.x),
+                   lerp(u[1], projRearBounds.pMin.y, projRearBounds.pMax.y),
+                   lensRearZ);
+
+        // Expand pupil bounds if ray makes it rhough the lens system
+        ray rLens = ray(pFilm, pRear-pFilm);
+        ray nullOut;
+        if (inside(Point2f(pRear.x, pRear.y), pupilBounds) || traceLensesFromSensor(rLens, nullOut)) {
+            pupilBounds = union(pupilBounds, Point2f(pRear.x, pRear.y));
+            ++nExitingRays;
+        }
+    }
+
+    // return entire element bounds if no rays made it through the lens system
+    // (i.e. it won't matter either way)
+    if (nExitingRays == 0) {
+        return projRearBounds;
+    }
+
+    pupilBounds = expand(pupilBounds, 2 * projRearBounds.diagonal().length() / sqrt(nSamples));
+
+    return pupilBounds;
 }
 
 json RealisticCamera::serialize() {

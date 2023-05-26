@@ -26,7 +26,7 @@ bool quadratic(float a, float b, float c, float *t0, float *t1) {
     return true;
 }
 
-bool refract (const vec4 &wi, const vec4 &n, float eta, vec4 *wt) {
+bool refract(const vec4 &wi, const vec4 &n, float eta, vec4 *wt) {
     vec4 n_ = n;
     vec4 wi_ = wi;
     float cosThetaI = n_.dot(wi_);
@@ -42,4 +42,8 @@ bool refract (const vec4 &wi, const vec4 &n, float eta, vec4 *wt) {
     *wt = (wi_*-1)*eta + n_*(eta*cosThetaI - cosThetaT);
 
     return true; 
+}
+
+float lerp(float t, float v1, float v2) {
+    return (1-t)*v1 + t*v2;
 }
