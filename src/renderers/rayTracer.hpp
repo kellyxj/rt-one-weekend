@@ -18,8 +18,8 @@ public:
 
     bool jitter = false;
 
-    Image takePicture(Scene & scene, int camIndex, float t);
-    std::vector<Image> takeVideo(Scene & scene, int camIndex, float start, float duration, int frameRate);
+    Image takePicture(Scene & scene, int camIndex, float t, int frameRate, int motionBlur);
+    std::vector<Image> takeVideo(Scene & scene, int camIndex, float start, float duration, int frameRate, int motionBlur);
     Hit traceRay(Scene & scene, ray & eyeRay, Hit & hit, int depth, float t);
 
     void findShade(Scene & scene, Hit & hit, int depth, float t);

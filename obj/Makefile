@@ -34,6 +34,7 @@ scene_loader.o: scene_loader.cpp scene.hpp
 translateAnimation.o: translateAnimation.cpp animation.hpp
 rotateAnimation.o: rotateAnimation.cpp animation.hpp
 
+
 .PHONY: clean
 clean: 
 	rm -rf *.o

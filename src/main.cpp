@@ -87,7 +87,7 @@ int main()
     sphere.translate(axis);
     sphere.scale(scaleAmount);
 
-    TranslateAnimation anim(vec4(1, 0, 0, 0), 1);
+    TranslateAnimation anim(vec4(1, -1, 0, 0), 1);
     sphere.animationList.push_back(&anim);
     //mat4 transform = anim.evaluate(2);
     //sphere.modelMatrix = sphere.modelMatrix.multiply(transform);
@@ -97,7 +97,7 @@ int main()
     base sphereMat;
     sphereMat.c = red;
     // sphereMat.brightness = 10;
-    sphere.setMaterial(glass);
+    sphere.setMaterial(sphereMat);
 
     scene.items.push_back(&sphere);
 
@@ -129,7 +129,8 @@ int main()
     RayTracer rayTracer;
 
     rayTracer.maxDepth = 10;
-    rayTracer.sampleRate = 64;
+    // put back to 64
+    rayTracer.sampleRate = 4;
 
     json json_ = scene.serialize();
     SceneLoader sceneLoader;
@@ -153,11 +154,13 @@ int main()
     //image = rayTracer.takePicture(scene, 0, 1);
     //output << image.dump_ppm();
 
-    int framerate = 4;
+    float vidStart = 0.0;
+    float duration = 4;
+    int framerate = 16;
+    // pictures per frame
+    int motionBlur = 2;
 
-    std::vector<Image> frames = rayTracer.takeVideo(scene, 0, 0, 5, framerate);
-
-    std::cout << "size: " << frames.size() << "\n";
+    std::vector<Image> frames = rayTracer.takeVideo(scene, 0, vidStart, duration, framerate, motionBlur);
 
     
     for (int i = 0; i < frames.size(); i++) {

@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cmath>
 
-Image RayTracer::takePicture(Scene &scene, int camIndex, float t)
+Image RayTracer::takePicture(Scene &scene, int camIndex, float t, int frameRate, int motionBlur)
 {
 
     Camera* cam = (scene.cameras[camIndex]);
@@ -18,88 +18,106 @@ Image RayTracer::takePicture(Scene &scene, int camIndex, float t)
 
     //std::cout << "matrix 1:\n" << scene.items[1]->modelMatrix << "\n";
 
-    // before we trace, transform all objects according to their animations
-    for (Geometry *item : scene.items)
-    {
-
-        for (Animation *anim : item->animationList) {
-
-            // find current animation
-            mat4 transMat = anim->evaluate(t);
-            // model * a_1 * a_2 * ... * a_n
-            item->modelMatrix = item->modelMatrix.multiply(transMat);
-        }
-
-        // set other two matrices
-        item->worldToModel = item->modelMatrix.invert();
-        item->normalToWorld = item->worldToModel.transpose();
-
-    }
-
     int sampleRate = this->sampleRate;
 
     for (int j = (cam->height - 1); j >= 0; j--)
     {
-        //std::cout << j << "\n";
+        //std::cout << "j: " << j << "\n";
         for (int i = 0; i < (cam->width); i++)
         {
-            for (int k = 0; k < sampleRate; k++)
-            {
-                float randX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (sampleRate > 1 ? 1 : 0);
-                float randY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (sampleRate > 1 ? 1 : 0);
+            Color cBlur;
 
-                randX -= .5;
-                randY -= .5;
+            for (int m = 0; m < motionBlur; m++) {
 
-                ray eyeRay = cam->getEyeRay(i + .5 + randX, j + .5 + randY);
+                output.setPixel(i, j, Color());
+                float tInc = t + (1.0 * m/motionBlur) / frameRate;
 
-                Hit hit;
-                hit = this->traceRay(scene, eyeRay, hit, 0, t);
+                // before we trace, transform all objects according to their animations
+                for (Geometry *item : scene.items)
+                {
 
+                    for (Animation *anim : item->animationList) {
+
+                        // find current animation
+                        mat4 transMat = anim->evaluate(tInc);
+                        // model * a_1 * a_2 * ... * a_n
+                        item->modelMatrix = item->modelMatrix.multiply(transMat);
+                    }
+
+                    // set other two matrices
+                    item->worldToModel = item->modelMatrix.invert();
+                    item->normalToWorld = item->worldToModel.transpose();
+
+                }
+
+
+                for (int k = 0; k < sampleRate; k++)
+                {
+                    float randX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (sampleRate > 1 ? 1 : 0);
+                    float randY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (sampleRate > 1 ? 1 : 0);
+
+                    randX -= .5;
+                    randY -= .5;
+
+                    ray eyeRay = cam->getEyeRay(i + .5 + randX, j + .5 + randY);
+
+                    Hit hit;
+                    hit = this->traceRay(scene, eyeRay, hit, 0, tInc);
+
+                    Color c = output.getPixel(i, j);
+
+                    c += hit.color / sampleRate * cam->exposure;
+
+
+
+                    // normal map
+                    // c.r += (hit.normal.x + 1)/(2*sampleRate);
+                    // c.g += (hit.normal.y + 1)/(2*sampleRate);
+                    // c.b += (hit.normal.z + 1)/(2*sampleRate);
+
+                    // unnormalized depth map
+                    // c.r += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
+                    // c.g += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
+                    // c.b += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
+
+                    output.setPixel(i, j, c);
+                }
                 Color c = output.getPixel(i, j);
-                c += hit.color / sampleRate * cam->exposure;
+                for(auto entry : c.channels) {
+                    entry = (float)pow((double)entry, 1/cam->gamma);
+                }
 
-                // normal map
-                // c.r += (hit.normal.x + 1)/(2*sampleRate);
-                // c.g += (hit.normal.y + 1)/(2*sampleRate);
-                // c.b += (hit.normal.z + 1)/(2*sampleRate);
-
-                // unnormalized depth map
-                // c.r += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
-                // c.g += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
-                // c.b += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
-
+                
                 output.setPixel(i, j, c);
+                cBlur += output.getPixel(i, j) / motionBlur;
+
+                // undo transforms
+                for (Geometry *item : scene.items)
+                {
+                    for (int ani = item->animationList.size() - 1; ani >= 0; ani--) {
+
+                        // find current animation
+                        mat4 transMat = item->animationList[ani]->evaluate(tInc);
+                        transMat = transMat.invert();
+                        // model * a_1 * a_2 * ... * a_n
+                        item->modelMatrix = item->modelMatrix.multiply(transMat);
+                    }
+
+                    item->worldToModel = item->modelMatrix.invert();
+                    item->normalToWorld = item->worldToModel.transpose();
+                }
             }
-            Color c = output.getPixel(i, j);
-            for(auto entry : c.channels) {
-                entry = (float)pow((double)entry, 1/cam->gamma);
-            }
-            output.setPixel(i, j, c);
+
+            output.setPixel(i, j, cBlur);
         }
     }
-
-    for (Geometry *item : scene.items)
-    {
-        for (int i = item->animationList.size() - 1; i >= 0; i--) {
-
-            // find current animation
-            mat4 transMat = item->animationList[i]->evaluate(t);
-            transMat = transMat.invert();
-            // model * a_1 * a_2 * ... * a_n
-            item->modelMatrix = item->modelMatrix.multiply(transMat);
-        }
-
-        item->worldToModel = item->modelMatrix.invert();
-        item->normalToWorld = item->worldToModel.transpose();
-    }
-    //std::cout << "matrix 2:\n" << scene.items[1]->modelMatrix << "\n";
 
     return output;
 }
 
-std::vector<Image> RayTracer::takeVideo(Scene & scene, int camIndex, float start, float duration, int frameRate)
+std::vector<Image> RayTracer::takeVideo(Scene & scene, int camIndex, float start, float duration, int frameRate, int motionBlur)
 {
+
     Camera* cam = (scene.cameras[camIndex]);
     
     std::vector<Image> frames;
@@ -113,8 +131,9 @@ std::vector<Image> RayTracer::takeVideo(Scene & scene, int camIndex, float start
 
         std::cout << i << ", t: " << t << "\n";
 
+
         Image img(cam->width, cam->height);
-        img = takePicture(scene, camIndex, t);
+        img = takePicture(scene, camIndex, t, frameRate, motionBlur);
         frames.push_back(img);
 
         t += 1.0 / frameRate;
