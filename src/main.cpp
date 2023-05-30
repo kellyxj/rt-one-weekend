@@ -43,8 +43,8 @@ int main()
 
     // * General scene settings
     // resolution
-    int nx = 10;
-    int ny = 10;
+    int nx = 50;
+    int ny = 50;
 
     RayTracer rayTracer;
     rayTracer.maxDepth = 10;
@@ -72,7 +72,7 @@ int main()
 
     std::vector<RealisticCamera::LensElementInterface> lenses;
     lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 100.0, 1.29, 20.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(50.0, 50.0, 1.0, 20.0));
+    lenses.push_back(RealisticCamera::LensElementInterface(50.0, 50.0, 1.0, 2.0));
     RealisticCamera cam3(lenses, vec4(-3,0,0.5,1), 0, 0, nx, ny, 5.0); 
     cam3.gamma = 2;
     scene.cameras.push_back(&cam3);

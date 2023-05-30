@@ -1,6 +1,8 @@
 #include "realisticCamera.hpp"
 #include <iostream>
 
+bool debugMode = false;
+
 void RealisticCamera::setEyePosition(vec4 pos) {
     eyePoint = pos;
 }
@@ -75,12 +77,14 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
             Point2f rearElementSample = uniformDiskSample();
             rearElementPosn = vec4(rearElementSample.x,rearElementSample.y,0);
             rearElementPosn *= rearElementRadius;
-            rearElementPosn += vec4(0,0,lensRearZ, 1); // set w=1 after scaling!
+            rearElementPosn += vec4(0,0,-lensRearZ, 1); // set w=1 after scaling!
         } else { // this case should be about equivalent to pinhole...
-            rearElementPosn = vec4(0,0,diagonal,1);
+            rearElementPosn = vec4(0,0,-diagonal,1);
         }
 
         rLens.direction = rearElementPosn - rLens.origin;
+        if (debugMode) std::cout << "rearElementPosn: " << rearElementPosn << "\n";
+        if (debugMode) std::cout << "Pre-traced Lens Direction: " << rLens.direction << "\n";
 
         bool rayExitedLenses = traceLensesFromSensor(rLens, rOut);
         if (rayExitedLenses) {
@@ -94,15 +98,13 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
 bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
 
-    // Transform ray from camera coords to lens coords
-    rLens.direction.z *= -1;
-    rLens.origin.z *= -1;
-
     // We need to keep track of the z posn of the current element
     float elementZ = 0;
 
     // Now we trace that ray (backwards) through the lens elements 
     for (int i = elementInterfaces.size() - 1; i >= 0; --i) {
+
+        // if (debugMode) std::cout << "Shouldn't be here...\n";
 
         const LensElementInterface &element = elementInterfaces[i];
         elementZ -= element.thickness;
@@ -153,24 +155,29 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
             float etaT = (i > 0 && elementInterfaces[i-1].eta != 0) ? elementInterfaces[i-1].eta : 1;
 
             // compute the refracted ray direction
-            if (!refract((rLens.direction * -1).normalize(), n, etaI/etaT, &w)) {
+            if (!refract((rLens.direction * 1).normalize(), n, etaI/etaT, &w)) { // ! rLens.direction * -1
                 return false;
             }
             rLens.direction = w;
         }
     }
 
-    // transform back from lens coords to camera coords
+    if (debugMode) std::cout << rLens.direction << "\n";
+
+    // transform from lens coords to camera coords
     rLens.direction.z *= -1;
-    rLens.origin.z *= -1;
 
     // the origin is a point so we need to set it as such for transformations
     rLens.origin.w = 1;
     rOut = rLens;
 
-    // convert the origin and ray direction from lens coords to camera coords
+    // convert the origin and ray direction from camera coords to world coords
     rOut.direction = camToWorldMatrix.transform(rOut.direction);
     rOut.origin = camToWorldMatrix.transform(rOut.origin);
+
+    if (debugMode) std::cout << "origin: " << rOut.origin << "\n";
+    if (debugMode) std::cout << "direct: " << rOut.direction << "\n";
+
     return true;
 }
 
@@ -240,17 +247,17 @@ Bounds2f RealisticCamera::boundExitPupil(float pFilmX0, float pFilmX1) const {
         // float u[2] = {radicalInverse(0, i), radicalInverse(1, i)};
 
         float u[2] = {1/sqrt(i), 1/cbrt(i)};
-        vec4 pRear(lerp(u[0], projRearBounds.pMin.x, projRearBounds.pMax.x),
-                   lerp(u[1], projRearBounds.pMin.y, projRearBounds.pMax.y),
-                   lensRearZ);
+        // vec4 pRear(lerp(u[0], projRearBounds.pMin.x, projRearBounds.pMax.x),
+        //            lerp(u[1], projRearBounds.pMin.y, projRearBounds.pMax.y),
+        //            lensRearZ);
 
-        // Expand pupil bounds if ray makes it rhough the lens system
-        ray rLens = ray(pFilm, pRear-pFilm);
-        ray nullOut;
-        if (inside(Point2f(pRear.x, pRear.y), pupilBounds) || traceLensesFromSensor(rLens, nullOut)) {
-            pupilBounds = union(pupilBounds, Point2f(pRear.x, pRear.y));
-            ++nExitingRays;
-        }
+        // // Expand pupil bounds if ray makes it rhough the lens system
+        // ray rLens = ray(pFilm, pRear-pFilm);
+        // ray nullOut;
+        // if (inside(Point2f(pRear.x, pRear.y), pupilBounds) || traceLensesFromSensor(rLens, nullOut)) {
+        //     pupilBounds = union(pupilBounds, Point2f(pRear.x, pRear.y));
+        //     ++nExitingRays;
+        // }
     }
 
     // return entire element bounds if no rays made it through the lens system
@@ -259,7 +266,7 @@ Bounds2f RealisticCamera::boundExitPupil(float pFilmX0, float pFilmX1) const {
         return projRearBounds;
     }
 
-    pupilBounds = expand(pupilBounds, 2 * projRearBounds.diagonal().length() / sqrt(nSamples));
+    // pupilBounds = expand(pupilBounds, 2 * projRearBounds.diagonal().length() / sqrt(nSamples));
 
     return pupilBounds;
 }
