@@ -1,6 +1,6 @@
 #include "groundGrid.hpp"
 
-Color groundGrid::getColor(vec4 & pos) {
+Color groundGrid::getColor(vec4 & pos, float t) {
     float xPos = pos.x;
     float yPos = pos.y;
     double intPart;

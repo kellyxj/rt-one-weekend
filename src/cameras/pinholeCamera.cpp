@@ -52,6 +52,26 @@ void PinholeCamera::setUVN() {
     vAxis = nAxis.cross(uAxis);
 }
 
+void PinholeCamera::matSetEyePosition(mat4 transform) {
+
+    mat4 eyePtMat = mat4();
+    eyePtMat.entries[0] = eyePoint.x; eyePtMat.entries[1] = eyePoint.y; eyePtMat.entries[2] = eyePoint.z; eyePtMat.entries[3] = 1;
+    eyePtMat = transform.multiply(eyePtMat);
+    eyePoint.x = eyePtMat.entries[0]; eyePoint.y = eyePtMat.entries[1]; eyePoint.z = eyePtMat.entries[2];
+
+    if (!holdAimPt) {
+        mat4 aimPtMat = mat4();
+        aimPtMat.entries[0] = aimPoint.x; aimPtMat.entries[1] = aimPoint.y; aimPtMat.entries[2] = aimPoint.z; aimPtMat.entries[3] = 1;
+        aimPtMat = transform.multiply(aimPtMat);
+        aimPoint.x = aimPtMat.entries[0]; aimPoint.y = aimPtMat.entries[1]; aimPoint.z = aimPtMat.entries[2];
+    }
+
+}
+
+vec4 PinholeCamera::getEyePoint() {
+    return eyePoint;
+}
+
 //Camera::lookAt(vec4 aim)
 
 json PinholeCamera::serialize() {

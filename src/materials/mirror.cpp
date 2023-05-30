@@ -1,6 +1,6 @@
 #include "mirror.hpp"
 
-Color Mirror::getColor(vec4 & pos) {
+Color Mirror::getColor(vec4 & pos, float t) {
     return this->c;
 }
 

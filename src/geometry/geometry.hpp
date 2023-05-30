@@ -1,15 +1,29 @@
+#ifndef __TRANSLATE_ANIMATION_H__
+#define __TRANSLATE_ANIMATION_H__
+
+#include "../animation/translateAnimation.hpp"
+
+#endif
+
+#ifndef __ROTATE_ANIMATION_H__
+#define __ROTATE_ANIMATION_H__
+
+#include "../animation/rotateAnimation.hpp"
+
+#endif
+
 #ifndef __GEOMETRY_H__
 #define __GEOMETRY_H__
 
 #include "../math/mat4.hpp"
 #include "../materials/material.hpp"
 #include "../materials/baseMaterial.hpp"
+#include "../materials/colorChange.hpp"
 #include "../materials/glass.hpp" 
 #include "../materials/mirror.hpp"
 #include "../materials/groundGrid.hpp"
 #include "../hit.hpp"
 #include "../math/vec4.hpp"
-#include "../animation/translateAnimation.hpp"
 
 enum class GeometryType {none, plane, sphere, square, mesh, triangle, bvh};
 class Hit;

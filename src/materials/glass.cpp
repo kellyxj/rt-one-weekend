@@ -1,6 +1,6 @@
 #include "glass.hpp"
 
-Color Glass::getColor(vec4 & pos) {
+Color Glass::getColor(vec4 & pos, float t) {
     return this->c;
 }
 

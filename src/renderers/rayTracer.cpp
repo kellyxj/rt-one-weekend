@@ -19,6 +19,7 @@ Image RayTracer::takePicture(Scene &scene, int camIndex, float t, int frameRate,
     //std::cout << "matrix 1:\n" << scene.items[1]->modelMatrix << "\n";
 
     int sampleRate = this->sampleRate;
+    mat4 transMat = mat4();
 
     for (int j = (cam->height - 1); j >= 0; j--)
     {
@@ -30,7 +31,13 @@ Image RayTracer::takePicture(Scene &scene, int camIndex, float t, int frameRate,
             for (int m = 0; m < motionBlur; m++) {
 
                 output.setPixel(i, j, Color());
-                float tInc = t + (1.0 * m/motionBlur) / frameRate;
+                //float tInc = t + (1.0 * m/motionBlur) / frameRate;
+                float tInc = t + (((double)rand()) / RAND_MAX) / frameRate;
+
+                if (i == 200 && j == 200) {
+                    std::cout << ", tInc: " << tInc << "\n";
+                }
+
 
                 // before we trace, transform all objects according to their animations
                 for (Geometry *item : scene.items)
@@ -49,6 +56,25 @@ Image RayTracer::takePicture(Scene &scene, int camIndex, float t, int frameRate,
                     item->normalToWorld = item->worldToModel.transpose();
 
                 }
+
+                transMat.setIdentity();
+
+                for (Animation *anim : cam->animationList) {
+
+                    mat4 animMat = anim->evaluate(tInc);
+                    // find current animation
+                    transMat = transMat.multiply(animMat);
+
+                }
+
+                //if (i == 200 && j == 200) {
+                    //std::cout << "orig eyepos: " << cam->getEyePoint() << "\n";
+                //}
+
+                cam->matSetEyePosition(transMat);
+
+                //std::cout << "eyepos after set: " << cam->getEyePoint() << "\n";
+                cam->setUVN();
 
 
                 for (int k = 0; k < sampleRate; k++)
@@ -106,10 +132,32 @@ Image RayTracer::takePicture(Scene &scene, int camIndex, float t, int frameRate,
                     item->worldToModel = item->modelMatrix.invert();
                     item->normalToWorld = item->worldToModel.transpose();
                 }
+
+                transMat.setIdentity();
+
+                for (int ani = cam->animationList.size() - 1; ani >= 0; ani--) {
+
+                    mat4 animMat = cam->animationList[ani]->evaluate(tInc);
+                    animMat = animMat.invert();
+                    // find current animation
+                    transMat = transMat.multiply(animMat);
+                }
+
+                cam->matSetEyePosition(transMat);
+
+                //if (i == 200 && j == 200) {
+                    //std::cout << "new eyepos: " << cam->getEyePoint() << "\n";
+                //}
+                cam->setUVN();
+
             }
 
             output.setPixel(i, j, cBlur);
+
+            //break;
         }
+
+        //break;
     }
 
     return output;
@@ -206,7 +254,7 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth, float t)
         hit.color.b += .15;
         hit.color.g += .15;
         */
-        Color hitColor = hit.material->getColor(hit.modelSpacePos);
+        Color hitColor = hit.material->getColor(hit.modelSpacePos, t);
         base hemisphereSampler;
 
         float lightPdf;
@@ -243,7 +291,7 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth, float t)
                 //float powerHeuristic = (lightPdf * lightPdf)/(hemispherePdf * hemispherePdf + lightPdf * lightPdf);
                 float balanceHeuristic = lightPdf/(hemispherePdf + lightPdf);
 
-                Color radiance = (shadowHit.material->getColor(shadowHit.modelSpacePos)) * shadowHit.brightness;
+                Color radiance = (shadowHit.material->getColor(shadowHit.modelSpacePos, t)) * shadowHit.brightness;
                 radiance *= solidAngle * lambertian;
                 hit.color += radiance * brdf * balanceHeuristic;
             }
@@ -269,7 +317,7 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth, float t)
             //float powerHeuristic = (hemispherePdf * hemispherePdf)/(hemispherePdf * hemispherePdf + lightPdf * lightPdf);
             float balanceHeuristic = hemispherePdf/(hemispherePdf + lightPdf);
 
-            Color radiance = (shadowHit.material->getColor(shadowHit.modelSpacePos)) * shadowHit.brightness;
+            Color radiance = (shadowHit.material->getColor(shadowHit.modelSpacePos, t)) * shadowHit.brightness;
             radiance *= hitColor * lambertian;
             hit.color += radiance * brdf * balanceHeuristic;
         }

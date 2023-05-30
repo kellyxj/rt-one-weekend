@@ -9,6 +9,8 @@ public:
     vec4 aimPoint;
     vec4 up;
 
+    bool holdAimPt;
+
     float panAngle;
     float tiltAngle;
 
@@ -26,6 +28,8 @@ public:
         eyePoint = vec4(-10, 0, 1, 1);
         aimPoint = vec4(0, 0, 1, 1);
         up = vec4(0, 0, 1, 0);
+
+        holdAimPt = false;
 
         panAngle = 0;
         tiltAngle = 0;
@@ -67,6 +71,9 @@ public:
     ray getEyeRay(float xPos, float yPos);
 
     void setUVN();
+    void matSetEyePosition(mat4 transform);
+
+    vec4 getEyePoint();
 
     json serialize();
 

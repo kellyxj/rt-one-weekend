@@ -87,8 +87,17 @@ int main()
     sphere.translate(axis);
     sphere.scale(scaleAmount);
 
-    TranslateAnimation anim(vec4(1, -1, 0, 0), 1);
-    sphere.animationList.push_back(&anim);
+    Square square;
+    square.translate(axis);
+
+    TranslateAnimation anim1(vec4(0, -1, 0, 0), 3);
+    sphere.animationList.push_back(&anim1);
+
+    //RotateAnimation anim1(vec4(0, 0, 1, 0), 63);
+    //sphere.animationList.push_back(&anim1);
+    //square.animationList.push_back(&anim1);
+
+    
     //mat4 transform = anim.evaluate(2);
     //sphere.modelMatrix = sphere.modelMatrix.multiply(transform);
     //sphere.worldToModel = sphere.modelMatrix.invert();
@@ -96,10 +105,15 @@ int main()
 
     base sphereMat;
     sphereMat.c = red;
+
+    ColorChange matColChange;
     // sphereMat.brightness = 10;
+    //sphere.setMaterial(matColChange);
     sphere.setMaterial(sphereMat);
+    square.setMaterial(sphereMat);
 
     scene.items.push_back(&sphere);
+    //scene.items.push_back(&square);
 
     Mesh mesh;
     //mesh.loadFromObj("cornell_box_cube.obj");
@@ -125,10 +139,15 @@ int main()
 
     PinholeCamera cam(vec4(-2, 0, 1, 1), 0, 0, nx, ny, .01, 90, 1);
     cam.gamma = 2;
+
+    //TranslateAnimation anim2(vec4(0, 1, 0, 0), 1);
+    //cam.animationList.push_back(&anim2);
+
+    
     scene.cameras.push_back((Camera*)&cam);
     RayTracer rayTracer;
 
-    rayTracer.maxDepth = 10;
+    rayTracer.maxDepth = 2;
     // put back to 64
     rayTracer.sampleRate = 4;
 
@@ -155,10 +174,10 @@ int main()
     //output << image.dump_ppm();
 
     float vidStart = 0.0;
-    float duration = 4;
-    int framerate = 16;
+    float duration = 1;
+    int framerate = 2;
     // pictures per frame
-    int motionBlur = 2;
+    int motionBlur = 4;
 
     std::vector<Image> frames = rayTracer.takeVideo(scene, 0, vidStart, duration, framerate, motionBlur);
 

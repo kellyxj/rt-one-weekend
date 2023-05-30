@@ -23,7 +23,7 @@ public:
     float brightness = 0;
     bool isDelta = false;
 
-    virtual Color getColor(vec4 &pos) = 0;
+    virtual Color getColor(vec4 &pos, float t) = 0;
     virtual ray scatter(ray &inRay, vec4 &pos, vec4 &normal) = 0;
 
     virtual json serialize() = 0;

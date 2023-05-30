@@ -1,6 +1,6 @@
 #include "baseMaterial.hpp"
 
-Color base::getColor(vec4 &pos)
+Color base::getColor(vec4 &pos, float)
 {
     return this->c;
 }
