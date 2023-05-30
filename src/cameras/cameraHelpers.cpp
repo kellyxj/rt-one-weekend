@@ -1,5 +1,5 @@
 #include "cameraHelpers.hpp"
-#include <algorithm>
+#include <iostream>
 
 Point2f uniformDiskSample() {
     float r = sqrt(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
@@ -41,6 +41,9 @@ bool refract(const vec4 &wi, const vec4 &n, float eta, vec4 *wt) {
 
     *wt = (wi_*-1)*eta + n_*(eta*cosThetaI - cosThetaT);
 
+    std::cout << "cosThetaI: " << cosThetaI << "\n";
+    std::cout << "wi: " << wi_ << "\n";
+    std::cout << "wt: " << *wt << "\n";
     return true; 
 }
 

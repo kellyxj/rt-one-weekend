@@ -1,7 +1,7 @@
 #include "realisticCamera.hpp"
 #include <iostream>
 
-bool debugMode = false;
+bool debugMode = true;
 
 void RealisticCamera::setEyePosition(vec4 pos) {
     eyePoint = pos;
@@ -66,7 +66,8 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
     ray rOut;
 
     // Keep looping until you find a ray that makes it out of the lens system
-    while(true) {
+    // while(true) {
+    for (int i = 0; i < 10; ++i) {
         
         // We are currently assuming the camera coords where objects are out 
         // in the world along +z (which is why we use +lensRearZ, for example). This 
@@ -84,7 +85,7 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
         rLens.direction = rearElementPosn - rLens.origin;
         if (debugMode) std::cout << "rearElementPosn: " << rearElementPosn << "\n";
-        if (debugMode) std::cout << "Pre-traced Lens Direction: " << rLens.direction << "\n";
+        if (debugMode) std::cout << "Pre-traced rLens.direction: " << rLens.direction << "\n";
 
         bool rayExitedLenses = traceLensesFromSensor(rLens, rOut);
         if (rayExitedLenses) {
@@ -130,12 +131,14 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
             // The call to intersectSphericalElement will do the actual ray tracing
             // and update t and n for us.
             if (!intersectSphericalElement(radius, zCenter, rLens, &t, &n)) {
+                if (debugMode) std::cout << "FAILED INTERSECT SPHERICAL ELEMENT \n";
                 return false;
             }
         }
 
         // check if intersection is within bounds of element aperture
         vec4 pHit = rLens.origin + (rLens.direction * t);
+        if (debugMode) std::cout << "pHit: " << pHit << "\n";
         float r2 = pHit.x * pHit.x + pHit.y * pHit.y;
         if (r2 > element.apertureRadius * element.apertureRadius) {
             return false;
@@ -155,14 +158,15 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
             float etaT = (i > 0 && elementInterfaces[i-1].eta != 0) ? elementInterfaces[i-1].eta : 1;
 
             // compute the refracted ray direction
-            if (!refract((rLens.direction * 1).normalize(), n, etaI/etaT, &w)) { // ! rLens.direction * -1
+            if (!refract((rLens.direction * -1).normalize(), n, etaI/etaT, &w)) {
+                if (debugMode) std::cout << "FAILED REFRACT! (total internal reflection)\n\n";
                 return false;
             }
             rLens.direction = w;
         }
     }
 
-    if (debugMode) std::cout << rLens.direction << "\n";
+    // if (debugMode) std::cout << rLens.direction << "\n";
 
     // transform from lens coords to camera coords
     rLens.direction.z *= -1;
@@ -192,14 +196,20 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     float C = o.length_squared() - radius*radius;
     float t0, t1;
 
-    if (!quadratic(A,B,C,&t0,&t1)) return false;
+    if (!quadratic(A,B,C,&t0,&t1)) {
+        if (debugMode) std::cout << "FAILED QUADRATIC\n\n";
+        return false;
+    }
 
     // select the appropriate t based on ray direction and element curvature
     bool useCloserT = (inRay.direction.z > 0) ^ (radius < 0);
 
     *t = useCloserT ? std::min(t0,t1) : std::max(t0,t1);
 
-    if (*t < 0) return false;
+    if (*t < 0) {
+        if (debugMode) std::cout << "T INTERSECT IS NEGATIVE\n\n";
+        return false;
+    }
 
     // compute surface normal at intersection point
     *n = (o + inRay.direction * (*t)).normalize();
