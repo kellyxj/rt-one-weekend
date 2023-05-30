@@ -1,7 +1,7 @@
 #include "realisticCamera.hpp"
 #include <iostream>
 
-bool debugMode = true;
+bool debugMode = false;
 
 void RealisticCamera::setEyePosition(vec4 pos) {
     eyePoint = pos;
@@ -43,8 +43,9 @@ void RealisticCamera::computeProperties() {
         lensRearZ = elementInterfaces.back().thickness;
         
         lensFrontZ = 0;
-        for (const LensElementInterface &element : elementInterfaces)
+        for (const LensElementInterface &element : elementInterfaces) {
             lensFrontZ += element.thickness;
+        }
         
         rearElementRadius = elementInterfaces.back().apertureRadius;
     }
@@ -84,8 +85,8 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
         }
 
         rLens.direction = rearElementPosn - rLens.origin;
-        if (debugMode) std::cout << "rearElementPosn: " << rearElementPosn << "\n";
-        if (debugMode) std::cout << "Pre-traced rLens.direction: " << rLens.direction << "\n";
+        // if (debugMode) std::cout << "rearElementPosn: " << rearElementPosn << "\n";
+        // if (debugMode) std::cout << "Pre-traced rLens.direction: " << rLens.direction << "\n";
 
         bool rayExitedLenses = traceLensesFromSensor(rLens, rOut);
         if (rayExitedLenses) {
@@ -138,7 +139,7 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
 
         // check if intersection is within bounds of element aperture
         vec4 pHit = rLens.origin + (rLens.direction * t);
-        if (debugMode) std::cout << "pHit: " << pHit << "\n";
+        // if (debugMode) std::cout << "pHit: " << pHit << "\n";
         float r2 = pHit.x * pHit.x + pHit.y * pHit.y;
         if (r2 > element.apertureRadius * element.apertureRadius) {
             return false;
@@ -169,7 +170,7 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
     // if (debugMode) std::cout << rLens.direction << "\n";
 
     // transform from lens coords to camera coords
-    rLens.direction.z *= -1;
+    // rLens.direction.z *= -1;
 
     // the origin is a point so we need to set it as such for transformations
     rLens.origin.w = 1;
@@ -179,8 +180,13 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
     rOut.direction = camToWorldMatrix.transform(rOut.direction);
     rOut.origin = camToWorldMatrix.transform(rOut.origin);
 
-    if (debugMode) std::cout << "origin: " << rOut.origin << "\n";
-    if (debugMode) std::cout << "direct: " << rOut.direction << "\n";
+    if (debugMode) {
+        std::cout << "origin: " << rOut.origin << "\n";
+        std::cout << "direct: " << rOut.direction << "\n";
+        if (rOut.origin.z < -3) {
+            std::getchar();
+        }
+    }
 
     return true;
 }
