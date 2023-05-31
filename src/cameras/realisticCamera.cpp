@@ -49,6 +49,9 @@ void RealisticCamera::computeProperties() {
         
         rearElementRadius = elementInterfaces.back().apertureRadius;
     }
+
+    elementInterfaces.back().thickness = focusThickLens(focusDistance);
+    std::cout << "Rear Thickness: " << elementInterfaces.back().thickness << "\n";
 }
 
 ray RealisticCamera::getEyeRay(float xPos, float yPos) {
@@ -226,6 +229,52 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     }
 
     return true;
+}
+
+void RealisticCamera::computeCardinalPoints(ray &rIn, ray &rOut, float *pz, float *fz) {
+    std::cout << "rOut: " << rOut.origin << "\n";
+    float tf = -rOut.origin.x / rOut.direction.x;
+    *fz = (rOut.direction * tf).z;
+    std::cout << "fz: " << *fz << "\n";
+    float tp = (-rIn.origin.x + rOut.origin.x) / rOut.direction.x;
+    *pz = (rOut.direction * tp).z;
+    std::cout << "pz: " << *pz << "\n";
+}
+
+void RealisticCamera::computeThickLensApproximation(float pz[2], float fz[2]) {
+    // find height x from optical axis for parallal rays 
+    // -- measured as small portion of sensor's diagonal extent
+    float x = 0.1 * diagonal; // ! 0.001?
+
+    // compute cardinal points for sensor side of lens system
+    ray rScene;
+    rScene.origin = vec4(x,0,-lensFrontZ-1);
+    rScene.direction = vec4(0,0,1);
+    ray rSensor;
+    traceLensesFromSensor(rScene, rSensor);
+    std::cout << "rScene.direction: " << rScene.direction << "\n" << "rScene.origin: " << rScene.origin << "\n";
+    std::cout << "rSensor.direction: " << rSensor.direction << "\n" << "rSensor.origin: " << rSensor.origin << "\n";
+    computeCardinalPoints(rScene, rSensor, &pz[0], &fz[0]);
+
+    // compute cardinal points for scene side of lens system
+    rSensor.origin = vec4(x,0,-lensRearZ+1);
+    rSensor.direction = vec4(0,0,-1);
+    traceLensesFromSensor(rSensor, rScene);
+    computeCardinalPoints(rSensor, rScene, &pz[1], &fz[1]);
+
+    std::cout << "pz: " << pz[0] << " " << pz[1] << "\n";
+}
+
+float RealisticCamera::focusThickLens(float focusDistance) {
+    float pz[2], fz[2];
+    computeThickLensApproximation(pz, fz);
+
+    // compute translation of lens along z to focus at given focusDistance
+    float f = fz[0] - pz[0];
+    float z = -focusDistance;
+    float delta = 0.5f * (pz[1] - z + pz[0] - sqrt((pz[1] - z - pz[0]) * (pz[1] - z - 4*f - pz[0])));
+
+    return elementInterfaces.back().thickness + delta;
 }
 
 void RealisticCamera::computeExitPupilBounds(int nSamples) {

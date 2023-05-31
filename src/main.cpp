@@ -98,7 +98,7 @@ int main()
     // lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 20.0, 1.29, 2.0));
     // lenses.push_back(RealisticCamera::LensElementInterface(110.0, 163.0, 1.0, 2.0));
 
-    RealisticCamera cam3(lenses, vec4(-3,0,0.5,1), 0, 0, nx, ny, 4.0); 
+    RealisticCamera cam3(lenses, vec4(-3,0,0.5,1), 0, 0, nx, ny, 4.0, 3.0); 
     cam3.gamma = 2;
     scene.cameras.push_back(&cam3);
 

@@ -29,8 +29,8 @@ public:
     std::vector<LensElementInterface> elementInterfaces;
 
     // Note: input diagonal size in mm!
-    RealisticCamera(std::vector<LensElementInterface> lenses, vec4 eye, float pan, float tilt, int w, int h, float diagonal)
-    : elementInterfaces(lenses), eyePoint(eye), panAngle(pan), tiltAngle(tilt), diagonal(diagonal/1000.0) {
+    RealisticCamera(std::vector<LensElementInterface> lenses, vec4 eye, float pan, float tilt, int w, int h, float diagonal, float focusDistance)
+    : elementInterfaces(lenses), eyePoint(eye), panAngle(pan), tiltAngle(tilt), diagonal(diagonal/1000.0), focusDistance(focusDistance) {
         setLookDirection(pan, tilt);
         width = w;
         height = h;
@@ -71,12 +71,23 @@ private:
     float lensRearZ;
     float lensFrontZ;
     float rearElementRadius;
+    float focusDistance;
     Bounds2f bounds;
 
     std::vector<Bounds2f> exitPupilBounds;
 
     // Compute properties of the camera like its aspect ratio, physical bounds, and lens z-bounds
     void computeProperties();
+
+    // Compute the z depths of the focal point and the principal plane for the given rays
+    // Note that it assumes the rays are in camera space but returns z values in lens space...
+    void computeCardinalPoints(ray &rIn, ray &rOut, float *pz, float *fz);
+
+    // Computes both pairs of cardinal points for the lens system
+    void computeThickLensApproximation(float pz[2], float fz[2]);
+
+    // Focuses the lens system using the thick lens approximation (adjusts the rear-element's z-value)
+    float focusThickLens(float focusDistance);
 
     // Compute the bounds of the exit pupil along radial positions away from the center of the sensor
     void computeExitPupilBounds(int nSamples);
