@@ -50,8 +50,9 @@ void RealisticCamera::computeProperties() {
         rearElementRadius = elementInterfaces.back().apertureRadius;
     }
 
+    if (debugMode) std::cout << "Rear Thickness: " << elementInterfaces.back().thickness << "\n";
     elementInterfaces.back().thickness = focusThickLens(focusDistance);
-    std::cout << "Rear Thickness: " << elementInterfaces.back().thickness << "\n";
+    if (debugMode) std::cout << "Rear Thickness: " << elementInterfaces.back().thickness << "\n";
 }
 
 ray RealisticCamera::getEyeRay(float xPos, float yPos) {
@@ -68,11 +69,14 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
     // This is where the resulting ray will be stored
     ray rOut;
+    rOut.exitedLenses = false;
 
     // Keep looping until you find a ray that makes it out of the lens system
     // while(true) {
     for (int i = 0; i < 10; ++i) {
         
+        // break; // !
+
         // We are currently assuming the camera coords where objects are out 
         // in the world along +z (which is why we use +lensRearZ, for example). This 
         // will explicitly be reversed when we traceLensesFromSensor.
@@ -93,6 +97,7 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
         bool rayExitedLenses = traceLensesFromSensor(rLens, rOut);
         if (rayExitedLenses) {
+            rOut.exitedLenses = true;
             break;
         }
     }
@@ -142,7 +147,6 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
 
         // check if intersection is within bounds of element aperture
         vec4 pHit = rLens.origin + (rLens.direction * t);
-        // if (debugMode) std::cout << "pHit: " << pHit << "\n";
         float r2 = pHit.x * pHit.x + pHit.y * pHit.y;
         if (r2 > element.apertureRadius * element.apertureRadius) {
             return false;
@@ -170,11 +174,6 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
         }
     }
 
-    // if (debugMode) std::cout << rLens.direction << "\n";
-
-    // transform from lens coords to camera coords
-    // rLens.direction.z *= -1;
-
     // the origin is a point so we need to set it as such for transformations
     rLens.origin.w = 1;
     rOut = rLens;
@@ -194,6 +193,55 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
     return true;
 }
 
+bool RealisticCamera::traceLensesFromScene(ray &rLens, ray &rOut) {
+    float elementZ = -lensFrontZ;
+
+    for (int i = 0; i < elementInterfaces.size(); ++i) {
+        const LensElementInterface &element = elementInterfaces[i];
+        float t;
+        vec4 n;
+        bool isStop = (element.curvatureRadius == 0);
+
+        if (isStop) {
+            t = (elementZ - rLens.origin.z) / rLens.direction.z;
+        } else {
+            float radius = element.curvatureRadius;
+            float zCenter = elementZ + element.curvatureRadius;
+            if (debugMode) std::cout << "elementZ: " << elementZ << "; zCenter: " << zCenter << "\n";
+            if (!intersectSphericalElement(radius, zCenter, rLens, &t, &n)) {
+                return false;
+            }
+        }
+
+        vec4 pHit = rLens.origin + (rLens.direction * t);
+        float r2 = pHit.x * pHit.x + pHit.y * pHit.y;
+        if (r2 > element.apertureRadius * element.apertureRadius) {
+            return false;
+        }
+        rLens.origin = pHit;
+
+        if (!isStop) {
+            vec4 wt;
+            float etaI = (i==0 || elementInterfaces[i-1].eta==0) ? 1 : elementInterfaces[i-1].eta;
+            float etaT = (elementInterfaces[i].eta != 0) ? elementInterfaces[i].eta : 1;
+
+            if (!refract((rLens.direction * -1).normalize(), n, etaI/etaT, &wt)) {
+                return false;
+            }
+            rLens.direction = wt;
+        }
+        elementZ += element.thickness;
+    }
+
+    rLens.origin.w = 1;
+    rOut = rLens;
+
+    // rOut.direction = camToWorldMatrix.transform(rOut.direction);
+    // rOut.origin = camToWorldMatrix.transform(rOut.origin);
+
+    return true;
+}
+
 bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray inRay, float *t, vec4 *n) {
 
     // solve for intersection points t0 and t1
@@ -205,9 +253,18 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     float C = o.length_squared() - radius*radius;
     float t0, t1;
 
+    if (debugMode) {
+        std::cout << "inRay.origin: " << inRay.origin << " inRay.direction: " << inRay.direction << "\n"; 
+        std::cout << "o: " << o << "; A: " << A << "; B: " << B << "; C: " << C << "; discriminant: " << (B*B - 4*A*C) << "\n";
+    }
+
     if (!quadratic(A,B,C,&t0,&t1)) {
-        if (debugMode) std::cout << "FAILED QUADRATIC\n\n";
+        if (debugMode) std::cout << "\nFAILED QUADRATIC\n";
         return false;
+    }
+
+    if (debugMode) {
+        std::cout << "t0: " << t0 << "; t1: " << t1 << "\n";
     }
 
     // select the appropriate t based on ray direction and element curvature
@@ -216,7 +273,7 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     *t = useCloserT ? std::min(t0,t1) : std::max(t0,t1);
 
     if (*t < 0) {
-        if (debugMode) std::cout << "T INTERSECT IS NEGATIVE\n\n";
+        if (debugMode) std::cout << "T INTERSECT IS NEGATIVE\n";
         return false;
     }
 
@@ -232,13 +289,18 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
 }
 
 void RealisticCamera::computeCardinalPoints(ray &rIn, ray &rOut, float *pz, float *fz) {
-    std::cout << "rOut: " << rOut.origin << "\n";
-    float tf = -rOut.origin.x / rOut.direction.x;
-    *fz = (rOut.direction * tf).z;
-    std::cout << "fz: " << *fz << "\n";
-    float tp = (-rIn.origin.x + rOut.origin.x) / rOut.direction.x;
-    *pz = (rOut.direction * tp).z;
-    std::cout << "pz: " << *pz << "\n";
+    // std::cout << "rOut: " << rOut.origin << "\n";
+    float tf = abs(rOut.origin.x / rOut.direction.x);
+    *fz = -(rOut.origin + rOut.direction * tf).z;
+    // std::cout << "fz: " << *fz << "\n";
+    float tp = abs((rIn.origin.x - rOut.origin.x) / rOut.direction.x);
+    *pz = -(rOut.origin + rOut.direction * tp).z;
+    // std::cout << "pz: " << *pz << "\n";
+
+    // float tf = -rOut.origin.x / rOut.direction.x;
+    // *fz = -(rOut.origin + rOut.direction * tf).z;
+    // float tp = (rIn.origin.x - rOut.origin.x) / rOut.direction.x;
+    // *pz = -(rOut.origin + rOut.direction * tp).z;
 }
 
 void RealisticCamera::computeThickLensApproximation(float pz[2], float fz[2]) {
@@ -248,21 +310,31 @@ void RealisticCamera::computeThickLensApproximation(float pz[2], float fz[2]) {
 
     // compute cardinal points for sensor side of lens system
     ray rScene;
-    rScene.origin = vec4(x,0,-lensFrontZ-1);
-    rScene.direction = vec4(0,0,1);
+    rScene.origin = vec4(x,0,-lensFrontZ-1,1);
+    rScene.direction = vec4(0,0,1,0);
+    // rScene.origin = vec4(x,0,lensFrontZ+1,1);
+    // rScene.direction = vec4(0,0,-1,0);
     ray rSensor;
-    traceLensesFromSensor(rScene, rSensor);
-    std::cout << "rScene.direction: " << rScene.direction << "\n" << "rScene.origin: " << rScene.origin << "\n";
-    std::cout << "rSensor.direction: " << rSensor.direction << "\n" << "rSensor.origin: " << rSensor.origin << "\n";
+    traceLensesFromScene(rScene, rSensor);
+    if (debugMode) {
+        std::cout << "rScene.direction: " << rScene.direction << "\n" << "rScene.origin: " << rScene.origin << "\n";
+        std::cout << "rSensor.direction: " << rSensor.direction << "\n" << "rSensor.origin: " << rSensor.origin << "\n\n\n";
+    }
     computeCardinalPoints(rScene, rSensor, &pz[0], &fz[0]);
 
     // compute cardinal points for scene side of lens system
-    rSensor.origin = vec4(x,0,-lensRearZ+1);
-    rSensor.direction = vec4(0,0,-1);
+    rSensor.origin = vec4(x,0,-lensRearZ+1,1);
+    rSensor.direction = vec4(0,0,-1,0);
+    // rScene.origin = vec4(x,0,lensRearZ-1,1);
+    // rScene.direction = vec4(0,0,1,0);
     traceLensesFromSensor(rSensor, rScene);
+    if (debugMode) {
+        std::cout << "rScene.direction: " << rScene.direction << "\n" << "rScene.origin: " << rScene.origin << "\n";
+        std::cout << "rSensor.direction: " << rSensor.direction << "\n" << "rSensor.origin: " << rSensor.origin << "\n\n\n";
+    }
     computeCardinalPoints(rSensor, rScene, &pz[1], &fz[1]);
 
-    std::cout << "pz: " << pz[0] << " " << pz[1] << "\n";
+    // std::cout << "pz: " << pz[0] << " " << pz[1] << "\n";
 }
 
 float RealisticCamera::focusThickLens(float focusDistance) {
@@ -273,6 +345,8 @@ float RealisticCamera::focusThickLens(float focusDistance) {
     float f = fz[0] - pz[0];
     float z = -focusDistance;
     float delta = 0.5f * (pz[1] - z + pz[0] - sqrt((pz[1] - z - pz[0]) * (pz[1] - z - 4*f - pz[0])));
+
+    std::cout << "Rear Thickness Delta: " << delta << "\n";
 
     return elementInterfaces.back().thickness + delta;
 }

@@ -10,13 +10,12 @@ Point2f uniformDiskSample() {
 bool quadratic(float a, float b, float c, float *t0, float *t1) {
     // use doubles to minimize floating point error, especially for sqrt
     double discriminant = (double)b*(double)b - 4*(double)a*(double)c;
-    
     if (discriminant < 0) return false;
-    double rootDiscriminant = sqrt(discriminant);
+    double rootDiscriminant = sqrt(discriminant); // must be positive
 
     double q;
-    if (b < 0) q = -0.5 * (b - rootDiscriminant);
-    else q = -0.5 * (b + rootDiscriminant);
+    if (b < 0) q = -0.5 * (b - rootDiscriminant); // q must be positive
+    else q = -0.5 * (b + rootDiscriminant); // q must be negative
 
     *t0 = q/a;
     *t1 = c/q;

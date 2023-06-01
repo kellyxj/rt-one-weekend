@@ -85,20 +85,16 @@ int main()
     // lenses.push_back(RealisticCamera::LensElementInterface(-7.70286, 1.21638, 1.617, 13.42));
     // lenses.push_back(RealisticCamera::LensElementInterface(-11.98328, 50.0, 1.0, 17.996));
 
-    // // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 50.0, 1.0, 2.0));
     // lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 100.0, 1.29, 20.0));
     // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 80.0, 1.0, 2.0));
 
     // lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 100.0, 1.29, 20.0));
-    // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 80.5, 1.0, 10.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 80.5, 1.0, 20.0));
 
-    lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 100.0, 1.29, 20.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(50.0, 80.5, 1.0, 20.0));
+    lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 20.0, 1.41, 100.0));
+    lenses.push_back(RealisticCamera::LensElementInterface(110.0, 180.5, 1.0, 10.0)); //thickness = 180.5
 
-    // lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 20.0, 1.29, 2.0));
-    // lenses.push_back(RealisticCamera::LensElementInterface(110.0, 163.0, 1.0, 2.0));
-
-    RealisticCamera cam3(lenses, vec4(-3,0,0.5,1), 0, 0, nx, ny, 4.0, 3.0); 
+    RealisticCamera cam3(lenses, vec4(-3,0,0.5,1), 0, 0, nx, ny, 20.0, 3.0); 
     cam3.gamma = 2;
     scene.cameras.push_back(&cam3);
 

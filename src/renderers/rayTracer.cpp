@@ -32,10 +32,14 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
                 ray eyeRay = cam->getEyeRay(i + .5 + randX, j + .5 + randY);
 
                 Hit hit;
-                hit = this->traceRay(scene, eyeRay, hit, 0);
-
                 Color c = output.getPixel(i, j);
-                c += hit.color / sampleRate * cam->exposure;
+
+                if (eyeRay.exitedLenses) {
+                    hit = this->traceRay(scene, eyeRay, hit, 0);
+                    c += hit.color / sampleRate * cam->exposure;
+                } else {
+                    c += black;
+                }
 
                 // normal map
                 // c.r += (hit.normal.x + 1)/(2*sampleRate);

@@ -100,6 +100,10 @@ private:
     // it returns true and initializes *outRay with the ray exiting the camera.
     bool traceLensesFromSensor (ray &rLens, ray &rOut);
 
+    // Similar to traceLensesFromSensor except it traces the ray starting from outside the lens
+    // system. Note that it assumes rLens is already in camera space and returns rOut also in camera space.
+    bool traceLensesFromScene(ray &rLens, ray &rOut);
+
     // Specialized sphere-ray intersection method for spheres centered along z axis
     bool intersectSphericalElement(float radius, float zCenter, ray rLens, float *t, vec4 *n);
 };
