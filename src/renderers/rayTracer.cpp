@@ -1,5 +1,6 @@
 #include "rayTracer.hpp"
 #include <iostream>
+#include <vector>
 
 Image RayTracer::takePicture(Scene &scene, int camIndex)
 {
@@ -16,11 +17,35 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
 
     int sampleRate = this->sampleRate;
 
-    for (int j = (cam->height - 1); j >= 0; j--)
+    std::vector<int> iterV;
+    if (cam->flipImage) {
+        for (int j = (cam->height -1); j >= 0; j--) {
+            iterV.push_back(j);
+        }
+    } else {
+        for (int j = 0; j < cam->height; j++) {
+            iterV.push_back(j);
+        }
+    }
+
+    std::vector<int> iterH;
+    if (cam->flipImage) {
+        for (int i = (cam->width -1); i >= 0; i--) {
+            iterH.push_back(i);
+        }
+    } else {
+        for (int i = 0; i < cam->width; i++) {
+            iterH.push_back(i);
+        }
+    }
+
+    for (int j : iterV)
     {
-        if (!(j%10)) std::cout << 1.0-float(j)/float(cam->height) << "\n";
-        for (int i = 0; i < (cam->width); i++)
+        if (!(j%10)) std::cout << float(j)/float(cam->height) << "\n";
+
+        for (int i : iterH)
         {
+
             for (int k = 0; k < sampleRate; k++)
             {
                 float randX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (sampleRate > 1 ? 1 : 0);

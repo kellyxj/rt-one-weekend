@@ -67,10 +67,10 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
     // Keep looping until you find a ray that makes it out of the lens system
     // Note: for now limited to 10 attempts!
-    for (int i = 0; i < 100; ++i) {
-
+    for (int i = 0; i < 10; ++i) {
+        rLens.origin = vec4(posU,posV,0,1);
         vec4 rearElementPosn;
-
+        
         if (elementInterfaces.size() > 0) {
             Point2f rearElementSample = uniformDiskSample();
             rearElementPosn = vec4(rearElementSample.x,rearElementSample.y,0);
@@ -94,7 +94,7 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
             break;
         }
     }
-    if (!rOut.exitedLenses) std::cout << rOut.direction << "\n";
+    // if (!rOut.exitedLenses) std::cout << rOut.direction << "\n";
     return rOut;
 }
 
