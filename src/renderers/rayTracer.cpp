@@ -23,8 +23,8 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
 
         for (int i = 0; i < cam->width; i++)
         {
-            int i_ = cam->flipImage ? cam->width - i : i;
-            int j_ = cam->flipImage ? j : cam->height - j;
+            int i_ = cam->flipImage ? cam->width - i - 1: i;
+            int j_ = cam->flipImage ? j : cam->height - j - 1;
 
             for (int k = 0; k < sampleRate; k++)
             {
