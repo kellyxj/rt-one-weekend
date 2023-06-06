@@ -48,7 +48,7 @@ int main()
 
     RayTracer rayTracer;
     rayTracer.maxDepth = 10;
-    rayTracer.sampleRate = 1;
+    rayTracer.sampleRate = 128;
 
     Scene scene;
     scene.name = "sphere";
@@ -68,27 +68,26 @@ int main()
     cam2.gamma = 2;
     cam2.apertureRadius = 0.1;
     cam2.focalDistance = 3;
-    cam2.flipImage = true;
     scene.cameras.push_back(&cam2);
 
     float sensorSize = 50.0;
     std::vector<RealisticCamera::LensElementInterface> lenses;
 
     // * PBRT Wide angle lens (22mm)
-    // lenses.push_back(RealisticCamera::LensElementInterface(35.98738, 1.21638, 1.54, 23.716));
-    // lenses.push_back(RealisticCamera::LensElementInterface(11.69718, 9.9957, 1, 17.996));
-    // lenses.push_back(RealisticCamera::LensElementInterface(13.08714, 5.12622, 1.772, 12.364));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-22.63294, 1.76924, 1.617, 9.812));
-    // lenses.push_back(RealisticCamera::LensElementInterface(71.05802, 0.8184, 1, 9.152));
-    // lenses.push_back(RealisticCamera::LensElementInterface(0, 2.27766, 0, 8.756));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-9.58584, 2.435254, 1.617, 8.184));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-11.28864, 0.11506, 1, 9.152));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-166.7765, 3.09606, 1.713, 10.648));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-7.5911, 1.32682, 1.805, 11.44));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-16.7662, 3.98068, 1, 12.276));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-7.70286, 1.21638, 1.617, 13.42));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-11.98328, 11.0, 1.0, 17.996));
-    // sensorSize = 40.0;
+    lenses.push_back(RealisticCamera::LensElementInterface(35.98738, 1.21638, 1.54, 23.716));
+    lenses.push_back(RealisticCamera::LensElementInterface(11.69718, 9.9957, 1, 17.996));
+    lenses.push_back(RealisticCamera::LensElementInterface(13.08714, 5.12622, 1.772, 12.364));
+    lenses.push_back(RealisticCamera::LensElementInterface(-22.63294, 1.76924, 1.617, 9.812));
+    lenses.push_back(RealisticCamera::LensElementInterface(71.05802, 0.8184, 1, 9.152));
+    lenses.push_back(RealisticCamera::LensElementInterface(0, 2.27766, 0, 8.756));
+    lenses.push_back(RealisticCamera::LensElementInterface(-9.58584, 2.435254, 1.617, 8.184));
+    lenses.push_back(RealisticCamera::LensElementInterface(-11.28864, 0.11506, 1, 9.152));
+    lenses.push_back(RealisticCamera::LensElementInterface(-166.7765, 3.09606, 1.713, 10.648));
+    lenses.push_back(RealisticCamera::LensElementInterface(-7.5911, 1.32682, 1.805, 11.44));
+    lenses.push_back(RealisticCamera::LensElementInterface(-16.7662, 3.98068, 1, 12.276));
+    lenses.push_back(RealisticCamera::LensElementInterface(-7.70286, 1.21638, 1.617, 13.42));
+    lenses.push_back(RealisticCamera::LensElementInterface(-11.98328, 11.0, 1.0, 17.996));
+    sensorSize = 40.0;
 
     // * Large aperture spherical lens
     // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 100.0, 1.29, 20.0));
@@ -117,22 +116,22 @@ int main()
     // sensorSize = 500.0;
 
     // * Gaussian lens (50 mm)
-    lenses.push_back(RealisticCamera::LensElementInterface(29.475, 3.76, 1.67, 25.2));
-    lenses.push_back(RealisticCamera::LensElementInterface(84.83, 0.12, 1.0, 25.2));
-    lenses.push_back(RealisticCamera::LensElementInterface(19.275, 4.025, 1.67, 23));
-    lenses.push_back(RealisticCamera::LensElementInterface(40.77, 3.275, 1.699, 23.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(12.75, 5.705, 1.0, 18.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(0, 4.5, 0, 17.1));
-    lenses.push_back(RealisticCamera::LensElementInterface(-14.495, 1.18, 1.603, 17.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(40.77, 6.065, 1.658, 20.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(-20.385, 0.19, 1.0, 20.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(437.065, 3.22, 1.717, 20.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(-39.73, 36.77, 1.0, 20.0));
-    sensorSize = 70.0;
+    // lenses.push_back(RealisticCamera::LensElementInterface(29.475, 3.76, 1.67, 25.2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(84.83, 0.12, 1.0, 25.2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(19.275, 4.025, 1.67, 23));
+    // lenses.push_back(RealisticCamera::LensElementInterface(40.77, 3.275, 1.699, 23.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(12.75, 5.705, 1.0, 18.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(0, 4.5, 0, 17.1));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-14.495, 1.18, 1.603, 17.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(40.77, 6.065, 1.658, 20.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-20.385, 0.19, 1.0, 20.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(437.065, 3.22, 1.717, 20.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-39.73, 36.77, 1.0, 20.0));
+    // sensorSize = 70.0;
 
     RealisticCamera cam3(lenses, vec4(-3,0,0.5,1), 180, 0, nx, ny, sensorSize, 3.0); 
     cam3.gamma = 2;
-    cam3.flipImage = true;
+    cam3.flipImage = false;
     scene.cameras.push_back(&cam3);
 
     // generic vec4 names
@@ -234,7 +233,7 @@ int main()
 
     // * Create and save ray traced image
     Image image(nx, ny);
-    image = rayTracer.takePicture(scene, 2);
+    image = rayTracer.takePicture(scene, 3);
     output << image.dump_ppm();
 
 /*  

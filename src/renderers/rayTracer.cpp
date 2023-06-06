@@ -17,34 +17,14 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
 
     int sampleRate = this->sampleRate;
 
-    std::vector<int> iterV;
-    if (cam->flipImage) {
-        for (int j = (cam->height -1); j >= 0; j--) {
-            iterV.push_back(j);
-        }
-    } else {
-        for (int j = 0; j < cam->height; j++) {
-            iterV.push_back(j);
-        }
-    }
-
-    std::vector<int> iterH;
-    if (cam->flipImage) {
-        for (int i = (cam->width -1); i >= 0; i--) {
-            iterH.push_back(i);
-        }
-    } else {
-        for (int i = 0; i < cam->width; i++) {
-            iterH.push_back(i);
-        }
-    }
-
-    for (int j : iterV)
+    for (int j = 0; j < cam->height; j++)
     {
         if (!(j%10)) std::cout << float(j)/float(cam->height) << "\n";
 
-        for (int i : iterH)
+        for (int i = 0; i < cam->width; i++)
         {
+            int i_ = cam->flipImage ? cam->width - i : i;
+            int j_ = cam->flipImage ? j : cam->height - j;
 
             for (int k = 0; k < sampleRate; k++)
             {
@@ -57,7 +37,7 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
                 ray eyeRay = cam->getEyeRay(i + .5 + randX, j + .5 + randY);
 
                 Hit hit;
-                Color c = output.getPixel(i, j);
+                Color c = output.getPixel(i_, j_);
 
                 if (eyeRay.exitedLenses) {
                     hit = this->traceRay(scene, eyeRay, hit, 0);
@@ -76,13 +56,13 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
                 // c.g += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
                 // c.b += sqrt((hit.pos-cam.eyePoint).length())/sampleRate;
 
-                output.setPixel(i, j, c);
+                output.setPixel(i_, j_, c);
             }
-            Color c = output.getPixel(i, j);
+            Color c = output.getPixel(i_, j_);
             for(auto entry : c.channels) {
                 entry = (float)pow((double)entry, 1/cam->gamma);
             }
-            output.setPixel(i, j, c);
+            output.setPixel(i_, j_, c);
         }
     }
 
