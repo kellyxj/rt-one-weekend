@@ -43,12 +43,12 @@ int main()
 
     // * General scene settings
     // resolution
-    int nx = 400;
-    int ny = 400;
+    int nx = 10;
+    int ny = 10;
 
     RayTracer rayTracer;
     rayTracer.maxDepth = 10;
-    rayTracer.sampleRate = 16;
+    rayTracer.sampleRate = 1;
 
     Scene scene;
     scene.name = "sphere";
@@ -83,24 +83,31 @@ int main()
     // lenses.push_back(RealisticCamera::LensElementInterface(-7.5911, 1.32682, 1.805, 11.44));
     // lenses.push_back(RealisticCamera::LensElementInterface(-16.7662, 3.98068, 1, 12.276));
     // lenses.push_back(RealisticCamera::LensElementInterface(-7.70286, 1.21638, 1.617, 13.42));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-11.98328, 50.0, 1.0, 17.996));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-11.98328, 11.0, 1.0, 17.996));
 
-    // lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 100.0, 1.29, 20.0));
-    // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 80.0, 1.0, 2.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 100.0, 1.29, 20.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 80.0, 1.0, 20.0));
 
     // lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 100.0, 1.29, 20.0));
     // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 80.5, 1.0, 20.0));
 
-    lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 20.0, 1.41, 100.0));
+    lenses.push_back(RealisticCamera::LensElementInterface(110.0, 20.0, 1.41, 100.0));
     lenses.push_back(RealisticCamera::LensElementInterface(0, 20.0, 0, 50.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(110.0, 180.5, 1.0, 10.0)); //thickness = 180.5
+    lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 180.5, 1.0, 10.0)); //thickness = 180.5
 
-    // lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 0.5, 1.41, 100.0));
-    // lenses.push_back(RealisticCamera::LensElementInterface(110.0, 0.0, 1.0, 100.0));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 0.0, 1.0, 100.0));
-    // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 180.0, 1.0, 10.0)); //thickness = 180.5
+    // lenses.push_back(RealisticCamera::LensElementInterface(29.475, 3.76, 1.67, 25.2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(84.83, 0.12, 1.0, 25.2));
+    // lenses.push_back(RealisticCamera::LensElementInterface(19.275, 4.025, 1.67, 23));
+    // lenses.push_back(RealisticCamera::LensElementInterface(40.77, 3.275, 1.699, 23.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(12.75, 5.705, 1.0, 18.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(0, 4.5, 0, 17.1));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-14.495, 1.18, 1.603, 17.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(40.77, 6.065, 1.658, 20.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-20.385, 0.19, 1.0, 20.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(437.065, 3.22, 1.717, 20.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-39.73, 36.77, 1.0, 20.0));
 
-    RealisticCamera cam3(lenses, vec4(-3,0,0.5,1), 180, 0, nx, ny, 20.0, 3.0); 
+    RealisticCamera cam3(lenses, vec4(-3,0,0.5,1), 180, 0, nx, ny, 1000.0, 3.0); 
     cam3.gamma = 2;
     scene.cameras.push_back(&cam3);
 

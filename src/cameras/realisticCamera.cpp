@@ -67,14 +67,14 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
     // Keep looping until you find a ray that makes it out of the lens system
     // Note: for now limited to 10 attempts!
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 100; ++i) {
 
         vec4 rearElementPosn;
 
         if (elementInterfaces.size() > 0) {
             Point2f rearElementSample = uniformDiskSample();
             rearElementPosn = vec4(rearElementSample.x,rearElementSample.y,0);
-            rearElementPosn *= rearElementRadius;
+            rearElementPosn *= rearElementRadius; // scale to size of rear lens aperture
             rearElementPosn += vec4(0,0,lensRearZ, 1); // set w=1 after scaling!
         } else { // this case should be about equivalent to pinhole...
             rearElementPosn = vec4(0,0,diagonal,1);
@@ -82,14 +82,19 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
 
         // Note: rLens is created in camera space!
         rLens.direction = rearElementPosn - rLens.origin;
+        if (debugMode) {
+            std::cout << "Init Camera Space Lens Origin: " << rLens.origin << "\n";
+            std::cout << "Init Camera Space Lens Direction: " << rLens.direction << "\n";
+        }
 
         bool rayExitedLenses = traceLensesFromSensor(rLens, rOut);
         if (rayExitedLenses) {
             rOut.exitedLenses = true;
+            if (debugMode) std::cout << "Times looped: " << i << "\n";
             break;
         }
     }
-
+    if (!rOut.exitedLenses) std::cout << rOut.direction << "\n";
     return rOut;
 }
 
@@ -104,6 +109,7 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
 
     // Now we trace that ray (backwards) through the lens elements 
     for (int i = elementInterfaces.size() - 1; i >= 0; --i) {
+        if (debugMode) std::cout << "Now tracing element: " << i << "\n";
         const LensElementInterface &element = elementInterfaces[i];
         elementZ -= element.thickness;
         float t;
@@ -134,6 +140,7 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
         vec4 pHit = rLens.origin + (rLens.direction * t);
         float r2 = pHit.x * pHit.x + pHit.y * pHit.y;
         if (r2 > element.apertureRadius * element.apertureRadius) {
+            if (debugMode) std::cout << "Hit outside aperture bounds! \n";
             return false;
         }
         rLens.origin = pHit;
@@ -154,6 +161,12 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
                 return false;
             }
             rLens.direction = w;
+        }
+
+        if (debugMode) {
+            std::cout << "After tracing element " << i 
+                      << " the new ray origin is: " << rLens.origin 
+                      << "; and the new ray direction is: " << rLens.direction << "\n";
         }
     }
 
@@ -200,6 +213,7 @@ bool RealisticCamera::traceLensesFromScene(ray &rLens, ray &rOut) {
         }
 
         vec4 pHit = rLens.origin + (rLens.direction * t);
+        if (debugMode) std::cout << "pHit: " << pHit << "\n";
         float r2 = pHit.x * pHit.x + pHit.y * pHit.y;
         if (r2 > element.apertureRadius * element.apertureRadius) {
             return false;
@@ -230,17 +244,19 @@ bool RealisticCamera::traceLensesFromScene(ray &rLens, ray &rOut) {
 
 bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray inRay, float *t, vec4 *n) {
 
+    if (debugMode) std::cout << "radius: " << radius << "; zCenter: " << zCenter << "\n";
+
     // solve for intersection points t0 and t1
     // This is solving for [D^2 t^2 + 2 O D t + O^2 - R^2 = 0] so that A = D^2, B = 2 O D, C = O^2 - R^2
-    // where D = direction vector of the ray, O = vector from ray origin to sphere center, R = sphere radius
-    vec4 o = vec4(0,0,zCenter,1) - inRay.origin; // vector from ray origin to center of the sphere
+    // where D = direction vector of the ray, O = vector from sphere center to ray origin, R = sphere radius
+    vec4 o = inRay.origin - vec4(0,0,zCenter,1);
     float A = inRay.direction.length_squared();
     float B = 2 * inRay.direction.dot(o);
     float C = o.length_squared() - radius*radius;
     float t0, t1;
 
     if (debugMode) {
-        std::cout << "inRay.origin: " << inRay.origin << " inRay.direction: " << inRay.direction << "\n"; 
+        std::cout << "inRay.origin: " << inRay.origin << "; inRay.direction: " << inRay.direction << "\n"; 
         std::cout << "o: " << o << "; A: " << A << "; B: " << B << "; C: " << C << "; discriminant: " << (B*B - 4*A*C) << "\n";
     }
 
@@ -249,12 +265,13 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
         return false;
     }
 
-    if (debugMode) {
-        std::cout << "t0: " << t0 << "; t1: " << t1 << "\n";
-    }
-
     // select the appropriate t based on ray direction and element curvature
     bool useCloserT = (inRay.direction.z > 0) ^ (radius < 0);
+
+    if (debugMode) {
+        std::cout << "useCloserT?: " << useCloserT << "\n";
+        std::cout << "t0: " << t0 << "; t1: " << t1 << "\n";
+    }
 
     *t = useCloserT ? std::min(t0,t1) : std::max(t0,t1);
 
@@ -264,12 +281,16 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
     }
 
     // compute surface normal at intersection point
-    *n = (o + inRay.direction * (*t)).normalize();
+    *n = o + inRay.direction * (*t);
 
-    // We want the normal to be in the same direction as the outgoing vector
-    if (inRay.direction.dot(*n) < 0) {
+    if (debugMode) std::cout << "Calculated Normal: " << *n << "\n";
+
+    // We want the normal to be opposite the incoming vector
+    if ((inRay.direction * -1).dot(*n) < 0) {
         *n = *n * -1;
     }
+
+    *n = (*n).normalize();
 
     return true;
 }
