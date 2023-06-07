@@ -18,7 +18,8 @@ public:
     float gamma;
     float exposure = 1;
 
-    bool flipImage = true;
+    bool flipY = false;
+    bool flipX = false;
 
     virtual ray getEyeRay(float xPos, float yPos) = 0;
     virtual json serialize() = 0;

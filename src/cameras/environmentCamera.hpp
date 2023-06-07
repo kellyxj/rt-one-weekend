@@ -27,6 +27,8 @@ public:
         height = 512;
         pixelWidth = (float)(right - left)/(float)(width);
         pixelHeight = (float)(top - bottom)/(float)(height);
+
+        setFlips();
     }
 
     // Input pan and tilt as degrees!
@@ -39,12 +41,16 @@ public:
         height = h;
         pixelWidth = (float)(right - left)/(float)(width);
         pixelHeight = (float)(top - bottom)/(float)(height);
+
+        setFlips();
     }
 
     void setEyePosition(vec4 pos);
     
     // Input pan and tilt as degrees!
     void setLookDirection(float pan, float tilt);
+
+    void setFlips();
 
     ray getEyeRay(float xPos, float yPos);
 

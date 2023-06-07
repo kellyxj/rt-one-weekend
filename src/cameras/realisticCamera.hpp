@@ -30,8 +30,8 @@ public:
 
     // Note: input diagonal size in mm!
     RealisticCamera(std::vector<LensElementInterface> lenses, vec4 eye, float pan, float tilt, int w, int h, float diagonal, float focusDistance)
-    : elementInterfaces(lenses), eyePoint(eye), panAngle(pan), tiltAngle(tilt), diagonal(diagonal/1000.0), focusDistance(focusDistance) {
-        setLookDirection(pan, tilt);
+    : elementInterfaces(lenses), eyePoint(eye), panAngle(pan+180), tiltAngle(tilt), diagonal(diagonal/1000.0), focusDistance(focusDistance) {
+        setLookDirection(panAngle, tiltAngle);
         width = w;
         height = h;
         computeProperties();

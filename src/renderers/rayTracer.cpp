@@ -20,11 +20,11 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
     for (int j = 0; j < cam->height; j++)
     {
         if (!(j%10)) std::cout << float(j)/float(cam->height) << "\n";
+        int j_ = cam->flipY ? cam->height - j - 1 : j;
 
         for (int i = 0; i < cam->width; i++)
         {
-            int i_ = cam->flipImage ? cam->width - i - 1: i;
-            int j_ = cam->flipImage ? j : cam->height - j - 1;
+            int i_ = cam->flipX ? cam->width - i - 1 : i;
 
             for (int k = 0; k < sampleRate; k++)
             {

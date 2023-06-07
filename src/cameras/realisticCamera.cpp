@@ -50,7 +50,22 @@ void RealisticCamera::computeProperties() {
         rearElementRadius = elementInterfaces.back().apertureRadius;
     }
 
-    // elementInterfaces.back().thickness = focusThickLens(focusDistance);
+    if (focusDistance > 0) { // set focusDistance to 0 to not manually focus
+        float newRearThickness = 0.5f * focusThickLens(focusDistance);
+        if (!std::isnan(newRearThickness)) {
+            elementInterfaces.back().thickness = newRearThickness;
+            std::cout << "New rear lens thickness set to " << newRearThickness
+                    << " to focus at distance " << focusDistance << ".\n";
+        } else {
+            std::cout << "WARNING: could not focus lens to provided focus distance of " 
+                    << focusDistance << ". Using default focus.\n";
+        }
+    } else {
+        if (focusDistance < 0) std::cout << "WARNING: invalid focusDistance, using default.\n";
+    }
+
+    flipX = false;
+    flipY = true;
 }
 
 ray RealisticCamera::getEyeRay(float xPos, float yPos) {
@@ -94,7 +109,6 @@ ray RealisticCamera::getEyeRay(float xPos, float yPos) {
             break;
         }
     }
-    // if (!rOut.exitedLenses) std::cout << rOut.direction << "\n";
     return rOut;
 }
 
@@ -190,8 +204,9 @@ bool RealisticCamera::traceLensesFromSensor(ray &rLens, ray &rOut) {
     return true;
 }
 
-bool RealisticCamera::traceLensesFromScene(ray &rLens, ray &rOut) {
+bool RealisticCamera::traceLensesFromScene(ray &rIn, ray &rOut) {
     float elementZ = -lensFrontZ;
+    ray rLens = rIn;
     rLens.direction.z *= -1;
     rLens.origin.z *= -1;
 
@@ -282,40 +297,32 @@ bool RealisticCamera::intersectSphericalElement(float radius, float zCenter, ray
 
     // compute surface normal at intersection point
     *n = o + inRay.direction * (*t);
-
-    if (debugMode) std::cout << "Calculated Normal: " << *n << "\n";
-
-    // We want the normal to be opposite the incoming vector
     if ((inRay.direction * -1).dot(*n) < 0) {
         *n = *n * -1;
     }
-
     *n = (*n).normalize();
+
+    if (debugMode) std::cout << "Calculated Normal: " << *n << "\n";
 
     return true;
 }
 
 void RealisticCamera::computeCardinalPoints(ray &rIn, ray &rOut, float *pz, float *fz) {
-    // std::cout << "rOut: " << rOut.origin << "\n";
-    float tf = abs(rOut.origin.x / rOut.direction.x);
+    float tf = -rOut.origin.x / rOut.direction.x;
     *fz = -(rOut.origin + rOut.direction * tf).z;
-    // std::cout << "fz: " << *fz << "\n";
-    float tp = abs((rIn.origin.x - rOut.origin.x) / rOut.direction.x);
+    float tp = (rIn.origin.x - rOut.origin.x) / rOut.direction.x;
     *pz = -(rOut.origin + rOut.direction * tp).z;
-    // std::cout << "pz: " << *pz << "\n";
 }
 
 void RealisticCamera::computeThickLensApproximation(float pz[2], float fz[2]) {
     // find height x from optical axis for parallal rays 
     // -- measured as small portion of sensor's diagonal extent
-    float x = 0.1 * diagonal; // ! 0.001?
+    float x = 0.001 * diagonal;
 
     // compute cardinal points for sensor side of lens system
     ray rScene;
-    rScene.origin = vec4(x,0,-lensFrontZ-1,1);
-    rScene.direction = vec4(0,0,1,0);
-    // rScene.origin = vec4(x,0,lensFrontZ+1,1);
-    // rScene.direction = vec4(0,0,-1,0);
+    rScene.origin = vec4(x,0,lensFrontZ+1,1);
+    rScene.direction = vec4(0,0,-1,0);
     ray rSensor;
     traceLensesFromScene(rScene, rSensor);
     if (debugMode) {
@@ -325,10 +332,8 @@ void RealisticCamera::computeThickLensApproximation(float pz[2], float fz[2]) {
     computeCardinalPoints(rScene, rSensor, &pz[0], &fz[0]);
 
     // compute cardinal points for scene side of lens system
-    rSensor.origin = vec4(x,0,-lensRearZ+1,1);
-    rSensor.direction = vec4(0,0,-1,0);
-    // rSensor.origin = vec4(x,0,lensRearZ-1,1);
-    // rSensor.direction = vec4(0,0,1,0);
+    rSensor.origin = vec4(x,0,lensRearZ-1,1);
+    rSensor.direction = vec4(0,0,1,0);
     traceLensesFromSensor(rSensor, rScene);
     if (debugMode) {
         std::cout << "rScene.direction: " << rScene.direction << "\n" << "rScene.origin: " << rScene.origin << "\n";
@@ -346,7 +351,8 @@ float RealisticCamera::focusThickLens(float focusDistance) {
     float z = -focusDistance;
     float delta = 0.5f * (pz[1] - z + pz[0] - sqrt((pz[1] - z - pz[0]) * (pz[1] - z - 4*f - pz[0])));
 
-    std::cout << "Rear Thickness Delta: " << delta << "\n";
+    if (debugMode) std::cout << "Rear Thickness Delta: " << delta << "\n";
+    // std::cout << delta << " " << elementInterfaces.back().thickness << " " << elementInterfaces.back().thickness + delta << "\n\n";
 
     return elementInterfaces.back().thickness + delta;
 }

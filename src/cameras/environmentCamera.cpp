@@ -9,6 +9,11 @@ void EnvironmentCamera::setLookDirection(float pan, float tilt) {
     tiltAngle = PI*tilt/180.0;
 }
 
+void EnvironmentCamera::setFlips() {
+    flipX = true;
+    flipY = false;
+}
+
 ray EnvironmentCamera::getEyeRay(float xPos, float yPos) {
     float posU = left + xPos * pixelWidth;
     float posV = bottom + yPos * pixelHeight;

@@ -48,7 +48,7 @@ int main()
 
     RayTracer rayTracer;
     rayTracer.maxDepth = 10;
-    rayTracer.sampleRate = 16;
+    rayTracer.sampleRate = 1;
 
     Scene scene;
     scene.name = "sphere";
@@ -56,48 +56,48 @@ int main()
     scene.backgroundColor = white;
     
     // * Scene Camera(s)
-    EnvironmentCamera cam0(vec4(-3, 0, 0.5, 1), nx, ny, 180, 0);
+    PinholeCamera cam0(vec4(-3, 0, 0.5, 1), 0, 0, nx, ny, 1, 90, nx/ny);
     cam0.gamma = 2;
     scene.cameras.push_back(&cam0);
 
-    PinholeCamera cam1(vec4(-3, 0, 0.5, 1), 0, 0, nx, ny, 1, 90, nx/ny);
+    EnvironmentCamera cam1(vec4(-3, 0, 0.5, 1), nx, ny, 180, 0);
     cam1.gamma = 2;
     scene.cameras.push_back(&cam1);
 
     ThinLensCamera cam2(vec4(-3, 0, 0.5, 1), 0, 0, nx, ny, 1, 90, nx/ny);
     cam2.gamma = 2;
-    cam2.apertureRadius = 0.1;
+    cam2.apertureRadius = 0.2;
     cam2.focalDistance = 3;
     scene.cameras.push_back(&cam2);
 
     float sensorSize = 50.0;
     std::vector<RealisticCamera::LensElementInterface> lenses;
 
-    // * Small aperture spherical lens
-    // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 100.0, 1.29, 20.0));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 80.0, 1.0, 2.0));
-    // sensorSize = 34.0;
+    // * Large aperture spherical lens (in focus)
+    // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 100.0, 1.29, 50.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 60.0, 1.0, 50.0));
+    // sensorSize = 165.0;
 
-    // * Large aperture spherical lens
-    // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 100.0, 1.29, 20.0));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 80.0, 1.0, 20.0));
-    // sensorSize = 75.0;
+    // * Large aperture spherical lens (out of focus)
+    // lenses.push_back(RealisticCamera::LensElementInterface(50.0, 100.0, 1.29, 50.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-50.0, 100.0, 1.0, 50.0));
+    // sensorSize = 222.0;
 
     // * Biconvex lens
     // lenses.push_back(RealisticCamera::LensElementInterface(110.0, 20.0, 1.41, 100.0));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 180.5, 1.0, 10.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 40, 1.0, 10.0));
     // sensorSize = 1000.0;
 
     // * Biconvex lens with aperture stop
-    lenses.push_back(RealisticCamera::LensElementInterface(110.0, 10.0, 1.41, 100.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(0, 10.0, 0, 50.0));
-    lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 180.5, 1.0, 10.0));
-    sensorSize = 1000.0;
+    // lenses.push_back(RealisticCamera::LensElementInterface(110.0, 10.0, 1.41, 100.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(0, 10.0, 0, 50.0));
+    // lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 180.5, 1.0, 10.0));
+    // sensorSize = 1000.0;
 
     // * Biconcave lens
-    // lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 20.0, 1.41, 100.0));
-    // lenses.push_back(RealisticCamera::LensElementInterface(110.0, 140.0, 1.0, 1.0)); // Note the small aperture!
-    // sensorSize = 500.0;
+    lenses.push_back(RealisticCamera::LensElementInterface(-110.0, 20.0, 1.41, 100.0));
+    lenses.push_back(RealisticCamera::LensElementInterface(110.0, 140.0, 1.0, 10.0)); // Note the small aperture!
+    sensorSize = 660.0;
 
     // * PBRT Wide angle lens (22mm)
     // lenses.push_back(RealisticCamera::LensElementInterface(35.98738, 1.21638, 1.54, 23.716));
@@ -112,8 +112,8 @@ int main()
     // lenses.push_back(RealisticCamera::LensElementInterface(-7.5911, 1.32682, 1.805, 11.44));
     // lenses.push_back(RealisticCamera::LensElementInterface(-16.7662, 3.98068, 1, 12.276));
     // lenses.push_back(RealisticCamera::LensElementInterface(-7.70286, 1.21638, 1.617, 13.42));
-    // lenses.push_back(RealisticCamera::LensElementInterface(-11.98328, 11.0, 1.0, 17.996));
-    // sensorSize = 40.0;
+    // lenses.push_back(RealisticCamera::LensElementInterface(-11.98328, 14.0, 1.0, 17.996));
+    // sensorSize = 60.0;
 
     // * Gaussian lens (50 mm)
     // lenses.push_back(RealisticCamera::LensElementInterface(29.475, 3.76, 1.67, 25.2));
@@ -144,9 +144,8 @@ int main()
     // lenses.push_back(RealisticCamera::LensElementInterface(-15.0404, 23.0, 1, 6.52));
     // sensorSize = 38.0;
 
-    RealisticCamera cam3(lenses, vec4(-3,0,0.5,1), 180, 0, nx, ny, sensorSize, 3.0); 
+    RealisticCamera cam3(lenses, vec4(-3,0,0.5,1), 0.0, 0.0, nx, ny, sensorSize, 0.0); 
     cam3.gamma = 2;
-    cam3.flipImage = false;
     scene.cameras.push_back(&cam3);
 
     // generic vec4 names
