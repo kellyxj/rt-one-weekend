@@ -7,6 +7,7 @@
 #include "../materials/glass.hpp" 
 #include "../materials/mirror.hpp"
 #include "../materials/groundGrid.hpp"
+#include "../materials/groundCheckerboard.hpp"
 #include "../hit.hpp"
 #include "../math/vec4.hpp"
 enum class GeometryType {none, plane, sphere, square, mesh, triangle, bvh};

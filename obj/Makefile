@@ -2,7 +2,7 @@ CXXFLAGS=-Wall -O2 -std=c++17
 CXX=g++
 LDLIBS=-lstdc++fs
 
-objects = main.o vec4.o color.o ray.o pinholeCamera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o baseMaterial.o square.o mirror.o glass.o \
+objects = main.o vec4.o color.o ray.o pinholeCamera.o geometry.o mat4.o plane.o scene.o image.o rayTracer.o sphere.o groundGrid.o groundCheckerboard.o baseMaterial.o square.o mirror.o glass.o film.o\
 triangle.o mesh.o bvh.o scene_loader.o light.o rectangleLight.o spectralRenderer.o
 VPATH = ../src:../src/geometry:../src/materials:../src/renderers:../bin:../src/util:../src/math:../src/lights:../src/cameras
 
@@ -21,12 +21,13 @@ color.o: color.cpp
 camera.o: camera.cpp vec4.hpp ray.hpp
 pinholeCamera.o: pinholeCamera.cpp camera.hpp
 mat4.o: mat4.cpp vec4.hpp
-geometry.o: geometry.cpp vec4.hpp mat4.hpp material.hpp hit.hpp baseMaterial.hpp glass.hpp mirror.hpp groundGrid.hpp
+geometry.o: geometry.cpp vec4.hpp mat4.hpp material.hpp hit.hpp baseMaterial.hpp glass.hpp film.hpp mirror.hpp groundGrid.hpp groundCheckerboard.hpp
 plane.o: plane.cpp geometry.hpp
-rayTracer.o: rayTracer.cpp scene.hpp image.hpp geometry.hpp hit.hpp material.hpp sphere.hpp plane.hpp groundGrid.hpp
+rayTracer.o: rayTracer.cpp scene.hpp image.hpp geometry.hpp hit.hpp material.hpp sphere.hpp plane.hpp groundGrid.hpp groundCheckerboard.hpp
 square.o: square.cpp geometry.hpp
 mirror.o: mirror.cpp material.hpp
 glass.o: glass.cpp material.hpp
+film.o: film.cpp material.hpp
 triangle.o: triangle.cpp geometry.hpp
 mesh.o: mesh.cpp triangle.hpp bvh.hpp
 bvh.o: bvh.cpp geometry.hpp

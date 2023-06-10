@@ -10,6 +10,7 @@ public:
     vec4 direction;
     Color color;
     IOR n_i;
+    Color pdf = white;
 
     ray(): origin(vec4()), direction(vec4()) {
         n_i.spectrum = white;

@@ -6,12 +6,12 @@ Color groundGrid::getColor(vec4 & pos) {
     double intPart;
 
     if(modf(xPos, &intPart) > .95 || modf(xPos, &intPart) < -.95 || modf(yPos, &intPart) > .95 || modf(yPos, &intPart) < -.95) {
-        return green;
+        return black;
     }
     else if((modf(xPos, &intPart) >= 0 && modf(xPos, &intPart) < .05) || (modf(yPos, &intPart) >= 0 && modf(yPos, &intPart) < .05) || 
         (modf(xPos, &intPart) <= 0 && modf(xPos, &intPart) > -.05) || (modf(yPos, &intPart) <= 0 && modf(yPos, &intPart) > -.05)) 
     {
-        return green;
+        return black;
     }
     else {
         return white;
