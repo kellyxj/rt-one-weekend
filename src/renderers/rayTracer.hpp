@@ -6,6 +6,7 @@
 #include "../image.hpp"
 #include "../materials/mirror.hpp"
 #include "../materials/glass.hpp"
+#include "../materials/film.hpp"
 #include "../hit.hpp"
 
 enum class RenderMode {direct, hemisphere, brdf};

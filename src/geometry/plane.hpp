@@ -1,5 +1,6 @@
 #include "geometry.hpp"
 #include "../materials/groundGrid.hpp"
+#include "../materials/groundCheckerboard.hpp"
 
 class Plane : public Geometry {
 public:

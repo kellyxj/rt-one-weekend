@@ -13,6 +13,7 @@ enum class MaterialType
     none,
     diffuse,
     groundGrid,
+    groundCheckerboard,
     dielectric,
     conductor
 };

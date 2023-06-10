@@ -19,4 +19,5 @@ public:
     vec4 getNormal(vec4 &pos, ray &inRay);
 
     json serialize();
+    bool dirctional = false;
 };

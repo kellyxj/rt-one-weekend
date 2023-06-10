@@ -3,7 +3,7 @@
 
 Image RayTracer::takePicture(Scene &scene, int camIndex)
 {
-    Camera* cam = (scene.cameras[camIndex]);
+    Camera *cam = (scene.cameras[camIndex]);
     Image output(cam->width, cam->height);
     for (int i = 0; i < output.width; i++)
     {
@@ -50,8 +50,9 @@ Image RayTracer::takePicture(Scene &scene, int camIndex)
                 output.setPixel(i, j, c);
             }
             Color c = output.getPixel(i, j);
-            for(auto entry : c.channels) {
-                entry = (float)pow((double)entry, 1/cam->gamma);
+            for (auto entry : c.channels)
+            {
+                entry = (float)pow((double)entry, 1 / cam->gamma);
             }
             output.setPixel(i, j, c);
         }
@@ -79,7 +80,9 @@ Hit RayTracer::traceRay(Scene &scene, ray &eyeRay, Hit &hit, int depth)
             closest = current;
         }
     }
+    // closest.pdf = hit.pdf * eyeRay.pdf;
     this->findShade(scene, closest, depth);
+
     return closest;
 }
 
@@ -131,7 +134,7 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
         // direct light contribution
         Hit shadowHit;
         ray shadowRay;
-        //light importance sampling strategy
+        // light importance sampling strategy
         for (Geometry *light : scene.lights)
         {
             Light *light_ = dynamic_cast<Light *>(light);
@@ -152,24 +155,25 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
                 float brdf = hit.material->sampleBrdf(hit.inRay, shadowRay, hit.pos);
 
                 float area = light_->area();
-                float solidAngle = area * shadowHit.normal.dot(lightVec) * -1/(distance_squared);
+                float solidAngle = area * shadowHit.normal.dot(lightVec) * -1 / (distance_squared);
                 lightPdf = solidAngle;
 
                 hemispherePdf = hemisphereSampler.sampleBrdf(hit.inRay, shadowRay, hit.pos);
-                //float powerHeuristic = (lightPdf * lightPdf)/(hemispherePdf * hemispherePdf + lightPdf * lightPdf);
-                float balanceHeuristic = lightPdf/(hemispherePdf + lightPdf);
+                // float powerHeuristic = (lightPdf * lightPdf)/(hemispherePdf * hemispherePdf + lightPdf * lightPdf);
+                float balanceHeuristic = lightPdf / (hemispherePdf + lightPdf);
 
                 Color radiance = (shadowHit.material->getColor(shadowHit.modelSpacePos)) * shadowHit.brightness;
                 radiance *= solidAngle * lambertian;
                 hit.color += radiance * brdf * balanceHeuristic;
             }
         }
-        //hemisphere direct light sampling strategy
+        // hemisphere direct light sampling strategy
         shadowRay = hemisphereSampler.scatter(hit.inRay, hit.pos, hit.normal);
         shadowHit.brightness = 0;
         shadowHit = traceShadowRay(scene, shadowRay, shadowHit);
-        
-        if(shadowHit.brightness > 0) {
+
+        if (shadowHit.brightness > 0)
+        {
             vec4 lightVec = shadowHit.pos - hit.pos;
             float distance_squared = lightVec.length_squared();
             lightVec.normalize();
@@ -180,10 +184,10 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
             float brdf = hit.material->sampleBrdf(hit.inRay, shadowRay, hit.pos);
 
             hemispherePdf = hemisphereSampler.sampleBrdf(hit.inRay, shadowRay, hit.pos);
-            Light* light = ((Light*)shadowHit.geometry);
-            lightPdf = light->area() * shadowHit.normal.dot(lightVec) * -1/(distance_squared);
-            //float powerHeuristic = (hemispherePdf * hemispherePdf)/(hemispherePdf * hemispherePdf + lightPdf * lightPdf);
-            float balanceHeuristic = hemispherePdf/(hemispherePdf + lightPdf);
+            Light *light = ((Light *)shadowHit.geometry);
+            lightPdf = light->area() * shadowHit.normal.dot(lightVec) * -1 / (distance_squared);
+            // float powerHeuristic = (hemispherePdf * hemispherePdf)/(hemispherePdf * hemispherePdf + lightPdf * lightPdf);
+            float balanceHeuristic = hemispherePdf / (hemispherePdf + lightPdf);
 
             Color radiance = (shadowHit.material->getColor(shadowHit.modelSpacePos)) * shadowHit.brightness;
             radiance *= hitColor * lambertian;
@@ -194,7 +198,7 @@ void RayTracer::findShade(Scene &scene, Hit &hit, int depth)
         ray reflectedRay;
         // BRDF importance sampling
         reflectedRay = hit.material->scatter(hit.inRay, hit.pos, hit.normal);
-
+        hit.color *= reflectedRay.pdf;
         if (depth < this->maxDepth)
         {
             bounceHit = this->traceRay(scene, reflectedRay, bounceHit, depth + 1);

@@ -19,6 +19,7 @@ public:
 
     Material* material;
     Color color = black;
+    Color pdf = white;
 };
 
 inline std::ostream& operator << (std::ostream &os, const Hit &h) {

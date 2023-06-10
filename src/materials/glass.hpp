@@ -6,7 +6,7 @@
 class Glass: public Material {
 public:
     MaterialType type = MaterialType::dielectric;
-    bool isDelta =true;
+    bool isDelta = true;
 
     IOR n_i;
     Color c;

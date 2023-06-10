@@ -44,6 +44,9 @@ Hit RectangleLight::trace(ray &inRay)
         hit.pos = inRay.origin + (inRay.direction * t0);
         hit.modelSpacePos = modelSpacePos;
         hit.normal = this->getNormal(hit.pos, ray);
+        if(dirctional && hit.normal.dot(inRay.direction) > -0.9995) {
+           return Hit();
+        }
         hit.material = this->material;
         hit.brightness = this->material->brightness;
         hit.inRay = inRay;
